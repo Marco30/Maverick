@@ -3,21 +3,19 @@ import { CommonModule } from '@angular/common';
 
 import { MainViewRoutingModule } from './main-view-routing.module';
 import { MainViewComponent } from './main-view.component';
-import { AiChatComponent } from '../components/ai-chat/ai-chat.component';
-import { FormsModule } from '@angular/forms';
-import { HttpClientModule } from '@angular/common/http';
+import { SideMenuComponent } from '../components/side-menu/side-menu.component';
+
+
 
 
 @NgModule({
   declarations: [
     MainViewComponent,
-    AiChatComponent
+    SideMenuComponent
   ],
   imports: [
     CommonModule,
-    MainViewRoutingModule,
-    FormsModule,
-    HttpClientModule
+    MainViewRoutingModule
   ]
 })
 export class MainViewModule { }

@@ -1,0 +1,31 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-left">
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#side-menu" aria-controls="side-menu" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+  
+    <div class="collapse navbar-collapse" id="side-menu">
+      <ul class="navbar-nav flex-column">
+        
+        <li class="nav-item" *ngFor="let item of menuItems">
+          <a class="nav-link" [href]="item.link || '#'" (click)="toggleSubItems(item, $event)">
+            <i [ngClass]="item.icon"></i>
+            {{ item.text }}
+            <i class="fas fa-caret-down float-right" *ngIf="item.subItems"></i>
+          </a>
+          <div *ngIf="item.subItems && item.showSubItems">
+            <ul class="navbar-nav flex-column ml-3">
+              <li class="nav-item" *ngFor="let subItem of item.subItems">
+                <a class="nav-link" [href]="item.link || '#'">
+                  <i [ngClass]="subItem.icon"></i>
+                  {{ subItem.text }}
+                </a>
+              </li>
+            </ul>
+          </div>
+        </li>
+        
+      </ul>
+    </div>
+  
+  </nav>
+  

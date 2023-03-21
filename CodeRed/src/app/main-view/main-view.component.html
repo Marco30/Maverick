@@ -2,33 +2,16 @@
     <div class="row h-100">
       <div class="col-md-auto bg-light" id="sidebar">
         <!-- Sidebar content goes here -->
+        <app-side-menu></app-side-menu>
       
-      
-        <nav class="sidebar">
-          <ul class="nav flex-column">
-            <li class="nav-item">
-              <a class="nav-link active" href="#">Active</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#">Link</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#">Link</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link disabled" href="#">Disabled</a>
-            </li>
-          </ul>
-        </nav>
+
       </div>
 
 
-      <div class="col-md-9" id="content">
+      <div class="col-md" id="content">
         <!-- Main content area -->
 
-        <app-ai-chat></app-ai-chat>
-
-        <!--<router-outlet></router-outlet>-->
+       <router-outlet></router-outlet>
 
       </div>
     </div>
