@@ -3,19 +3,23 @@ import { CommonModule } from '@angular/common';
 
 import { MainViewRoutingModule } from './main-view-routing.module';
 import { MainViewComponent } from './main-view.component';
-import { SideMenuComponent } from '../components/side-menu/side-menu.component';
 
 
+import { DragDropModule } from '@angular/cdk/drag-drop';
+import { SidebarComponent } from '../components/sidebar/sidebar.component';
+import { NavigationMenuComponent } from '../components/navigation-menu/navigation-menu.component';
 
 
 @NgModule({
   declarations: [
     MainViewComponent,
-    SideMenuComponent
+    NavigationMenuComponent,
+    SidebarComponent
   ],
   imports: [
     CommonModule,
-    MainViewRoutingModule
+    MainViewRoutingModule,
+    DragDropModule
   ]
 })
 export class MainViewModule { }

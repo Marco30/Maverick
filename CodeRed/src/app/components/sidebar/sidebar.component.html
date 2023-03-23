@@ -1,0 +1,38 @@
+
+<div class="sticky">
+
+    <div class="row ">
+        <div class="col-md-12">
+          <button class="btn btn-primary" (click)="toggleDragMode()">
+            {{ dragMode ? 'Stop dragging' : 'Start dragging' }}
+          </button>
+      
+          <div class="list-group" cdkDropList [cdkDropListData]="items" (cdkDropListDropped)="onDrop($event)">
+            <div class="list-group-item" cdkDrag [cdkDragDisabled]="!dragMode">
+              {{ items[0].name }} test
+              <button (click)="toggleCollapse(0)">Toggle Collapse</button>
+              <div *ngIf="!isCollapsed[0]">
+                <app-navigation-menu></app-navigation-menu>
+              </div>
+            </div>
+            <div class="list-group-item" cdkDrag [cdkDragDisabled]="!dragMode">
+              {{ items[1].name }}
+              <button (click)="toggleCollapse(1)">Toggle Collapse</button>
+              <div *ngIf="!isCollapsed[1]">
+                <p>Column 2 content goes here</p>
+              </div>
+            </div>
+            <div class="list-group-item" cdkDrag [cdkDragDisabled]="!dragMode">
+              {{ items[2].name }}
+              <button (click)="toggleCollapse(2)">Toggle Collapse</button>
+              <div *ngIf="!isCollapsed[2]">
+                <p>Column 3 content goes here</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+    </div>
+      
+  

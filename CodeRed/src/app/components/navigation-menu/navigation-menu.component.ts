@@ -2,11 +2,11 @@ import { Component } from '@angular/core';
 import { MenuItem } from 'src/app/model/menu-item';
 
 @Component({
-  selector: 'app-side-menu',
-  templateUrl: './side-menu.component.html',
-  styleUrls: ['./side-menu.component.css']
+  selector: 'app-navigation-menu',
+  templateUrl: './navigation-menu.component.html',
+  styleUrls: ['./navigation-menu.component.css']
 })
-export class SideMenuComponent {
+export class NavigationMenuComponent {
 
   menuItems: MenuItem[] = [
     new MenuItem('Home', 'fas fa-home', undefined, '/home'),
