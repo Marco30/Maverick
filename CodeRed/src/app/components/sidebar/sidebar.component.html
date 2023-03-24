@@ -1,14 +1,18 @@
-<div class="sticky">
+<div class="dark sticky">
   <div class="row">
     <div class="col-md-12">
-      <button class="btn btn-primary" (click)="toggleDragMode()">
+      <button class="btn btn-primary btn-icon" (click)="toggleDragMode()">
+        <i class="fas fa-arrows-alt"></i>
         {{ dragMode ? 'Stop dragging' : 'Start dragging' }}
       </button>
 
       <div class="list-group" cdkDropList [cdkDropListData]="items" (cdkDropListDropped)="onDrop($event)">
         <div class="list-group-item" cdkDrag [cdkDragDisabled]="!dragMode" *ngFor="let item of items; let i = index">
           {{ item.name }}
-          <button (click)="toggleCollapse(i)">Toggle Collapse</button>
+          <button class="btn-collapse" (click)="toggleCollapse(i)">
+            <i class="fas fa-chevron-down" *ngIf="isCollapsed[i]"></i>
+            <i class="fas fa-chevron-up" *ngIf="!isCollapsed[i]"></i>
+          </button>
           <div *ngIf="!isCollapsed[i]">
             <div *ngIf="item.data">
               <ng-container *ngComponentOutlet="item.data"></ng-container>

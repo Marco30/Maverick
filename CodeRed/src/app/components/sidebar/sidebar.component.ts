@@ -18,9 +18,9 @@ export class SidebarComponent {
   dragMode = false;
   isCollapsed = [false, false, false];
   items = [
-    { name: 'Column 1', data: NavigationMenuComponent, position: 0 },
-    { name: 'Column 2', data: null, position: 1 },
-    { name: 'Column 3', data: null, position: 2 },
+    { name: 'Toolbar 1', data: NavigationMenuComponent, position: 0 },
+    { name: 'Toolbar 2', data: null, position: 1 },
+    { name: 'Toolbar 3', data: null, position: 2 },
   ];
 
   // Inject ElementRef and Renderer2 into the constructor

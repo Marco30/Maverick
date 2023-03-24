@@ -1,19 +1,158 @@
-.card-header {
-    cursor: pointer;
-  }
-  
-  .card-header:hover {
-    background-color: #f1f1f1;
-  }
-  
-  .card-body-placeholder {
-    border: 2px dotted #ccc;
-    min-height: 100px;
-    margin-bottom: 10px;
-  }
+:host {
+  --dark-bg-color: #333;
+  --dark-text-color: #fff;
+  --dark-primary-color: #007bff;
+  --dark-primary-border-color: #007bff;
+  --dark-primary-hover-color: #0069d9;
+  --dark-primary-hover-border-color: #0062cc;
+  --dark-list-item-bg-color: #444;
+  --dark-list-item-text-color: #fff;
+  --dark-list-item-hover-bg-color: #555;
+  --dark-icon-btn-bg-color: #343a40;
+  --dark-icon-btn-text-color: #fff;
+  --dark-icon-btn-hover-bg-color: #23272b;
+  --dark-collapse-btn-text-color: #f6f6f7;
+  --dark-collapse-btn-hover-text-color: #f8f8f8;
+}
+
+:host {
+  --Light-bg-color: #fff;
+  --Light-text-color: #333;
+  --Light-btn-primary-bg-color: #007bff;
+  --Light-btn-primary-border-color: #007bff;
+  --Light-btn-primary-hover-bg-color: #0069d9;
+  --Light-btn-primary-hover-border-color: #0062cc;
+  --Light-list-group-item-bg-color: #fff;
+  --Light-list-group-item-color: #333;
+  --Light-list-group-item-hover-bg-color: #f2f2f2;
+  --Light-list-group-item-hover-color: #333;
+  --Light-btn-collapse-bg-color: #fff;
+  --Light-btn-collapse-color: #333;
+  --Light-btn-collapse-hover-bg-color: #f2f2f2;
+  --Light-btn-collapse-hover-color: #333;
+  --Light-chevron-color: #333;
+}
 
   .sticky {
     position: -webkit-sticky;
     position: sticky;
     top: 0;
   }
+
+.btn-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  padding: 5px 10px;
+}
+
+.btn-icon:hover {
+  background-color: #0062cc;
+  color: #fff;
+}
+
+.btn-collapse {
+  background-color: transparent;
+  border: none;
+  color: #007bff;
+  cursor: pointer;
+  padding: 0;
+}
+
+.btn-collapse:hover {
+  color: #0056b3;
+}
+
+
+  /* Light theme */
+  
+  .light {
+    background-color: var(--Light-bg-color);
+    color: var(--Light-text-color);
+  }
+  
+  .light .btn-primary {
+    background-color: var(--Light-btn-primary-bg-color);
+    border-color: var(--Light-btn-primary-border-color);
+  }
+  
+  .light .btn-primary:hover {
+    background-color: var(--Light-btn-primary-hover-bg-color);
+    border-color: var(--Light-btn-primary-hover-border-color);
+  }
+  
+  .light .list-group-item {
+    background-color: var(--Light-list-group-item-bg-color);
+    color: var(--Light-list-group-item-color);
+  }
+  
+  .light .list-group-item:hover {
+    background-color: var(--Light-list-group-item-hover-bg-color);
+    color: var(--Light-list-group-item-hover-color);
+  }
+  
+  .light .btn-collapse {
+    background-color: var(--Light-btn-collapse-bg-color);
+    color: var(--Light-btn-collapse-color);
+  }
+  
+  .light .btn-collapse:hover {
+    background-color: var(--Light-btn-collapse-hover-bg-color);
+    color: var(--Light-btn-collapse-hover-color);
+  }
+  
+  .light .fa-chevron-up,
+  .light .fa-chevron-down {
+    color: var(--Light-chevron-color);
+  }
+  
+/* Dark theme */
+
+
+.dark {
+  background-color: var(--dark-bg-color);
+  color: var(--dark-text-color);
+}
+
+.dark .btn-primary {
+  background-color: var(--dark-primary-color);
+  border-color: var(--dark-primary-border-color);
+}
+
+.dark .btn-primary:hover {
+  background-color: var(--dark-primary-hover-color);
+  border-color: var(--dark-primary-hover-border-color);
+}
+
+.dark .list-group-item {
+  background-color: var(--dark-list-item-bg-color);
+  color: var(--dark-list-item-text-color);
+}
+
+.dark .list-group-item:hover {
+  background-color: var(--dark-list-item-hover-bg-color);
+  color: var(--dark-list-item-text-color);
+}
+
+.dark .btn-icon {
+  background-color: var(--dark-icon-btn-bg-color);
+  color: var(--dark-icon-btn-text-color);
+}
+
+.dark .btn-icon:hover {
+  background-color: var(--dark-icon-btn-hover-bg-color);
+  color: var(--dark-icon-btn-text-color);
+}
+
+.dark .btn-collapse {
+  color: var(--dark-collapse-btn-text-color);
+}
+
+.dark .btn-collapse:hover {
+  color: var(--dark-collapse-btn-hover-text-color);
+}
