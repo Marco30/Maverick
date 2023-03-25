@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ElementRef, Renderer2, ViewChild } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
 @Component({
@@ -9,8 +9,10 @@ import { HttpClient } from '@angular/common/http';
 export class AiChatComponent {
   messages: any[] = [];
   newMessage: string = '';
+  @ViewChild('chatContainer', {static: false}) private chatContainer: ElementRef | null = null;
+  @ViewChild('submitContainer', {static: false}) private submitContainer: ElementRef | null = null;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient,private renderer: Renderer2) {}
 
   ngOnInit() {
     console.info('Marco test');
@@ -21,10 +23,42 @@ export class AiChatComponent {
       { sender: 'Bot', content: 'Sure! Our product is designed to...' },
       { sender: 'User', content: 'That sounds great. How do I get started?' },
       { sender: 'Bot', content: 'You can get started by...' },
+      { sender: 'Bot', content: 'Hi there! How can I help you?' },
+      { sender: 'User', content: 'Can you tell me more about your product?' },
+      { sender: 'Bot', content: 'Sure! Our product is designed to...' },
+      { sender: 'User', content: 'That sounds great. How do I get started?' },
+      { sender: 'Bot', content: 'You can get started by...' },
+      { sender: 'Bot', content: 'Hi there! How can I help you?' },
+      { sender: 'User', content: 'Can you tell me more about your product?' },
+      { sender: 'Bot', content: 'Sure! Our product is designed to...' },
+      { sender: 'User', content: 'That sounds great. How do I get started?' },
+      { sender: 'Bot', content: 'You can get started by...' },
     ];
 
     this.exampleAnswers();
   }
+
+  ngAfterViewInit() {
+    // scroll to bottom of chat container
+    if (this.chatContainer) {
+      this.scrollToLastMessage()
+    }
+  }
+
+  scrollToLastMessage(): void {
+ 
+    if (this.chatContainer) {
+      const element = this.chatContainer.nativeElement;
+      const lastMessage = element.lastElementChild;
+      if (lastMessage) {
+        lastMessage.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+    }
+ 
+
+  }
+
+ 
 
   exampleAnswers() {
     this.messages.push({
