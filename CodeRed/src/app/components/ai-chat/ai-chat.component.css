@@ -1,5 +1,13 @@
 @import url('/src/styles.css');
   
+.ai-chat{
+  background-color: var(--border-color);
+
+
+ 
+}
+
+
   .chat-container {
     overflow-y: auto;
   }
@@ -9,7 +17,7 @@
     padding: 0px 30px 0px 30px;
   }
 
-  .sticky {
+  .submit-sticky {
     position: -webkit-sticky;
     position: sticky;
     bottom: 0;
