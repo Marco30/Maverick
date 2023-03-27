@@ -6,7 +6,7 @@ import { Component } from '@angular/core';
   styleUrls: ['./login-view.component.css']
 })
 export class LoginViewComponent {
-
+  isDarkMode = false;
   showRegistrationForm = false;
 
   loginData = {
@@ -24,6 +24,10 @@ export class LoginViewComponent {
   constructor() { }
 
   ngOnInit() {
+  }
+
+  toggleDarkMode() {
+    this.isDarkMode = !this.isDarkMode;
   }
 
   login() {
