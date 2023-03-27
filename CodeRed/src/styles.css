@@ -1,8 +1,72 @@
 /* You can add global styles to this file, and also import other style files */
 :root {
-    --primary-color: #007bff;
-    --secondary-color: #444;
-    --background-color: #1e1e1e;
-    --border-color: #353740;
-    --text-color: #fff;
-  }
+  --background-color: #ffffff;
+  --text-color: #333333;
+  --primary-color: #007bff;
+  --secondary-color: #444;
+  --border-color: #353740;
+  /* COPIED FROM  */
+  --bs-blue: #4eac6d;
+  --bs-indigo: #560bad;
+  --bs-purple: #6153cc;
+  --bs-pink: #e83e8c;
+  --bs-red: #ef476f;
+  --bs-orange: #fc814a;
+  --bs-yellow: #ffd166;
+  --bs-green: #06d6a0;
+  --bs-teal: #050505;
+  --bs-cyan: #50a5f1;
+  --bs-white: #fff;
+  --bs-gray: #797c8c;
+  --bs-gray-dark: #343a40;
+  --bs-gray-100: #f8f9fa;
+  --bs-gray-200: #f9f9f9;
+  --bs-gray-300: #f6f6f9;
+  --bs-gray-400: #e6ebf5;
+  --bs-gray-500: #adb5bd;
+  --bs-gray-600: #797c8c;
+  --bs-gray-700: #495057;
+  --bs-gray-800: #343a40;
+  --bs-gray-900: #212529;
+  --bs-primary: #4eac6d;
+  --bs-secondary: #797c8c;
+  --bs-success: #06d6a0;
+  --bs-info: #50a5f1;
+  --bs-warning: #ffd166;
+  --bs-danger: #ef476f;
+  --bs-purple: #6153cc;
+  --bs-pink: #e83e8c;
+  --bs-light: #f6f6f9;
+  --bs-indigo: #560bad;
+  --bs-dark: #343a40;
+  /* --bs-primary-rgb: 78,172,109;
+    --bs-secondary-rgb: 121,124,140;
+    --bs-success-rgb: 6,214,160;
+    --bs-info-rgb: 80,165,241;
+    --bs-warning-rgb: 255,209,102;
+    --bs-danger-rgb: 239,71,111;
+    --bs-purple-rgb: 97,83,204;
+    --bs-pink-rgb: 232,62,140;
+    --bs-light-rgb: 246,246,249;
+    --bs-indigo-rgb: 86,11,173;
+    --bs-dark-rgb: 52,58,64;
+    --bs-white-rgb: 255,255,255;
+    --bs-black-rgb: 0,0,0;
+    --bs-body-color-rgb: 73,80,87;
+    --bs-body-bg-rgb: 250,250,250;
+    --bs-font-sans-serif: "Cerebri Sans,sans-serif";
+    --bs-font-monospace: SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;
+    --bs-gradient: linear-gradient(180deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0));
+    --bs-body-font-family: var(--bs-font-sans-serif);
+    --bs-body-font-size: 0.9375rem;
+    --bs-body-font-weight: 400;
+    --bs-body-line-height: 1.5;
+    --bs-body-color: #495057;
+    --bs-body-bg: #fafafa; */
+}
+
+:root.dark-theme {
+  --background-color: #1e1e1e;
+  --text-color: #fff;
+  --bs-dark: #343a40;
+}

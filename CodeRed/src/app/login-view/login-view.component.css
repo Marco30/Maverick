@@ -1,26 +1,25 @@
-:host {
-    /* Define variables for colors */
+/* Define variables for colors */
+/* :host {
     --background-color: #FFFFFF;
     --text-color: #333333;
-  }
-  
-  .container {
-    /* your existing styles for the light mode here */
-    background-color: var(--background-color);
-    color: var(--text-color);
-  }
-  
-  .dark-mode {
-    /* Override the variables for dark mode */
-    --background-color: #333333;
-    --text-color: #FFFFFF;
-  
-    /* your styles for the dark mode here */
-    background-color: var(--background-color);
-    color: var(--text-color);
-  }
+  } */
 
-  .dark-mode .card{
-    background-color: var(--background-color);
-    color: var(--text-color);
-  }
+.container {
+  /* your existing styles for the light mode here */
+  background-color: var(--background-color);
+  color: var(--text-color);
+}
+
+/* your styles for the dark mode here */
+/* Override the variables for dark mode */
+/* .dark-mode {
+  --background-color: #333333;
+  --text-color: #ffffff;
+  background-color: var(--background-color);
+  color: var(--text-color);
+} */
+
+.card {
+  background-color: var(--background-color);
+  color: var(--text-color);
+}

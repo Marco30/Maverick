@@ -1,33 +1,32 @@
 import { Component } from '@angular/core';
+import { ThemeService } from '../services/theme.service';
 
 @Component({
   selector: 'app-login-view',
   templateUrl: './login-view.component.html',
-  styleUrls: ['./login-view.component.css']
+  styleUrls: ['./login-view.component.css'],
 })
 export class LoginViewComponent {
-  isDarkMode = false;
   showRegistrationForm = false;
 
   loginData = {
     email: '',
-    password: ''
+    password: '',
   };
 
   registerData = {
     name: '',
     email: '',
     password: '',
-    password_confirmation: ''
+    password_confirmation: '',
   };
 
-  constructor() { }
+  constructor(private themeService: ThemeService) {}
 
-  ngOnInit() {
-  }
+  ngOnInit() {}
 
   toggleDarkMode() {
-    this.isDarkMode = !this.isDarkMode;
+    this.themeService.toggleDarkTheme();
   }
 
   login() {
@@ -37,6 +36,4 @@ export class LoginViewComponent {
   register() {
     console.log('Registering with data:', this.registerData);
   }
-
-
 }
