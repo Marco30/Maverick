@@ -1,26 +1,30 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using WarGamesAPI.DTO;
+using WarGamesAPI.Interfaces;
 using WarGamesAPI.Model;
 #pragma warning disable CS1998
 
 namespace WarGamesAPI.Controllers;
 
-[Route("wargames")] [ApiController]
+[Route("wargames")]
+[ApiController]
 public class MessageController : ControllerBase
 {
     readonly ILogger<MessageController> _logger;
+    readonly IQuestionService _questionService;
 
-    public MessageController(ILogger<MessageController> logger)
+    public MessageController(ILogger<MessageController> logger, IQuestionService questionService)
     {
         _logger = logger;
+        _questionService = questionService;
     }
 
-[HttpGet("getmessages")]
-public async Task<ActionResult<List<Message>>> GetMessages()
-{
-    _logger.LogInformation("GetMessages called");
-    var random = new Random();
-    var result = new List<Message>
+    [HttpGet("getmessages")]
+    public async Task<ActionResult<List<Message>>> GetMessages()
+    {
+        _logger.LogInformation("GetMessages called");
+        var random = new Random();
+        var result = new List<Message>
     {
         new() { Id = random.Next(), Question = "What is 2 + 2?", Answer = "5" },
         new() { Id = random.Next(), Question = "Is the Easter Bunny real?", Answer = "Yes" },
@@ -44,16 +48,20 @@ public async Task<ActionResult<List<Message>>> GetMessages()
         new() { Id = random.Next(), Question = "What is the distance between the Earth and the Moon?", Answer = "384,400 km" }
     };
 
-    return result;
-}
+        return result;
+    }
 
     [HttpGet("getmessage/{id}")]
     public async Task<ActionResult<Message>> Get(int id)
     {
-        _logger.LogInformation($"GetMessage called with messageId {id}");
+        _logger.LogInformation($"GetMessage called. MessageId: {id}");
 
-        var message = new Message { Id = id, Question = "What is 2 + 2?", 
-            Answer = $"This is the answer to the question with id {id}" };
+        var message = new Message
+        {
+            Id = id,
+            Question = "What is 2 + 2?",
+            Answer = $"This is the answer to the question with id {id}"
+        };
 
         return Ok(message);
     }
@@ -62,11 +70,14 @@ public async Task<ActionResult<List<Message>>> GetMessages()
     public async Task<ActionResult<Message>> AskQuestion(QuestionDto question)
     {
         _logger.LogInformation($"AskQuestion called. userId: {question.UserId} Question: {question.Question}.");
-
-        var message = new Message { Id = new Random().Next(), Question = question.Question, Answer = "42" };
+        var message = await _questionService.AskQuestion(question);
+        if (message is null)
+        {
+            return StatusCode(500);
+        }
         return StatusCode(201, message);
     }
-    
+
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {
