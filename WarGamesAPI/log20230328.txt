@@ -1,0 +1,4 @@
+2023-03-28 10:29:07.336 +02:00 [INF] GetMessages called
+2023-03-28 10:35:40.610 +02:00 [INF] GetMessages called
+2023-03-28 10:37:06.432 +02:00 [INF] AskQuestion called with question what time is it?.
+2023-03-28 10:39:38.507 +02:00 [INF] AskQuestion called. userId: 25 Question: what time is it?.
