@@ -1,19 +1,29 @@
-<div class="container">
+<div class="container py-4 text-primary-color">
+  <h1 class="text-uppercase h1-size text-center pt-2 pb-5 text-secondary-color">
+    ultimate ai
+  </h1>
   <div class="row justify-content-center">
     <div class="col-md-8">
-      <div class="card">
-        <div class="card-header">
-          {{ showRegistrationForm ? "Register" : "Login" }}
-        </div>
-        <button (click)="toggleDarkMode()">Toggle Dark Mode</button>
+      <div class="card bg-primary-color p-3">
+        <h2 class="h2-size text-center py-2">Welcome to AI world</h2>
+        <h3 class="card-header rounded h4-size text-center">
+          {{
+            currentView == VIEWS.register
+              ? "Register"
+              : currentView == VIEWS.login
+              ? "Login"
+              : "Reset Password"
+          }}
+        </h3>
+
         <div class="card-body">
           <form
-            *ngIf="!showRegistrationForm"
+            *ngIf="currentView == VIEWS.login"
             (ngSubmit)="login()"
             #loginForm="ngForm"
           >
-            <div class="form-group">
-              <label for="email">Email</label>
+            <div class="form-group pb-2">
+              <label for="email" class="py-1">Email</label>
               <input
                 type="email"
                 class="form-control"
@@ -24,8 +34,8 @@
               />
             </div>
 
-            <div class="form-group">
-              <label for="password">Password</label>
+            <div class="form-group pb-2">
+              <label for="password" class="py-1">Password</label>
               <input
                 type="password"
                 class="form-control"
@@ -36,23 +46,34 @@
               />
             </div>
 
-            <button type="submit" class="btn btn-primary">Login</button>
-            <button
-              type="button"
-              class="btn btn-link"
-              (click)="showRegistrationForm = true"
-            >
-              Register
+            <button type="submit" class="btn custom-btn w-100 mt-3">
+              Login
             </button>
+            <div class="d-flex justify-content-between">
+              <button
+                type="button"
+                class="btn btn-link"
+                (click)="setView(VIEWS.register)"
+              >
+                Register
+              </button>
+              <button
+                type="button"
+                class="btn btn-link"
+                (click)="setView(VIEWS.forgotPassword)"
+              >
+                Forgot Password
+              </button>
+            </div>
           </form>
 
           <form
-            *ngIf="showRegistrationForm"
+            *ngIf="currentView === VIEWS.register"
             (ngSubmit)="register()"
             #registerForm="ngForm"
           >
-            <div class="form-group">
-              <label for="name">Name</label>
+            <div class="form-group pb-2">
+              <label for="name" class="py-1">Name</label>
               <input
                 type="text"
                 class="form-control"
@@ -63,8 +84,8 @@
               />
             </div>
 
-            <div class="form-group">
-              <label for="email">Email</label>
+            <div class="form-group pb-2">
+              <label for="email" class="py-1">Email</label>
               <input
                 type="email"
                 class="form-control"
@@ -75,8 +96,8 @@
               />
             </div>
 
-            <div class="form-group">
-              <label for="password">Password</label>
+            <div class="form-group pb-2">
+              <label for="password" class="py-1">Password</label>
               <input
                 type="password"
                 class="form-control"
@@ -87,8 +108,10 @@
               />
             </div>
 
-            <div class="form-group">
-              <label for="password_confirmation">Confirm Password</label>
+            <div class="form-group pb-2">
+              <label for="password_confirmation" class="py-1"
+                >Confirm Password</label
+              >
               <input
                 type="password"
                 class="form-control"
@@ -99,14 +122,62 @@
               />
             </div>
 
-            <button type="submit" class="btn btn-primary">Register</button>
-            <button
-              type="button"
-              class="btn btn-link"
-              (click)="showRegistrationForm = false"
-            >
-              Back to Login
+            <button type="submit" class="btn custom-btn w-100 mt-3">
+              Register
             </button>
+            <div class="d-flex justify-content-between">
+              <button
+                type="button"
+                class="btn btn-link"
+                (click)="setView(VIEWS.login)"
+              >
+                Back to Login
+              </button>
+              <button
+                type="button"
+                class="btn btn-link"
+                (click)="setView(VIEWS.forgotPassword)"
+              >
+                Forgot Password
+              </button>
+            </div>
+          </form>
+          <form
+            *ngIf="currentView == VIEWS.forgotPassword"
+            (ngSubmit)="resetPassword()"
+            #forgotPassword="ngForm"
+          >
+            <div class="form-group pb-2">
+              <label for="email" class="py-1">Email</label>
+              <input
+                type="email"
+                class="form-control"
+                id="email"
+                name="email"
+                [(ngModel)]="email"
+                required
+              />
+            </div>
+
+            <button type="submit" class="btn custom-btn w-100 mt-3">
+              Reset Password
+            </button>
+            <div class="d-flex justify-content-between">
+              <button
+                type="button"
+                class="btn btn-link"
+                (click)="setView(VIEWS.register)"
+              >
+                Register
+              </button>
+              <button
+                type="button"
+                class="btn btn-link"
+                (click)="setView(VIEWS.login)"
+              >
+                Login
+              </button>
+            </div>
           </form>
         </div>
       </div>

@@ -3,11 +3,9 @@
     --background-color: #FFFFFF;
     --text-color: #333333;
   } */
-
-.container {
-  /* your existing styles for the light mode here */
-  background-color: var(--background-color);
-  color: var(--text-color);
+.toggle-theme {
+  background-color: var(--btn-bg-color-active);
+  color: var(--btn-text-color-active);
 }
 
 /* your styles for the dark mode here */
@@ -18,8 +16,3 @@
   background-color: var(--background-color);
   color: var(--text-color);
 } */
-
-.card {
-  background-color: var(--background-color);
-  color: var(--text-color);
-}

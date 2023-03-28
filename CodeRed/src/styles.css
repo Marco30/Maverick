@@ -1,10 +1,23 @@
 /* You can add global styles to this file, and also import other style files */
 :root {
-  --background-color: #ffffff;
-  --text-color: #333333;
+  --bg-primary-color: #ffffff;
+  --text-primary-color: #111314;
+  /* --text-color-primary: #495057; */
+  --bg-secondary-color: #4eac6d;
+  --text-secondary-color: #fefffe;
+  --btn-bg-color: #4eac6d;
+  --btn-text-color: #fcfefd;
+
+  --h1-font-size: calc(1.3rem + 0.46875vw);
+  --h2-font-size: calc(1.2rem + 0.46875vw);
+  --h3-font-size: calc(1.1rem + 0.46875vw);
+  --h4-font-size: calc(1rem + 0.46875vw);
+
+  --text-primary-color: #333333;
   --primary-color: #007bff;
   --secondary-color: #444;
   --border-color: #353740;
+  /* #4EAC6D */
   /* COPIED FROM  */
   --bs-blue: #4eac6d;
   --bs-indigo: #560bad;
@@ -39,34 +52,46 @@
   --bs-light: #f6f6f9;
   --bs-indigo: #560bad;
   --bs-dark: #343a40;
-  /* --bs-primary-rgb: 78,172,109;
-    --bs-secondary-rgb: 121,124,140;
-    --bs-success-rgb: 6,214,160;
-    --bs-info-rgb: 80,165,241;
-    --bs-warning-rgb: 255,209,102;
-    --bs-danger-rgb: 239,71,111;
-    --bs-purple-rgb: 97,83,204;
-    --bs-pink-rgb: 232,62,140;
-    --bs-light-rgb: 246,246,249;
-    --bs-indigo-rgb: 86,11,173;
-    --bs-dark-rgb: 52,58,64;
-    --bs-white-rgb: 255,255,255;
-    --bs-black-rgb: 0,0,0;
-    --bs-body-color-rgb: 73,80,87;
-    --bs-body-bg-rgb: 250,250,250;
-    --bs-font-sans-serif: "Cerebri Sans,sans-serif";
-    --bs-font-monospace: SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;
-    --bs-gradient: linear-gradient(180deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0));
-    --bs-body-font-family: var(--bs-font-sans-serif);
-    --bs-body-font-size: 0.9375rem;
-    --bs-body-font-weight: 400;
-    --bs-body-line-height: 1.5;
-    --bs-body-color: #495057;
-    --bs-body-bg: #fafafa; */
 }
 
 :root.dark-theme {
-  --background-color: #1e1e1e;
-  --text-color: #fff;
-  --bs-dark: #343a40;
+  --bg-primary-color: #2e2e2e;
+  --text-primary-color: #e2e6e3;
+  --bg-secondary-color: #262626;
+  --text-secondary-color: #fefefe;
+}
+
+body {
+  transition: all 0.5s ease-in-out;
+  background-color: var(--bg-secondary-color);
+}
+
+.h1-size {
+  font-size: var(--h1-font-size);
+}
+.h2-size {
+  font-size: var(--h2-font-size);
+}
+.h3-size {
+  font-size: var(--h3-font-size);
+}
+.h4-size {
+  font-size: var(--h4-font-size);
+}
+.bg-primary-color {
+  background-color: var(--bg-primary-color);
+}
+.bg-secondary-color {
+  background-color: var(--bg-secondary-color);
+}
+.text-primary-color {
+  color: var(--text-primary-color);
+}
+.text-secondary-color {
+  color: var(--text-secondary-color);
+}
+
+.custom-btn {
+  background-color: var(--btn-bg-color);
+  color: var(--btn-text-color);
 }
