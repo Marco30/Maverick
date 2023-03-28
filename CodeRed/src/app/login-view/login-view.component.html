@@ -1,0 +1,52 @@
+<div class="container" [ngClass]="{'dark-mode': isDarkMode}">
+    <div class="row justify-content-center">
+      <div class="col-md-8">
+        <div class="card">
+          <div class="card-header">{{ showRegistrationForm ? 'Register' : 'Login' }}</div>
+          <button (click)="toggleDarkMode()">Toggle Dark Mode</button>
+          <div class="card-body">
+            <form *ngIf="!showRegistrationForm" (ngSubmit)="login()" #loginForm="ngForm">
+              <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" class="form-control" id="email" name="email" [(ngModel)]="loginData.email" required>
+              </div>
+  
+              <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" class="form-control" id="password" name="password" [(ngModel)]="loginData.password" required>
+              </div>
+  
+              <button type="submit" class="btn btn-primary">Login</button>
+              <button type="button" class="btn btn-link" (click)="showRegistrationForm = true">Register</button>
+            </form>
+  
+            <form *ngIf="showRegistrationForm" (ngSubmit)="register()" #registerForm="ngForm">
+              <div class="form-group">
+                <label for="name">Name</label>
+                <input type="text" class="form-control" id="name" name="name" [(ngModel)]="registerData.name" required>
+              </div>
+  
+              <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" class="form-control" id="email" name="email" [(ngModel)]="registerData.email" required>
+              </div>
+  
+              <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" class="form-control" id="password" name="password" [(ngModel)]="registerData.password" required>
+              </div>
+  
+              <div class="form-group">
+                <label for="password_confirmation">Confirm Password</label>
+                <input type="password" class="form-control" id="password_confirmation" name="password_confirmation" [(ngModel)]="registerData.password_confirmation" required>
+              </div>
+  
+              <button type="submit" class="btn btn-primary">Register</button>
+              <button type="button" class="btn btn-link" (click)="showRegistrationForm = false">Back to Login</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
