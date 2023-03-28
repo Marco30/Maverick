@@ -1,35 +1,43 @@
 import { Component } from '@angular/core';
+import { Observable, Subject, takeUntil } from 'rxjs';
+import { ThemeService } from '../services/theme.service';
+
+const VIEWS = {
+  login: 'login',
+  register: 'register',
+  forgotPassword: 'forgot-password',
+} as const;
+
+type Object<T> = T[keyof T];
+type ViewsType = Object<typeof VIEWS>;
 
 @Component({
   selector: 'app-login-view',
   templateUrl: './login-view.component.html',
-  styleUrls: ['./login-view.component.css']
+  styleUrls: ['./login-view.component.css'],
 })
 export class LoginViewComponent {
-  isDarkMode = false;
-  showRegistrationForm = false;
-
   loginData = {
     email: '',
-    password: ''
+    password: '',
   };
 
   registerData = {
     name: '',
     email: '',
     password: '',
-    password_confirmation: ''
+    password_confirmation: '',
   };
 
-  constructor() { }
+  email: string = '';
+  VIEWS = VIEWS;
+  currentView: ViewsType = this.VIEWS.login;
 
-  ngOnInit() {
+  constructor() {}
+
+  setView(view: ViewsType) {
+    this.currentView = view;
   }
-
-  toggleDarkMode() {
-    this.isDarkMode = !this.isDarkMode;
-  }
-
   login() {
     console.log('Logging in with data:', this.loginData);
   }
@@ -37,6 +45,7 @@ export class LoginViewComponent {
   register() {
     console.log('Registering with data:', this.registerData);
   }
-
-
+  resetPassword() {
+    console.log('reset password: ', this.email);
+  }
 }
