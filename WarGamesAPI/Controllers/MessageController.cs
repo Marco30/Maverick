@@ -8,10 +8,17 @@ namespace WarGamesAPI.Controllers;
 [Route("wargames")] [ApiController]
 public class MessageController : ControllerBase
 {
+    readonly ILogger<MessageController> _logger;
+
+    public MessageController(ILogger<MessageController> logger)
+    {
+        _logger = logger;
+    }
 
 [HttpGet("getmessages")]
 public async Task<ActionResult<List<Message>>> GetMessages()
 {
+    _logger.LogInformation("GetMessages called");
     var random = new Random();
     var result = new List<Message>
     {
@@ -43,6 +50,8 @@ public async Task<ActionResult<List<Message>>> GetMessages()
     [HttpGet("getmessage/{id}")]
     public async Task<ActionResult<Message>> Get(int id)
     {
+        _logger.LogInformation($"GetMessage called with messageId {id}");
+
         var message = new Message { Id = id, Question = "What is 2 + 2?", 
             Answer = $"This is the answer to the question with id {id}" };
 
@@ -52,6 +61,8 @@ public async Task<ActionResult<List<Message>>> GetMessages()
     [HttpPost("askquestion")]
     public async Task<ActionResult<Message>> AskQuestion(QuestionDto question)
     {
+        _logger.LogInformation($"AskQuestion called. userId: {question.UserId} Question: {question.Question}.");
+
         var message = new Message { Id = new Random().Next(), Question = question.Question, Answer = "42" };
         return StatusCode(201, message);
     }
