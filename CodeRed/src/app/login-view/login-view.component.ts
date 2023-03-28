@@ -1,6 +1,4 @@
 import { Component } from '@angular/core';
-import { Observable, Subject, takeUntil } from 'rxjs';
-import { ThemeService } from '../services/theme.service';
 
 const VIEWS = {
   login: 'login',

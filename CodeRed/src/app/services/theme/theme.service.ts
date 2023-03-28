@@ -5,16 +5,18 @@ import { BehaviorSubject, Subject } from 'rxjs';
   providedIn: 'root',
 })
 export class ThemeService {
-  darkTheme = new BehaviorSubject<string>('light');
+  currentTheme = new BehaviorSubject<string>('light');
 
   public getTheme() {
-    return this.darkTheme.asObservable();
+    return this.currentTheme.asObservable();
   }
 
   constructor() {}
 
-  public toggleDarkTheme() {
+  public togglecurrentTheme() {
     document.documentElement.classList.toggle('dark-theme');
-    this.darkTheme.next(this.darkTheme.value === 'light' ? 'dark' : 'light');
+    this.currentTheme.next(
+      this.currentTheme.value === 'light' ? 'dark' : 'light'
+    );
   }
 }
