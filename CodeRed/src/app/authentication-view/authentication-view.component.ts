@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { Router } from '@angular/router';
 const VIEWS = {
   login: 'login',
   register: 'register',
@@ -15,7 +16,9 @@ type ViewsType = Object<typeof VIEWS>;
 export class AuthenticationViewComponent {
   VIEWS = VIEWS;
   currentView: ViewsType = this.VIEWS.login;
-
+  constructor(private router: Router) {
+    console.log('url: ', this.router.url);
+  }
   setView(view: ViewsType) {
     this.currentView = view;
   }
