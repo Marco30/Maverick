@@ -15,6 +15,13 @@ const routes: Routes = [
         (m) => m.AuthenticationViewModule
       ),
   },
+  {
+    path: 'authView/reset/:token',
+    loadChildren: () =>
+      import('./authentication-view/authentication-view.module').then(
+        (m) => m.AuthenticationViewModule
+      ),
+  },
 ];
 
 @NgModule({

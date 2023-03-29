@@ -38,7 +38,10 @@
               Register
             </button>
             <button
-              *ngIf="currentView !== VIEWS.resetPasswordRequest"
+              *ngIf="
+                currentView !== VIEWS.resetPasswordRequest &&
+                currentView !== VIEWS.resetPassword
+              "
               type="button"
               class="btn btn-link custom-link-color"
               (click)="setView(VIEWS.resetPasswordRequest)"

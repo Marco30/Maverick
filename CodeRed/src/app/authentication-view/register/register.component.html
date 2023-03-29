@@ -1,4 +1,4 @@
-<form (ngSubmit)="register()" #registerForm="ngForm">
+<form (ngSubmit)="register()" #registerform #registerForm="ngForm">
   <h3 class="h2-size text-center">Register</h3>
   <div class="form-group pb-2">
     <label for="socialSecurityNumber" class="py-1">Personnummer*</label>
@@ -17,7 +17,7 @@
   </div>
 
   <div class="form-group pb-2">
-    <label for="name" class="py-1">Name</label>
+    <label for="name" class="py-1">Full Name*</label>
     <input
       type="text"
       class="form-control"
@@ -25,7 +25,14 @@
       name="name"
       [(ngModel)]="registerData.fullName"
       required
+      #fullNameControl="ngModel"
     />
+    <p
+      class="text-danger help-block my-2"
+      *ngIf="fullNameControl.errors?.['required'] && fullNameControl.touched"
+    >
+      First name is required
+    </p>
   </div>
 
   <div class="form-group pb-2">
@@ -37,9 +44,77 @@
       name="email"
       [(ngModel)]="registerData.email"
       required
+      #emailControl="ngModel"
     />
+    <p
+      class="text-danger help-block my-2"
+      *ngIf="emailControl.errors?.['required'] && emailControl.touched"
+    >
+      Email is required
+    </p>
   </div>
 
+  <div class="form-group has-error pb-2">
+    <label for="city" class="py-1">City*</label>
+    <input
+      required
+      type="text"
+      class="form-control input-line"
+      id="city"
+      placeholder="Stad"
+      [(ngModel)]="registerData.address.city"
+      name="city"
+      #cityControl="ngModel"
+    />
+
+    <p
+      class="help-block text-danger my-2"
+      *ngIf="cityControl.errors?.['required'] && cityControl.touched"
+    >
+      City is required
+    </p>
+  </div>
+  <div class="form-group has-error pb-2">
+    <label for="street" class="py-1">Street*</label>
+    <input
+      required
+      type="text"
+      class="form-control input-line"
+      id="street"
+      placeholder="Gata"
+      [(ngModel)]="registerData.address.street"
+      name="street"
+      #streetControl="ngModel"
+    />
+
+    <p
+      class="help-block text-danger my-2"
+      *ngIf="streetControl.errors?.['required']&& streetControl.touched"
+    >
+      Street is required
+    </p>
+  </div>
+
+  <div class="form-group has-error pb-2">
+    <label for="zipCode" class="py-1">Zip Code*</label>
+    <input
+      required
+      type="text"
+      class="form-control input-line"
+      id="zipCode"
+      placeholder="ZipCode"
+      [(ngModel)]="registerData.address.zipCode"
+      name="zipCode"
+      #zipCodeControl="ngModel"
+    />
+
+    <p
+      class="help-block text-danger my-2"
+      *ngIf="zipCodeControl.errors?.['required'] && zipCodeControl.touched"
+    >
+      ZipCode is required
+    </p>
+  </div>
   <div class="form-group pb-2">
     <label for="password" class="py-1">Password</label>
     <input
@@ -55,15 +130,53 @@
   <div class="form-group pb-2">
     <label for="password_confirmation" class="py-1">Confirm Password</label>
     <input
-      type="password"
-      class="form-control"
-      id="password_confirmation"
-      name="password_confirmation"
-      [(ngModel)]="passwordConfirmation"
       required
+      type="password"
+      class="form-control input-line"
+      id="confirmPassword"
+      placeholder="Repetera lösenord"
+      [(ngModel)]="passwordConfirmation"
+      name="confirmPassword"
+      #confirmPassword="ngModel"
+      (ngModelChange)="checkSame($event)"
     />
   </div>
-  <p>
+  <p
+    class="text-danger help-block my-2"
+    *ngIf="confirmPassword.errors?.['required'] && confirmPassword.touched"
+  >
+    Required field
+  </p>
+  <p class="text-danger help-block my-2" *ngIf="noMatchPasswords === true">
+    Passwords don't match
+  </p>
+  <div class="form-group pb-2">
+    <input
+      #AgreeMarketing
+      name="agreeMarketing"
+      type="checkbox"
+      class="p-1"
+      id="agreeMarketing"
+      (change)="onAgreeMarketingChanged(AgreeMarketing.checked)"
+      [checked]="registerData.agreeMarketing"
+    />
+    <label class="ms-2" for="agreeMarketing">Agree Marketing</label>
+  </div>
+  <div class="form-group pb-2">
+    <input
+      #SubscribeToEmailNotification
+      name="SubscribeToEmailNotification"
+      type="checkbox"
+      class="p-1"
+      id="SubscribeToEmailNotification"
+      (change)="onSubscribeToEmailChanged(SubscribeToEmailNotification.checked)"
+      [checked]="registerData.subscribeToEmailNotification"
+    />
+    <label class="ms-2" for="SubscribeToEmailNotification"
+      >Subscribe to email notification</label
+    >
+  </div>
+  <p class="my-2">
     By registering you agree to the Doot
     <span class="custom-link-color" role="button"> Terms of use </span>
   </p>

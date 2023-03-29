@@ -18,8 +18,15 @@ export class AuthenticationViewComponent {
   currentView: ViewsType = this.VIEWS.login;
   constructor(private router: Router) {
     console.log('url: ', this.router.url);
+    if (this.router.url.includes('reset')) {
+      this.currentView = VIEWS.resetPassword;
+    }
   }
   setView(view: ViewsType) {
+    if (this.currentView === VIEWS.resetPassword) {
+      this.router.navigate(['authView']);
+      return;
+    }
     this.currentView = view;
   }
 }

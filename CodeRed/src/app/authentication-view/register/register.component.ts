@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
+import { NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Register } from 'src/app/model/register/register';
 import { AuthenticationService } from 'src/app/service/authentication/authentication.service';
@@ -9,6 +10,7 @@ import { AuthenticationService } from 'src/app/service/authentication/authentica
   styleUrls: ['./register.component.css'],
 })
 export class RegisterComponent {
+  @ViewChild('registerform', { static: false }) registerform!: NgForm;
   constructor(
     private authenticationService: AuthenticationService,
     private router: Router
@@ -18,8 +20,8 @@ export class RegisterComponent {
     fullName: '',
     firstName: '',
     lastName: '',
-    agreeMarketing: false,
-    subscribeToEmailNotification: false,
+    agreeMarketing: true,
+    subscribeToEmailNotification: true,
     email: '',
     password: '',
     gender: '',
@@ -33,10 +35,31 @@ export class RegisterComponent {
       country: '',
     },
   };
+  noMatchPasswords: boolean = false;
   errors: string[] = [];
   passwordConfirmation: string = '';
   cancelDataFetching: boolean = false;
   showSpinner: boolean = false;
+
+  checkSame(input: string) {
+    const secondPassword = input;
+    const firstPassword = this.registerData.password;
+    if (secondPassword !== firstPassword) {
+      // stuff for form control
+      console.log('passwords not match');
+
+      this.noMatchPasswords = true;
+      this.registerform.controls?.['confirmPassword'].markAsDirty();
+      this.registerform.form.controls?.['confirmPassword'].setErrors(null);
+    } else {
+      // form control with errors
+      this.noMatchPasswords = false;
+      this.registerform.form.controls?.['confirmPassword'].setErrors({
+        incorrect: true,
+      });
+      this.registerform.form.controls?.['confirmPassword'].markAsPristine();
+    }
+  }
 
   register() {
     console.log('Registering with data:', this.registerData);
@@ -107,5 +130,11 @@ export class RegisterComponent {
   cancelFetching(e: string) {
     this.cancelDataFetching = true;
     this.showSpinner = false;
+  }
+  public onAgreeMarketingChanged(value: boolean) {
+    this.registerData.agreeMarketing = value;
+  }
+  public onSubscribeToEmailChanged(value: boolean) {
+    this.registerData.subscribeToEmailNotification = value;
   }
 }
