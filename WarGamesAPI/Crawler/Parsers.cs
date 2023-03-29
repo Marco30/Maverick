@@ -1,5 +1,6 @@
 using HtmlAgilityPack;
 using System.Text.RegularExpressions;
+using WarGamesAPI.DTO;
 using WarGamesAPI.Model;
 
 namespace WarGamesAPI.Crawler;
@@ -11,7 +12,7 @@ public class Parsers
     {
 
         UserDto userData = new UserDto();
-        Address address = new Address();
+        AddressDto address = new AddressDto();
         // Loads the page you want to scrape/Crawl
         var htmlDocument = new HtmlDocument();
         htmlDocument.LoadHtml(htmlPage);
@@ -110,7 +111,7 @@ public class Parsers
 
                 }
 
-                var Street = htmlDocument.DocumentNode.SelectSingleNode("/html/body/div[1]/div[3]/div/div/div[1]/div/div[7]/div[1]/span[2]");
+                var Street = htmlDocument.DocumentNode.SelectSingleNode("/html/body/div[1]/div[3]/div/div/div[1]/div/div[7]/div[2]/span[2]");
 
                 address.Street = Street.InnerText.Trim();
 
@@ -118,7 +119,7 @@ public class Parsers
 
                 address.City = CityTrim(city.InnerText.Trim()); */
 
-                var zipCodeAndMunicipality = htmlDocument.DocumentNode.SelectSingleNode("/html/body/div[1]/div[3]/div/div/div[1]/div/div[7]/div[1]/span[3]");
+                var zipCodeAndMunicipality = htmlDocument.DocumentNode.SelectSingleNode("/html/body/div[1]/div[3]/div/div/div[1]/div/div[7]/div[2]/span[3]");
 
                 string[] arrayZipCodeAndMunicipality = zipCodeAndMunicipality.InnerText.Trim().Split(' ');
 
@@ -126,7 +127,7 @@ public class Parsers
 
                 address.Municipality = arrayZipCodeAndMunicipality[1];
 
-                //userData.Address = address;
+                userData.Address = address;
 
                 return userData;
 
