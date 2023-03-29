@@ -170,9 +170,9 @@ public class AuthController : ControllerBase
             user.SocialSecurityNumber = socialSecurityNr.ToString();
             return Task.FromResult<IActionResult>(Ok(user));
         }
-            
+
         return Task.FromResult<IActionResult>(NotFound());
-            
+
     }
 
     [HttpPost("registeruser")]
@@ -193,18 +193,28 @@ public class AuthController : ControllerBase
         if (register.SocialSecurityNumber != null && VerifySocialSecurityNumber(register.SocialSecurityNumber))
         {
 
-            AddressDto? address = register.Address;
-
-            var registeredAddress = await _userRepo.AddAddress(address);
-
-            if (registeredAddress is null)
+            try
             {
-                return StatusCode(500, new ResponseMessageDto { Error = true, Message = "Error saving address" });
+                UserDto crawlResult = Crawlers.SeleniumGetUserInfoPagesCrawler("https://mrkoll.se/", register.SocialSecurityNumber);
+                AddressDto? address = crawlResult.Address;
+
+                var registeredAddress = await _userRepo.AddAddress(address);
+
+                if (registeredAddress is null)
+                {
+                    return StatusCode(500, new ResponseMessageDto { Error = true, Message = "Error saving address" });
+                }
+
+                register.AddressId = registeredAddress.Id;
+
+            }
+            catch (Exception e)
+            {
+                _logger.LogInformation($"Crawl failed, registering user anyway{e.Message}");
             }
 
-            register.AddressId = registeredAddress.Id;
-
             var registeredUser = await _userRepo.AddUser(register);
+
             if (registeredUser != null)
             {
                 var token = TokenData.CreateJwtToken(registeredUser);
@@ -216,6 +226,10 @@ public class AuthController : ControllerBase
                 return Ok(inloggedUser);
 
             }
+
+
+
+
 
         }
 

@@ -171,19 +171,20 @@ public class TokenData
 
 
         var claims = new List<Claim> {
-            new Claim (JwtRegisteredClaimNames.Sub, user.SocialSecurityNumber ),
-            new Claim (JwtRegisteredClaimNames.Jti, Guid.NewGuid ().ToString ()),
-            new Claim (JwtRegisteredClaimNames.Iat, ToUnixEpochDate (now).ToString (), ClaimValueTypes.Integer64),
-            new Claim (ClaimTypes.Name, user.SocialSecurityNumber ),
-            new Claim (ClaimTypes.NameIdentifier, user.SocialSecurityNumber ),
-            
-            new Claim ("issuer", appSettings.JwtIssuer),
-            new Claim ("audience", appSettings.JwtAudience),
-            new Claim ("fullname", user.FullName),
-            new Claim ("lastname", user.LastName),
-            new Claim ("firstname", user.FirstName),
-            new Claim ("id", user.Id.ToString()),
+            new Claim(JwtRegisteredClaimNames.Sub, user.SocialSecurityNumber ?? string.Empty),
+            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+            new Claim(JwtRegisteredClaimNames.Iat, ToUnixEpochDate(now).ToString(), ClaimValueTypes.Integer64),
+            new Claim(ClaimTypes.Name, user.SocialSecurityNumber ?? string.Empty),
+            new Claim(ClaimTypes.NameIdentifier, user.SocialSecurityNumber ?? string.Empty),
+
+            new Claim("issuer", appSettings.JwtIssuer ?? string.Empty),
+            new Claim("audience", appSettings.JwtAudience ?? string.Empty),
+            new Claim("fullname", user.FullName ?? string.Empty),
+            new Claim("lastname", user.LastName ?? string.Empty),
+            new Claim("firstname", user.FirstName ?? string.Empty),
+            new Claim("id", user.Id.ToString() ?? string.Empty),
         };
+
 
         // Add act on behalf of self claim.
         claims.Add(new Claim(ClaimTypes.Role, "privatperson"));

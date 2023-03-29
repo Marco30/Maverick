@@ -3,7 +3,7 @@ using OpenQA.Selenium.Chrome;
 using WebDriverManager.DriverConfigs.Impl;
 using System.Net;
 using HtmlAgilityPack;
-using WarGamesAPI.Model;
+using OpenQA.Selenium.Support.UI;
 
 namespace WarGamesAPI.Crawler;
 
@@ -11,10 +11,10 @@ public class Crawlers
 {
 
     /*Selenium Get User Data Crawler function*/
-    public static User? SeleniumGetUserInfoPagesCrawler(string pageURL, string socialSecurityNumber)
+    public static UserDto SeleniumGetUserInfoPagesCrawler(string pageURL, string socialSecurityNumber)
     {
 
-        User userdata = new User();
+        var userdata = new UserDto();
 
         var options = new ChromeOptions()
         {
@@ -44,8 +44,7 @@ public class Crawlers
         }
 
         browser.Navigate().GoToUrl(pageURL);
-
-
+        
         browser.FindElement(By.XPath("/html/body/div[1]/div/div/div/div[2]/div/button[2]")).Click();
         Thread.Sleep(3000);
         browser.FindElement(By.Id("inpField10")).SendKeys(socialSecurityNumber);

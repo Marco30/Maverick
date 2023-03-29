@@ -7,10 +7,10 @@ namespace WarGamesAPI.Crawler;
 public class Parsers
 {
     /*Parse UserData from page html*/
-    public static User ParseHtmlUserData(string htmlPage)
+    public static UserDto ParseHtmlUserData(string htmlPage)
     {
 
-        User userData = new User();
+        UserDto userData = new UserDto();
         Address address = new Address();
         // Loads the page you want to scrape/Crawl
         var htmlDocument = new HtmlDocument();

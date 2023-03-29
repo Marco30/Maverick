@@ -48,6 +48,7 @@ public class UserRepository : IUserRepository
 
         var user = new User
         {
+            Id = new Random().Next(),
             Email = register.Email,
             Password = register.Password,
             FullName = register.FirstName + " " + register.LastName,
@@ -73,6 +74,8 @@ public class UserRepository : IUserRepository
         var confirmedAddress = allAddresses.FirstOrDefault(a => a.Id == address.Id);
         return confirmedAddress ?? null;
     }
+
+
 
 
 
