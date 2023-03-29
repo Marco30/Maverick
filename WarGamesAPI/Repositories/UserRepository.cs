@@ -69,6 +69,7 @@ public class UserRepository : IUserRepository
 
     public async Task<Address?> AddAddress(AddressDto address)
     {
+        address.Id = new Random().Next();
         Json.CheckAndAddDataToJson("Address", address);
         List<Address> allAddresses = Json.GetJsonData<Address>("Address");
         var confirmedAddress = allAddresses.FirstOrDefault(a => a.Id == address.Id);

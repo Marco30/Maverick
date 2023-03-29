@@ -228,9 +228,6 @@ public class AuthController : ControllerBase
             }
 
 
-
-
-
         }
 
         return BadRequest(new ResponseMessageDto { Error = true, Message = "Fel på personnummer" });

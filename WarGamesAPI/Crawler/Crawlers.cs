@@ -3,7 +3,6 @@ using OpenQA.Selenium.Chrome;
 using WebDriverManager.DriverConfigs.Impl;
 using System.Net;
 using HtmlAgilityPack;
-using OpenQA.Selenium.Support.UI;
 
 namespace WarGamesAPI.Crawler;
 
