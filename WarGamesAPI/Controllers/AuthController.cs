@@ -188,15 +188,17 @@ public class AuthController : ControllerBase
     {
         if (register.Email is null) return BadRequest(new ResponseMessageDto { Error = true, Message = "Email saknas" });
 
-        var existingUser = await _userRepo.GetUserFromEmailAsync(register.Email);
+        var emailUser = await _userRepo.GetUserFromEmailAsync(register.Email);
+        var socialSecurityUser = await _userRepo.GetUserFromSocSecAsync(register.SocialSecurityNumber);
 
-        if (existingUser != null)
-            return BadRequest(new ResponseMessageDto { Error = true, Message = "Användaren är redan registrerad" });
+        if (emailUser != null )
+            return BadRequest(new ResponseMessageDto { Error = true, Message = "En användare med denna email är redan registrerad" });
+
+        if (socialSecurityUser != null)
+            return BadRequest(new ResponseMessageDto { Error = true, Message = "En användare med detta peronnummer är redan registrerad" });
 
         if (register.Password is null)
             return BadRequest(new ResponseMessageDto { Error = true, Message = "Lösenord saknas" });
-
-
 
         if (register.SocialSecurityNumber != null && VerifySocialSecurityNumber(register.SocialSecurityNumber))
         {
