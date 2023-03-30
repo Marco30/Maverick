@@ -1,24 +1,29 @@
-using WarGamesAPI.DTO;
 using WarGamesAPI.Interfaces;
 using WarGamesAPI.Model;
+
 #pragma warning disable CS1998
 
 namespace WarGamesAPI.Services;
 
 public class QuestionService : IQuestionService
 {
-    readonly IMessageRepository _messageRepo;
+    readonly IQuestionRepository _messageRepo;
 
-    public QuestionService(IMessageRepository messageRepo)
+    public QuestionService(IQuestionRepository messageRepo)
     {
         _messageRepo = messageRepo;
     }
 
-    public async Task<Message?> AskQuestion(QuestionDto question)
+    public async Task<Answer?> AskQuestion(Question question)
     {
         var answer = await GenerateAnswer();
-        var messageToSave = new Message { Question = question.Question, Answer = answer };
-        return await _messageRepo.SaveMessage(messageToSave);
+        var answerToSave = new Answer
+        {
+            QuestionId = question.Id, 
+            Text = answer, Time = DateTime.Now
+        };
+
+        return await _messageRepo.SaveAnswer(answerToSave);
     }
 
 
