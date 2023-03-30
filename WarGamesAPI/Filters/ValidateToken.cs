@@ -3,51 +3,49 @@ using Microsoft.AspNetCore.Mvc;
 using MiracleMileAPI.Sessions;
 using System.Text.RegularExpressions;
 
-namespace WarGamesAPI.Filters
+namespace WarGamesAPI.Filters;
+
+public class ValidateToken : Attribute, IAuthorizationFilter
 {
 
-    public class ValidateToken : Attribute, IAuthorizationFilter
+    public void OnAuthorization(AuthorizationFilterContext context)
     {
+        var authHeaders = context.HttpContext.Request.Headers["authorization"];
 
-        public void OnAuthorization(AuthorizationFilterContext context)
+        if (authHeaders.Count < 1)
         {
-            var authHeaders = context.HttpContext.Request.Headers["authorization"];
+            context.Result = new UnauthorizedResult();
+        }
+        else
+        {
+            var pattern = new Regex(@"^Bearer\s+(.+)$", RegexOptions.IgnoreCase);
+            var match = pattern.Match(authHeaders[0]);
 
-            if (authHeaders.Count < 1)
+            if (match.Success)
             {
-                context.Result = new UnauthorizedResult();
-            }
-            else
-            {
-                var pattern = new Regex(@"^Bearer\s+(.+)$", RegexOptions.IgnoreCase);
-                var match = pattern.Match(authHeaders[0]);
-
-                if (match.Success)
+                try
                 {
-                    try
-                    {
 
-                        if (!TokenData.ValidateToken(match.Groups[1].Value))
-                        {
-                            context.Result = new UnauthorizedResult();
-                        }
-                        else
-                        {
-                            var success = true;
-                        }
-
-                    }
-                    catch
+                    if (!TokenData.ValidateToken(match.Groups[1].Value))
                     {
                         context.Result = new UnauthorizedResult();
                     }
+                    else
+                    {
+                        var success = true;
+                    }
+
                 }
-                else
+                catch
                 {
                     context.Result = new UnauthorizedResult();
                 }
             }
+            else
+            {
+                context.Result = new UnauthorizedResult();
+            }
         }
-
     }
+
 }

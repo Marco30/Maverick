@@ -1,9 +1,9 @@
 ﻿using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Win32;
 using MiracleMileAPI.Sessions;
 using WarGamesAPI.Crawler;
 using WarGamesAPI.DTO;
+using WarGamesAPI.Filters;
 using WarGamesAPI.Interfaces;
 using WarGamesAPI.Model;
 #pragma warning disable CS1998
@@ -58,6 +58,7 @@ public class AuthController : ControllerBase
 
     }
 
+    [ValidateToken]
     [HttpPost("newtoken")]
     public async Task<IActionResult> NewToken()
     {
@@ -104,6 +105,7 @@ public class AuthController : ControllerBase
 
     }
 
+    [ValidateToken]
     [HttpPost("resetpasswordrequest")]
     public async Task<IActionResult> sendResetPasswordEmail(ResetPasswordRequestDto request)
     {
@@ -134,6 +136,7 @@ public class AuthController : ControllerBase
         }
     }
 
+    [ValidateToken]
     [HttpPost("resetpassword")]
     public async Task<IActionResult> resetUserPassword(ResetPasswordDto reset)
     {
@@ -159,6 +162,7 @@ public class AuthController : ControllerBase
         }
     }
 
+    [ValidateToken]
     [HttpPost("getUserDataFromSecurityNumber")]
     public Task<IActionResult> GetUserData(GetUserDataDto userData)
     {
