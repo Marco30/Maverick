@@ -2,6 +2,7 @@
 using WarGamesAPI.DTO;
 using WarGamesAPI.Interfaces;
 using WarGamesAPI.Model;
+using WarGamesAPI.Filters;
 #pragma warning disable CS1998
 
 namespace WarGamesAPI.Controllers;
@@ -18,7 +19,7 @@ public class MessageController : ControllerBase
         _logger = logger;
         _questionService = questionService;
     }
-
+    [ValidateToken]
     [HttpGet("getmessages")]
     public async Task<ActionResult<List<Message>>> GetMessages()
     {
