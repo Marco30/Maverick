@@ -1,4 +1,4 @@
-const BaseUrl = 'https://localhost:44365/miraclemile';
+const BaseUrl = 'https://localhost:7125/wargames';
 export const environment = {
   production: true,
   authenticate_url: `${BaseUrl}/authenticate`,

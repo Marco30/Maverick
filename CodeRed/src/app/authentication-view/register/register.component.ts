@@ -39,7 +39,7 @@ export class RegisterComponent {
   errors: string[] = [];
   passwordConfirmation: string = '';
   cancelDataFetching: boolean = false;
-  showSpinner: boolean = false;
+  showLoading: boolean = false;
 
   checkSame(input: string) {
     const secondPassword = input;
@@ -82,7 +82,7 @@ export class RegisterComponent {
     }
     if (num.length == 12) {
       this.cancelDataFetching = false;
-      this.showSpinner = true;
+      this.showLoading = true;
       this.registerData.socialSecurityNumber = num;
       this.authenticationService
         .getUserDataFromSecurityNumber(this.registerData)
@@ -93,6 +93,8 @@ export class RegisterComponent {
             const { year, month, day } = this.getBirthDay(
               this.registerData.socialSecurityNumber
             );
+            this.registerData.fullName =
+              userData.fullName || this.registerData.fullName;
             this.registerData.firstName =
               userData?.firstName || this.registerData.firstName;
             this.registerData.lastName =
@@ -108,11 +110,11 @@ export class RegisterComponent {
             this.registerData.birthYear = Number(year);
             this.registerData.birthMonth = Number(month);
             this.registerData.birthDay = Number(day);
-            this.showSpinner = false;
+            this.showLoading = false;
           },
           error: (err) => {
             console.log(err);
-            this.showSpinner = false;
+            this.showLoading = false;
           },
         });
     }
@@ -127,9 +129,9 @@ export class RegisterComponent {
     return { year, month, day };
   }
 
-  cancelFetching(e: string) {
+  cancelLoader() {
     this.cancelDataFetching = true;
-    this.showSpinner = false;
+    this.showLoading = false;
   }
   public onAgreeMarketingChanged(value: boolean) {
     this.registerData.agreeMarketing = value;

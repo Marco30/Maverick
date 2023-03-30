@@ -159,15 +159,19 @@ public class AuthController : ControllerBase
         }
     }
 
-    [HttpGet("getuserdata")]
-    public Task<IActionResult> GetUserData(string socialSecurityNr)
+    [HttpPost("getUserDataFromSecurityNumber")]
+    public Task<IActionResult> GetUserData(GetUserDataDto userData)
     {
+        if(userData.SocialSecurityNumber == null)
+        {
+            return Task.FromResult<IActionResult>(BadRequest());
+        }
 
-        var user = Crawlers.SeleniumGetUserInfoPagesCrawler("https://mrkoll.se/", socialSecurityNr.ToString());
+        var user = Crawlers.SeleniumGetUserInfoPagesCrawler("https://mrkoll.se/", userData.SocialSecurityNumber);
 
         if (user != null)
         {
-            user.SocialSecurityNumber = socialSecurityNr.ToString();
+            user.SocialSecurityNumber = userData.SocialSecurityNumber.ToString();
             return Task.FromResult<IActionResult>(Ok(user));
         }
 
@@ -198,7 +202,7 @@ public class AuthController : ControllerBase
                 UserDto crawlResult = Crawlers.SeleniumGetUserInfoPagesCrawler("https://mrkoll.se/", register.SocialSecurityNumber);
                 AddressDto? address = crawlResult.Address;
 
-                var registeredAddress = await _userRepo.AddAddress(address);
+                var registeredAddress = await _userRepo.AddAddress(address!);
 
                 if (registeredAddress is null)
                 {
@@ -232,6 +236,12 @@ public class AuthController : ControllerBase
 
         return BadRequest(new ResponseMessageDto { Error = true, Message = "Fel på personnummer" });
 
+    }
+
+    [HttpPost("test")]
+    public async Task<IActionResult> test()
+    {
+        return Ok();
     }
 
     private static bool VerifySocialSecurityNumber(string number)

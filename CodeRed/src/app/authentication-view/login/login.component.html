@@ -1,5 +1,10 @@
 <form (ngSubmit)="login()" #loginForm="ngForm">
   <h3 class="h2-size text-center">Login</h3>
+  <app-loader
+    *ngIf="showLoading"
+    [showCancel]="showLoading"
+    (cancelLoader)="cancelLoader()"
+  ></app-loader>
   <div class="form-group pb-2">
     <label for="email" class="py-1">Email</label>
     <input

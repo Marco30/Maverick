@@ -1,0 +1,129 @@
+.loader-wrapper {
+  /* position: relative;
+  min-height: 40vh;
+  width: 100%;
+  z-index: 10; */
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.svgs-wrapper {
+  /* 
+     Because of the length of the parent div this attribute shows the modal only in the upper part of the div
+  which user doesn't see. 
+   */
+  /* position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0; */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000000;
+}
+.loading-svg-wrapper {
+  position: relative;
+  display: grid;
+  place-items: center;
+}
+
+path {
+  fill: var(--btn-bg-color);
+}
+.paw-right {
+  position: absolute;
+  animation: walk-right infinite 2s;
+  left: 40%;
+  top: 20%;
+  opacity: 0;
+  transform: scale(1.4);
+}
+
+.paw-left {
+  position: absolute;
+  animation: walk-left infinite 2s;
+  animation-delay: 1s;
+  left: 25%;
+  top: 20%;
+  opacity: 0;
+  transform: scale(1.4);
+}
+@keyframes walk-right {
+  0% {
+    left: 40%;
+    top: 20%;
+    opacity: 0;
+    transform: scale(1.4);
+  }
+  15% {
+    left: 40%;
+    top: 20%;
+    opacity: 1;
+    transform: scale(0.8);
+  }
+  60% {
+    left: 40%;
+    top: 60%;
+    opacity: 1;
+    transform: scale(0.8);
+  }
+  75% {
+    left: 40%;
+    top: 60%;
+    opacity: 0;
+    transform: scale(1.4);
+  }
+
+  100% {
+    left: 40%;
+    top: 20%;
+    opacity: 0;
+    transform: scale(1.4);
+  }
+}
+@keyframes walk-left {
+  0% {
+    left: 25%;
+    top: 20%;
+    opacity: 0;
+    transform: scale(1.4);
+  }
+  15% {
+    left: 25%;
+    top: 20%;
+    opacity: 1;
+    transform: scale(0.8);
+  }
+  60% {
+    left: 25%;
+    top: 60%;
+    opacity: 1;
+    transform: scale(0.8);
+  }
+  75% {
+    left: 25%;
+    top: 60%;
+    opacity: 0;
+    transform: scale(1.4);
+  }
+
+  100% {
+    left: 25%;
+    top: 20%;
+    opacity: 0;
+    transform: scale(1.4);
+  }
+}
+.circle {
+  animation: spinning infinite 1s;
+}
+
+@keyframes spinning {
+  100% {
+    transform: rotate(360deg);
+  }
+}

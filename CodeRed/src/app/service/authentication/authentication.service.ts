@@ -26,7 +26,7 @@ export class AuthenticationService {
   private reminderSubscription: any;
   private refreshSubscription: any;
   private refreshJwtTokenSubscription: any;
-  private logoutPath = '/LoginView';
+  private logoutPath = '/authView';
 
   // private chatUser: any;
   setChatUser(user: User) {
@@ -54,7 +54,6 @@ export class AuthenticationService {
 
   getUserDataFromSecurityNumber(userInfo: Register): Observable<Register> {
     const url = environment.get_user_data_from_security_number;
-
     const queryParams = { model: userInfo };
     return this.postData<any>(url, queryParams);
   }
@@ -73,13 +72,16 @@ export class AuthenticationService {
 
   sendTest() {
     const queryParams = { model: { Password: 'password', Token: 'token' } };
-    return this.postData<any>('https://localhost:44365/miraclemile/test', {});
+    return this.postData<any>(
+      'https://localhost:7125/wargames/test',
+      queryParams
+    );
   }
 
   logout() {
-    // localStorage.removeItem('chatId');
+    localStorage.removeItem('chatId');
     this.cleanTokenData();
-    // this.userService.setUserToNull();
+    this.chatUser.next(null);
     location.reload();
     this.router.navigate([this.logoutPath]);
   }
