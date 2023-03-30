@@ -16,6 +16,12 @@ public class UserRepository : IUserRepository
         return users.FirstOrDefault(u => u.Email?.ToLower() == email.ToLower());
     }
 
+    public async Task<User?> GetUserFromSocSecAsync(string socSecNr)
+    {
+        var users = Json.GetJsonData<User>("User");
+        return users.FirstOrDefault(u => u.SocialSecurityNumber == socSecNr);
+    }
+
     public async Task<User?> GetUserFromIdAsync(int id)
     {
         var users = Json.GetJsonData<User>("User");

@@ -1,9 +1,9 @@
 ﻿using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Win32;
 using MiracleMileAPI.Sessions;
 using WarGamesAPI.Crawler;
 using WarGamesAPI.DTO;
+using WarGamesAPI.Filters;
 using WarGamesAPI.Interfaces;
 using WarGamesAPI.Model;
 #pragma warning disable CS1998
@@ -58,6 +58,7 @@ public class AuthController : ControllerBase
 
     }
 
+    [ValidateToken]
     [HttpPost("newtoken")]
     public async Task<IActionResult> NewToken()
     {
@@ -104,6 +105,7 @@ public class AuthController : ControllerBase
 
     }
 
+    [ValidateToken]
     [HttpPost("resetpasswordrequest")]
     public async Task<IActionResult> sendResetPasswordEmail(ResetPasswordRequestDto request)
     {
@@ -134,6 +136,7 @@ public class AuthController : ControllerBase
         }
     }
 
+    [ValidateToken]
     [HttpPost("resetpassword")]
     public async Task<IActionResult> resetUserPassword(ResetPasswordDto reset)
     {
@@ -159,6 +162,7 @@ public class AuthController : ControllerBase
         }
     }
 
+    [ValidateToken]
     [HttpPost("getUserDataFromSecurityNumber")]
     public Task<IActionResult> GetUserData(GetUserDataDto userData)
     {
@@ -184,15 +188,17 @@ public class AuthController : ControllerBase
     {
         if (register.Email is null) return BadRequest(new ResponseMessageDto { Error = true, Message = "Email saknas" });
 
-        var existingUser = await _userRepo.GetUserFromEmailAsync(register.Email);
+        var emailUser = await _userRepo.GetUserFromEmailAsync(register.Email);
+        var socialSecurityUser = await _userRepo.GetUserFromSocSecAsync(register.SocialSecurityNumber);
 
-        if (existingUser != null)
-            return BadRequest(new ResponseMessageDto { Error = true, Message = "Användaren är redan registrerad" });
+        if (emailUser != null )
+            return BadRequest(new ResponseMessageDto { Error = true, Message = "En användare med denna email är redan registrerad" });
+
+        if (socialSecurityUser != null)
+            return BadRequest(new ResponseMessageDto { Error = true, Message = "En användare med detta peronnummer är redan registrerad" });
 
         if (register.Password is null)
             return BadRequest(new ResponseMessageDto { Error = true, Message = "Lösenord saknas" });
-
-
 
         if (register.SocialSecurityNumber != null && VerifySocialSecurityNumber(register.SocialSecurityNumber))
         {

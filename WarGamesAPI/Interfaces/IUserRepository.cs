@@ -10,6 +10,7 @@ public interface IUserRepository
     Task<bool> UpdateUserPassword(int userId, string password);
     Task<Address?> AddAddress(AddressDto address);
     Task<User?> AddUser(RegisterUserDto register);
+    Task<User?> GetUserFromSocSecAsync(string socSecNr);
 
 
 
