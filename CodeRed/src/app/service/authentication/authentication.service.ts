@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { Observable, Subject, timer } from 'rxjs';
+import { BehaviorSubject, Observable, Subject, timer } from 'rxjs';
 import { AuthToken } from 'src/app/model/authToken/auth-token';
 import { Login } from 'src/app/model/login/login';
 import { Register } from 'src/app/model/register/register';
@@ -17,8 +17,10 @@ export class AuthenticationService {
     private router: Router // public dialogService: DialogService
   ) {}
 
-  chatUser: Subject<User> = new Subject<User>();
-  getUser = () => this.chatUser.asObservable();
+  chatUser: BehaviorSubject<User | null> = new BehaviorSubject<User | null>(
+    null
+  );
+  getChatUser = () => this.chatUser.asObservable();
   private tokenName = 'jwt_token';
   private timerSubscription: any;
   private reminderSubscription: any;
@@ -30,7 +32,7 @@ export class AuthenticationService {
   setChatUser(user: User) {
     this.chatUser.next(user);
   }
-  public getAuthentication(logindata: Login): Observable<AuthToken> {
+  public login(logindata: Login): Observable<AuthToken> {
     console.info('login data: ', logindata);
 
     /*const url = environment.authenticate_url;
@@ -44,7 +46,7 @@ export class AuthenticationService {
     return this.postData<any>(url, queryParams);
   }
 
-  registerUser(registerData: Register) {
+  register(registerData: Register) {
     const url = environment.register_url;
     const queryParams = { model: registerData };
     return this.postData<Register>(url, queryParams);

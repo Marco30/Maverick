@@ -63,7 +63,7 @@ export class RegisterComponent {
 
   register() {
     console.log('Registering with data:', this.registerData);
-    this.authenticationService.registerUser(this.registerData).subscribe({
+    this.authenticationService.register(this.registerData).subscribe({
       next: (res) => {
         console.info('--------register------------');
         console.info(res);
