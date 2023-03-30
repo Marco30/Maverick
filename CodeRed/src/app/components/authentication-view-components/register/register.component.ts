@@ -35,6 +35,7 @@ export class RegisterComponent {
       country: '',
     },
   };
+  showTermsOfUse: boolean = false;
   noMatchPasswords: boolean = false;
   errors: string[] = [];
   passwordConfirmation: string = '';
@@ -63,17 +64,21 @@ export class RegisterComponent {
 
   register() {
     console.log('Registering with data:', this.registerData);
-    this.authenticationService.register(this.registerData).subscribe({
-      next: (res) => {
-        console.info('--------register------------');
-        console.info(res);
-        // Routing to login view won't work beacuse  the user is already at /login
-      },
-      error: (err) => {
-        this.errors = [];
-        this.errors.push('Error registering user');
-      },
-    });
+    if (this.registerData.password !== this.passwordConfirmation) {
+      this.errors.push('Passwords do not match');
+    }
+    if (!this.registerData) if (this.errors.length > 0) return;
+    // this.authenticationService.register(this.registerData).subscribe({
+    //   next: (res) => {
+    //     console.info('--------register------------');
+    //     console.info(res);
+    //     // Routing to login view won't work beacuse  the user is already at /login
+    //   },
+    //   error: (err) => {
+    //     this.errors = [];
+    //     this.errors.push('Error registering user');
+    //   },
+    // });
   }
   getUserData(): void {
     let num = this.registerData.socialSecurityNumber;
@@ -138,5 +143,9 @@ export class RegisterComponent {
   }
   public onSubscribeToEmailChanged(value: boolean) {
     this.registerData.subscribeToEmailNotification = value;
+  }
+
+  closeModal() {
+    this.showTermsOfUse = false;
   }
 }

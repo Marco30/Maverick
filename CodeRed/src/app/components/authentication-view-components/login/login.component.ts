@@ -29,13 +29,13 @@ export class LoginComponent {
           if (!res.user) {
             this.loginData.error = 'Wrong credentials!';
           }
-          this.authenticationService.setToken(res.token);
           console.info('-----login-----');
           console.info(res);
-          // this.testService.toggleAuthentication(true);
-          this.authenticationService.startCountingDown();
           console.info('parse token');
-          // this.userService.setUser(res.user);
+          // this.testService.toggleAuthentication(true);
+          this.authenticationService.setToken(res.token);
+          this.authenticationService.startCountingDown();
+          this.authenticationService.setChatUser(res.user);
           this.router.navigate(['MainView/ChatView']);
         },
         error: () => {

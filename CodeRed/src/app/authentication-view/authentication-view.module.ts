@@ -8,6 +8,7 @@ import { LoginComponent } from '../components/authentication-view-components/log
 import { ResetPasswordComponent } from '../components/authentication-view-components/reset-password/reset-password.component';
 import { ResetPasswordRequestComponent } from '../components/authentication-view-components/reset-password-request/reset-password-request.component';
 import { LoaderModule } from '../components/loader/loader.module';
+import { ModalModule } from '../components/modal/modal.module';
 
 @NgModule({
   declarations: [
@@ -22,6 +23,7 @@ import { LoaderModule } from '../components/loader/loader.module';
     FormsModule,
     AuthenticationViewRoutingModule,
     LoaderModule,
+    ModalModule,
   ],
 })
 export class AuthenticationViewModule {}

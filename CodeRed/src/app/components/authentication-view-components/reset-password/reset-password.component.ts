@@ -55,6 +55,10 @@ export class ResetPasswordComponent {
     ) {
       return;
     }
+    if (this.data.confirmPassword !== this.data.password) {
+      this.error = 'Passwords do not match';
+      return;
+    }
     const token = this.route.snapshot.params['token'];
     console.log('resetting password: ', this);
     console.log('params: ', token);
@@ -63,8 +67,8 @@ export class ResetPasswordComponent {
       .subscribe({
         next: (res) => {
           console.log('success resetting password:', res);
-          this.info = 'Success resettign password';
-          // this.router.navigate(['auth']);
+          this.info = 'Success resetting password';
+          // this.router.navigate(['authView']);
         },
         error: (err) => {
           console.log('error resetting password: ', err);

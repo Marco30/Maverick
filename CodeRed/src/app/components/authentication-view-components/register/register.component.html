@@ -186,8 +186,61 @@
   </div>
   <p class="my-2">
     By registering you agree to the Doot
-    <span class="custom-link-color" role="button"> Terms of use </span>
+    <span
+      class="custom-link-color"
+      role="button"
+      (click)="showTermsOfUse = true"
+    >
+      Terms of use
+    </span>
   </p>
+
+  <div *ngIf="errors.length > 0">
+    <span
+      class="text-danger help-block d-block mt-1 text-center"
+      *ngFor="let error of errors"
+    >
+      {{ error }}
+    </span>
+  </div>
 
   <button type="submit" class="custom-btn w-100 mt-3">Register</button>
 </form>
+<app-modal *ngIf="showTermsOfUse" (closeModal)="closeModal()">
+  <div>
+    <h3>Our terms of use</h3>
+    <p>
+      Lorem ipsum dolor sit amet consectetur adipisicing elit. Culpa,
+      exercitationem. Est fugiat harum ipsa accusamus id suscipit laboriosam,
+      nostrum minima eos esse reprehenderit error assumenda quo eum quasi
+      veritatis. Accusantium deleniti impedit perferendis. Repellendus ea
+      quaerat eligendi voluptate ipsa molestiae explicabo suscipit asperiores
+      cum, minus, nihil voluptas fugit praesentium beatae veniam labore alias
+      rem nulla laborum libero odit tenetur? Asperiores fugiat ipsa excepturi
+      sapiente culpa illo deleniti id at pariatur harum in officiis, libero
+      eligendi voluptas. Aperiam blanditiis quibusdam voluptates repellat id
+      quis ratione provident, in exercitationem rerum reprehenderit quam
+      mollitia sequi ipsam labore amet doloribus laborum incidunt sint
+      cupiditate, aliquid cum aspernatur quos? Modi obcaecati, vero, nostrum
+      voluptatum quas, molestiae reiciendis voluptates porro quisquam molestias
+      eos. Cum rem id ab, iste dolorem adipisci. Minima dignissimos velit
+      necessitatibus natus ad quam numquam optio quaerat ab nulla eligendi porro
+      debitis deleniti molestias sunt accusantium explicabo quod animi iure,
+      aspernatur ipsa totam laborum ut. Asperiores enim error, modi tenetur
+      Lorem ipsum dolor sit amet consectetur adipisicing elit. Ipsum qui in quae
+      vel inventore rerum quisquam harum natus temporibus hic, id fugit odio
+      aliquid! Tempora, veniam. Dolores, cumque non! Similique deleniti
+      doloremque quos temporibus quas assumenda beatae nulla voluptas pariatur
+      nesciunt atque provident inventore culpa, quis debitis mollitia doloribus!
+      Dolore officiis dolorem iste distinctio, aperiam ut sapiente laborum.
+      Libero aut corporis, obcaecati magni autem quia, provident pariatur
+      commodi quidem quis optio odio! Unde incidunt ex cum eius voluptatum in
+      illo vero explicabo iusto at facere ipsam tenetur animi aut ad, dicta
+      nostrum veritatis necessitatibus, ipsum sint autem inventore provident
+      dolorum?
+    </p>
+    <button class="btn btn-link custom-link-color" (click)="closeModal()">
+      Close terms of use
+    </button>
+  </div>
+</app-modal>
