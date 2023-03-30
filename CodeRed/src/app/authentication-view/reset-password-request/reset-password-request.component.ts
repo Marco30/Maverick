@@ -33,20 +33,19 @@ export class ResetPasswordRequestComponent {
     this.resetPasswordData.error = '';
     this.resetPasswordData.info =
       'Check your email and follow the instructions';
-    // this.authenticationService
-    //   .sendResetPasswordRequest(this.resetPasswordData.email)
-    //   .pipe(takeUntil(this.unsubscribe$))
-    //   .subscribe({
-    //     next: (res) => {
-    //       console.log('response from server: ', res);
-    //       this.resetPasswordData.error = '';
-    //       this.resetPasswordData.info = 'Check your email!';
-    //     },
-    //     error: (err) => {
-    //       this.resetPasswordData.info = '';
-    //       this.resetPasswordData.error = 'Sorry, Something went wrong!';
-    //     },
-    //   });
+    this.authenticationService
+      .sendResetPasswordRequest(this.resetPasswordData.email)
+      .subscribe({
+        next: (res) => {
+          console.log('response from server: ', res);
+          this.resetPasswordData.error = '';
+          this.resetPasswordData.info = 'Check your email!';
+        },
+        error: (err) => {
+          this.resetPasswordData.info = '';
+          this.resetPasswordData.error = 'Sorry, Something went wrong!';
+        },
+      });
 
     //   this.authenticationService
     //     .sendTest()

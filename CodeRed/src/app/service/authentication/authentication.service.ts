@@ -1,9 +1,10 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { Observable, timer } from 'rxjs';
+import { Observable, Subject, timer } from 'rxjs';
 import { AuthToken } from 'src/app/model/authToken/auth-token';
 import { Login } from 'src/app/model/login/login';
 import { Register } from 'src/app/model/register/register';
+import { User } from 'src/app/model/user/user';
 import { environment } from 'src/environments/environment';
 import { GenericHttpService } from '../genericHttp/generic-http.service';
 
@@ -16,6 +17,8 @@ export class AuthenticationService {
     private router: Router // public dialogService: DialogService
   ) {}
 
+  chatUser: Subject<User> = new Subject<User>();
+  getUser = () => this.chatUser.asObservable();
   private tokenName = 'jwt_token';
   private timerSubscription: any;
   private reminderSubscription: any;
@@ -23,8 +26,10 @@ export class AuthenticationService {
   private refreshJwtTokenSubscription: any;
   private logoutPath = '/LoginView';
 
-  private chatUser: any;
-
+  // private chatUser: any;
+  setChatUser(user: User) {
+    this.chatUser.next(user);
+  }
   public getAuthentication(logindata: Login): Observable<AuthToken> {
     console.info('login data: ', logindata);
 

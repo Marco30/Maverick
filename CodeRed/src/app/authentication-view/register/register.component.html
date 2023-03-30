@@ -27,12 +27,12 @@
       required
       #fullNameControl="ngModel"
     />
-    <p
-      class="text-danger help-block my-2"
+    <span
+      class="text-danger help-block d-block mt-1"
       *ngIf="fullNameControl.errors?.['required'] && fullNameControl.touched"
     >
-      First name is required
-    </p>
+      This field is required
+    </span>
   </div>
 
   <div class="form-group pb-2">
@@ -46,12 +46,12 @@
       required
       #emailControl="ngModel"
     />
-    <p
-      class="text-danger help-block my-2"
+    <span
+      class="text-danger help-block d-block mt-1"
       *ngIf="emailControl.errors?.['required'] && emailControl.touched"
     >
-      Email is required
-    </p>
+      This field is required
+    </span>
   </div>
 
   <div class="form-group has-error pb-2">
@@ -67,12 +67,12 @@
       #cityControl="ngModel"
     />
 
-    <p
-      class="help-block text-danger my-2"
+    <span
+      class="text-danger help-block d-block mt-1"
       *ngIf="cityControl.errors?.['required'] && cityControl.touched"
     >
-      City is required
-    </p>
+      This field is required
+    </span>
   </div>
   <div class="form-group has-error pb-2">
     <label for="street" class="py-1">Street*</label>
@@ -87,12 +87,12 @@
       #streetControl="ngModel"
     />
 
-    <p
-      class="help-block text-danger my-2"
+    <span
+      class="text-danger help-block d-block mt-1"
       *ngIf="streetControl.errors?.['required']&& streetControl.touched"
     >
-      Street is required
-    </p>
+      This field is required
+    </span>
   </div>
 
   <div class="form-group has-error pb-2">
@@ -108,12 +108,12 @@
       #zipCodeControl="ngModel"
     />
 
-    <p
-      class="help-block text-danger my-2"
+    <span
+      class="text-danger help-block d-block mt-1"
       *ngIf="zipCodeControl.errors?.['required'] && zipCodeControl.touched"
     >
-      ZipCode is required
-    </p>
+      This field is required
+    </span>
   </div>
   <div class="form-group pb-2">
     <label for="password" class="py-1">Password</label>
@@ -140,16 +140,19 @@
       #confirmPassword="ngModel"
       (ngModelChange)="checkSame($event)"
     />
+    <span
+      class="text-danger help-block d-block mt-1"
+      *ngIf="confirmPassword.errors?.['required'] && confirmPassword.touched"
+    >
+      This field is required
+    </span>
+    <span
+      class="text-danger help-block d-block mt-1"
+      *ngIf="noMatchPasswords === true"
+    >
+      Passwords don't match
+    </span>
   </div>
-  <p
-    class="text-danger help-block my-2"
-    *ngIf="confirmPassword.errors?.['required'] && confirmPassword.touched"
-  >
-    Required field
-  </p>
-  <p class="text-danger help-block my-2" *ngIf="noMatchPasswords === true">
-    Passwords don't match
-  </p>
   <div class="form-group pb-2">
     <input
       #AgreeMarketing
@@ -181,5 +184,5 @@
     <span class="custom-link-color" role="button"> Terms of use </span>
   </p>
 
-  <button type="submit" class="btn custom-btn w-100 mt-3">Register</button>
+  <button type="submit" class="custom-btn w-100 mt-3">Register</button>
 </form>

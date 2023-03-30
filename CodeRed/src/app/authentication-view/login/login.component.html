@@ -8,6 +8,7 @@
       id="email"
       name="email"
       [(ngModel)]="loginData.email"
+      #emailControl="ngModel"
       required
     />
   </div>
@@ -21,24 +22,15 @@
       name="password"
       [(ngModel)]="loginData.password"
       required
+      #passwordControl="ngModel"
     />
   </div>
 
-  <button type="submit" class="btn custom-btn w-100 mt-3">Login</button>
-  <!-- <div class="d-flex justify-content-between mt-4">
-              <button
-                type="button"
-                class="btn btn-link custom-link-color"
-                (click)="setView(VIEWS.register)"
-              >
-                Register
-              </button>
-              <button
-                type="button"
-                class="btn btn-link custom-link-color"
-                (click)="setView(VIEWS.forgotPassword)"
-              >
-                Forgot Password
-              </button>
-            </div> -->
+  <button
+    type="submit"
+    class="custom-btn w-100 mt-3"
+    [disabled]="emailControl.errors?.['required'] || !emailControl.dirty || !passwordControl.dirty || passwordControl.errors?.['required']"
+  >
+    Login
+  </button>
 </form>
