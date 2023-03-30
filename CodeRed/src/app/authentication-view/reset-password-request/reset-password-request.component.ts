@@ -18,7 +18,7 @@ export class ResetPasswordRequestComponent {
     error: '',
     info: ' Enter your Email and instructions will be sent to you!',
   };
-  // Send request to reset password
+
   resetPasswordRequest() {
     console.log('reset password request submitted: ', this.resetPasswordData);
 
@@ -42,14 +42,8 @@ export class ResetPasswordRequestComponent {
           this.resetPasswordData.info = 'Check your email!';
         },
         error: (err) => {
-          this.resetPasswordData.info = '';
           this.resetPasswordData.error = 'Sorry, Something went wrong!';
         },
       });
-
-    //   this.authenticationService
-    //     .sendTest()
-    //     .pipe(takeUntil(this.unsubscribe$))
-    //     .subscribe((res) => console.log('test endpoint'));
   }
 }

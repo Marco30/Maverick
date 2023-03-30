@@ -24,7 +24,6 @@ export class ResetPasswordComponent {
     private route: ActivatedRoute
   ) {}
 
-  ngOnInit(): void {}
   toLogin() {
     this.router.navigate(['auth']);
   }
@@ -65,7 +64,7 @@ export class ResetPasswordComponent {
         next: (res) => {
           console.log('success resetting password:', res);
           this.info = 'Success resettign password';
-          this.router.navigate(['auth']);
+          // this.router.navigate(['auth']);
         },
         error: (err) => {
           console.log('error resetting password: ', err);
