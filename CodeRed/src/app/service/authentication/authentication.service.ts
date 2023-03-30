@@ -7,13 +7,14 @@ import { Register } from 'src/app/model/register/register';
 import { User } from 'src/app/model/user/user';
 import { environment } from 'src/environments/environment';
 import { GenericHttpService } from '../genericHttp/generic-http.service';
+import { HttpRequestService } from '../httpRequest/http-request.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthenticationService {
   constructor(
-    private genericHttpService: GenericHttpService,
+    private httpRequestService: HttpRequestService,
     private router: Router // public dialogService: DialogService
   ) {}
 
@@ -43,36 +44,36 @@ export class AuthenticationService {
 
     const queryParams = { model: logindata };
 
-    return this.postData<any>(url, queryParams);
+    return this.httpRequestService.postData<any>(url, queryParams);
   }
 
   register(registerData: Register) {
     const url = environment.register_url;
     const queryParams = { model: registerData };
-    return this.postData<Register>(url, queryParams);
+    return this.httpRequestService.postData<Register>(url, queryParams);
   }
 
   getUserDataFromSecurityNumber(userInfo: Register): Observable<Register> {
     const url = environment.get_user_data_from_security_number;
     const queryParams = { model: userInfo };
-    return this.postData<any>(url, queryParams);
+    return this.httpRequestService.postData<any>(url, queryParams);
   }
 
   sendResetPasswordRequest(email: string) {
     const url = environment.reset_password_request;
     const queryParams = { model: { email } };
-    return this.postData(url, queryParams);
+    return this.httpRequestService.postData(url, queryParams);
   }
 
   sendResetPassword(token: string, password: string) {
     const url = environment.reset_password;
     const queryParams = { model: { Password: password, Token: token } };
-    return this.postData(url, queryParams);
+    return this.httpRequestService.postData(url, queryParams);
   }
 
   sendTest() {
     const queryParams = { model: { Password: 'password', Token: 'token' } };
-    return this.postData<any>(
+    return this.httpRequestService.postData<any>(
       'https://localhost:7125/wargames/test',
       queryParams
     );
@@ -126,15 +127,13 @@ export class AuthenticationService {
     const url = environment.refreshToken_url;
 
     //return this.genericHttpService.post<any>(url);
-    return this.postData<any>(url);
+    return this.httpRequestService.postData<any>(url);
   }
 
   /**
    * post data.
    */
-  public postData<T>(url: string, QueryParams: object = {}): Observable<any> {
-    return this.genericHttpService.post<T>(url, QueryParams);
-  }
+
 
   public parseJwt(token: any) {
     const base64Url = token.split('.')[1];
