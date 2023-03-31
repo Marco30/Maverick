@@ -46,9 +46,21 @@ export class RegisterComponent {
     const secondPassword = input;
     const firstPassword = this.registerData.password;
     if (secondPassword !== firstPassword) {
+      // stuff for form control
+      console.log('passwords not match');
+
       this.noMatchPasswords = true;
+      this.registerform.controls?.['passwordConfirmation'].markAsDirty();
+      this.registerform.form.controls?.['passwordConfirmation'].setErrors(null);
     } else {
+      // form control with errors
       this.noMatchPasswords = false;
+      this.registerform.form.controls?.['passwordConfirmation'].setErrors({
+        incorrect: true,
+      });
+      this.registerform.form.controls?.[
+        'passwordConfirmation'
+      ].markAsPristine();
     }
   }
 
@@ -56,6 +68,9 @@ export class RegisterComponent {
     console.log('Registering with data:', this.registerData);
     if (this.registerData.password !== this.passwordConfirmation) {
       this.errors.push('Passwords do not match');
+    }
+    if (!this.registerData.fullName) {
+      this.errors.push('Full name is required');
     }
     if (!this.registerData) if (this.errors.length > 0) return;
     // this.authenticationService.register(this.registerData).subscribe({
