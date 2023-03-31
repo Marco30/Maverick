@@ -4,9 +4,11 @@
   <div class="form-group pb-2">
     <label for="email" class="py-1">Email</label>
     <input
+      pattern="^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$"
       type="email"
       class="form-control"
       id="email"
+      placeholder="Mejl"
       name="email"
       [(ngModel)]="loginData.email"
       #emailControl="ngModel"
@@ -20,6 +22,7 @@
       type="password"
       class="form-control"
       id="password"
+      placeholder="Password"
       name="password"
       [(ngModel)]="loginData.password"
       required

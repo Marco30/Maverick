@@ -129,8 +129,20 @@
       name="password"
       [(ngModel)]="registerData.password"
       required
+      #passwordControl1="ngModel"
     />
-  </div>
+
+  <span
+        class="text-danger help-block"
+        *ngIf="
+          passwordControl1.errors?.['required'] &&
+          passwordControl1.touched 
+        "
+      >
+      password field must not be empty
+      </span>
+    </div>
+
 
   <div class="form-group pb-2">
     <label for="password_confirmation" class="py-1">Confirm Password</label>
@@ -149,7 +161,7 @@
       class="text-danger help-block d-block mt-1"
       *ngIf="confirmPassword.errors?.['required'] && confirmPassword.touched"
     >
-      This field is required
+    Confirm password field is required
     </span>
     <span
       class="text-danger help-block d-block mt-1"
