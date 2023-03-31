@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { Observable } from 'rxjs';
-import { ThemeService } from './services/theme.service';
+import { ThemeService } from './service/theme/theme.service';
 
 @Component({
   selector: 'app-root',
@@ -15,6 +15,6 @@ export class AppComponent {
   }
 
   toggleDarkMode() {
-    this.themeService.toggleDarkTheme();
+    this.themeService.togglecurrentTheme();
   }
 }

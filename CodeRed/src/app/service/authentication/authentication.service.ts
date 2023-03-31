@@ -1,29 +1,91 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { Observable, timer } from 'rxjs';
+import { BehaviorSubject, Observable, Subject, timer } from 'rxjs';
 import { AuthToken } from 'src/app/model/authToken/auth-token';
 import { Login } from 'src/app/model/login/login';
+import { Register } from 'src/app/model/register/register';
+import { User } from 'src/app/model/user/user';
 import { environment } from 'src/environments/environment';
 import { GenericHttpService } from '../genericHttp/generic-http.service';
+import { HttpRequestService } from '../httpRequest/http-request.service';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class AuthenticationService {
   constructor(
-    private genericHttpService: GenericHttpService,
-    private router: Router,
-    // public dialogService: DialogService
+    private httpRequestService: HttpRequestService,
+    private router: Router // public dialogService: DialogService
   ) {}
 
-  private tokenName = "jwt_token";
+  chatUser: BehaviorSubject<User | null> = new BehaviorSubject<User | null>(
+    null
+  );
+  getChatUser = () => this.chatUser.asObservable();
+  private tokenName = 'jwt_token';
   private timerSubscription: any;
   private reminderSubscription: any;
   private refreshSubscription: any;
   private refreshJwtTokenSubscription: any;
-  private logoutPath = '/LoginView'
+  private logoutPath = '/authView';
 
-  private chatUser: any;
+  // private chatUser: any;
+  setChatUser(user: User) {
+    this.chatUser.next(user);
+  }
+  public login(logindata: Login): Observable<AuthToken> {
+    console.info('login data: ', logindata);
+
+    /*const url = environment.authenticate_url;
+
+    return this.genericHttpService.post<any>(url, logindata);*/
+
+    const url = environment.authenticate_url;
+
+    const queryParams = { model: logindata };
+
+    return this.httpRequestService.postData<any>(url, queryParams);
+  }
+
+  register(registerData: Register) {
+    const url = environment.register_url;
+    const queryParams = { model: registerData };
+    return this.httpRequestService.postData<Register>(url, queryParams);
+  }
+
+  getUserDataFromSecurityNumber(userInfo: Register): Observable<Register> {
+    const url = environment.get_user_data_from_security_number;
+    const queryParams = { model: userInfo };
+    return this.httpRequestService.postData<any>(url, queryParams);
+  }
+
+  sendResetPasswordRequest(email: string) {
+    const url = environment.reset_password_request;
+    const queryParams = { model: { email } };
+    return this.httpRequestService.postData(url, queryParams);
+  }
+
+  sendResetPassword(token: string, password: string) {
+    const url = environment.reset_password;
+    const queryParams = { model: { Password: password, Token: token } };
+    return this.httpRequestService.postData(url, queryParams);
+  }
+
+  sendTest() {
+    const queryParams = { model: { Password: 'password', Token: 'token' } };
+    return this.httpRequestService.postData<any>(
+      'https://localhost:7125/wargames/test',
+      queryParams
+    );
+  }
+
+  logout() {
+    localStorage.removeItem('chatId');
+    this.cleanTokenData();
+    this.chatUser.next(null);
+    location.reload();
+    this.router.navigate([this.logoutPath]);
+  }
 
   getToken(): string | null {
     return localStorage.getItem(this.tokenName);
@@ -65,40 +127,24 @@ export class AuthenticationService {
     const url = environment.refreshToken_url;
 
     //return this.genericHttpService.post<any>(url);
-    return this.postData<any>(url);
-  }
-
-  public getAuthentication(logindata: Login): Observable<AuthToken> {
-    console.info("login data: ", logindata);
-
-    /*const url = environment.authenticate_url;
-
-    return this.genericHttpService.post<any>(url, logindata);*/
-
-    const url = environment.authenticate_url;
-
-    const queryParams = { model: logindata };
-
-    return this.postData<any>(url, queryParams);
+    return this.httpRequestService.postData<any>(url);
   }
 
   /**
    * post data.
    */
-  public postData<T>(url: string, QueryParams: object = {}): Observable<any> {
-    return this.genericHttpService.post<T>(url, QueryParams);
-  }
+
 
   public parseJwt(token: any) {
-    const base64Url = token.split(".")[1];
-    const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
     const jsonPayload = decodeURIComponent(
       atob(base64)
-        .split("")
+        .split('')
         .map((c) => {
-          return "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2);
+          return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
         })
-        .join("")
+        .join('')
     );
 
     return JSON.parse(jsonPayload);
@@ -114,13 +160,13 @@ export class AuthenticationService {
   // displays message before logging out as well, check if users are active and renews the token if user is aktiv
 
   startCountingDown() {
-    console.info("token");
+    console.info('token');
     console.info(this.getToken);
 
     // review this feature maybe better to use an Interval timer that check every 20 seconds if token valid
     const expirationDate = this.getTokenExpirationDate();
 
-    console.info("date of token expiration " + expirationDate);
+    console.info('date of token expiration ' + expirationDate);
 
     const remainingTime = expirationDate.getTime() - Date.now();
 
@@ -128,11 +174,11 @@ export class AuthenticationService {
 
     const refreshToken = remainingTime - 600000; // 10 min
 
-    console.info("refresh Token if active " + refreshToken);
+    console.info('refresh Token if active ' + refreshToken);
 
-    console.info("reminder Of Token Expiration " + reminderOfTokenExpiration);
+    console.info('reminder Of Token Expiration ' + reminderOfTokenExpiration);
 
-    console.info("remainingTime " + remainingTime);
+    console.info('remainingTime ' + remainingTime);
 
     this.refreshSubscription = timer(refreshToken).subscribe(() =>
       this.checkIfUserActive()
@@ -150,12 +196,12 @@ export class AuthenticationService {
   checkIfUserActive() {
     this.refreshJwtTokenSubscription = this.RefreshJwtToken.bind(this);
 
-    document.body.addEventListener("click", this.refreshJwtTokenSubscription);
-    document.body.addEventListener("keydown", this.refreshJwtTokenSubscription);
+    document.body.addEventListener('click', this.refreshJwtTokenSubscription);
+    document.body.addEventListener('keydown', this.refreshJwtTokenSubscription);
   }
 
   RefreshJwtToken() {
-    console.info("------Refresh Token--------");
+    console.info('------Refresh Token--------');
 
     let newToken: AuthToken;
 
@@ -167,17 +213,17 @@ export class AuthenticationService {
       this.setToken(newToken);
 
       this.startCountingDown();
-      console.info("------set new Token--------");
+      console.info('------set new Token--------');
     });
   }
 
   cleanTokenData() {
     document.body.removeEventListener(
-      "click",
+      'click',
       this.refreshJwtTokenSubscription
     );
     document.body.removeEventListener(
-      "keydown",
+      'keydown',
       this.refreshJwtTokenSubscription
     );
     this.deleteToken();
@@ -189,13 +235,13 @@ export class AuthenticationService {
   }
 
   Reminder() {
-    console.info("Token will expir in 5 min");
+    console.info('Token will expir in 5 min');
     const expirationDate = this.getTokenExpirationDate();
     this.reminderSubscription.unsubscribe();
     console.info(
-      "Token will expir in 5 min " +
+      'Token will expir in 5 min ' +
         expirationDate.toString() +
-        ", Time now " +
+        ', Time now ' +
         Date.now().toString()
     );
     /* const ref = this.dialogService.open(ConfirmComponent, {
@@ -218,44 +264,19 @@ export class AuthenticationService {
 
   tokenHasExpired() {
     if (this.isTokenExpired()) {
-      console.info("Token has expired");
+      console.info('Token has expired');
       const expirationDate = this.getTokenExpirationDate();
       console.info(
-        "Token has expired " +
+        'Token has expired ' +
           expirationDate.toString() +
-          ", Time now " +
+          ', Time now ' +
           Date.now().toString()
       );
       // alert('Token has expired ' + expirationDate.toString() + ', Time now ' + Date.now().toString());
       this.cleanTokenData();
       this.router.navigate([this.logoutPath]);
     } else {
-      console.info("error in tokenIsExpired func");
+      console.info('error in tokenIsExpired func');
     }
-  }
-
-  sendResetPasswordRequest(email: string) {
-    const url = environment.resetPasswordRequest;
-    const queryParams = { model: { email } };
-    return this.postData(url, queryParams);
-  }
-
-  sendResetPassword(token: string, password: string) {
-    const url = environment.resetPassword;
-    const queryParams = { model: { Password: password, Token: token } };
-    return this.postData(url, queryParams);
-  }
-
-  sendTest() {
-    const queryParams = { model: { Password: "password", Token: "token" } };
-    return this.postData<any>("https://localhost:44365/miraclemile/test", {});
-  }
-
-  logout() {
-    // localStorage.removeItem('chatId');
-    this.cleanTokenData();
-    // this.userService.setUserToNull();
-    location.reload();
-    this.router.navigate([this.logoutPath]);
   }
 }
