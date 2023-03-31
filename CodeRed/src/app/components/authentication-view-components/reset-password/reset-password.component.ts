@@ -32,17 +32,9 @@ export class ResetPasswordComponent {
     const secondPassword = input;
     const firstPassword = this.data.password;
     if (secondPassword !== firstPassword) {
-      // stuff for form control
       this.noMatchPasswords = true;
-      this.resetForm.controls?.['confirmPassword'].markAsDirty();
-      this.resetForm.form.controls?.['confirmPassword'].setErrors(null);
     } else {
-      // form control with errors
       this.noMatchPasswords = false;
-      this.resetForm.form.controls?.['confirmPassword'].setErrors({
-        incorrect: true,
-      });
-      this.resetForm.form.controls?.['confirmPassword'].markAsPristine();
     }
   }
 

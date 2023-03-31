@@ -46,19 +46,9 @@ export class RegisterComponent {
     const secondPassword = input;
     const firstPassword = this.registerData.password;
     if (secondPassword !== firstPassword) {
-      // stuff for form control
-      console.log('passwords not match');
-
       this.noMatchPasswords = true;
-      this.registerform.controls?.['confirmPassword'].markAsDirty();
-      this.registerform.form.controls?.['confirmPassword'].setErrors(null);
     } else {
-      // form control with errors
       this.noMatchPasswords = false;
-      this.registerform.form.controls?.['confirmPassword'].setErrors({
-        incorrect: true,
-      });
-      this.registerform.form.controls?.['confirmPassword'].markAsPristine();
     }
   }
 
