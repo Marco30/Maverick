@@ -61,6 +61,7 @@ export class RegisterComponent {
       this.registerform.form.controls?.[
         'passwordConfirmation'
       ].markAsPristine();
+      this.registerform.form.controls?.['passwordConfirmation'].markAsTouched();
     }
   }
 
