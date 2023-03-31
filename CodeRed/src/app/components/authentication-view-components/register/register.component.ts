@@ -1,6 +1,7 @@
 import { Component, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
+import { Address } from 'src/app/model/address/address';
 import { Register } from 'src/app/model/register/register';
 import { AuthenticationService } from 'src/app/service/authentication/authentication.service';
 
@@ -14,7 +15,17 @@ export class RegisterComponent {
   constructor(
     private authenticationService: AuthenticationService,
     private router: Router
-  ) {}
+  ) { }
+
+  address: Address = {
+    city: '',
+    country: '',
+    street: '',
+    zipCode: '',
+    attention: '',
+    careOf: '',
+  };
+
   registerData: Register = {
     socialSecurityNumber: '',
     fullName: '',
@@ -28,13 +39,9 @@ export class RegisterComponent {
     birthDay: 0,
     birthMonth: 0,
     birthYear: 0,
-    address: {
-      city: '',
-      street: '',
-      zipCode: '',
-      country: '',
-    },
+    address: this.address,
   };
+
   showTermsOfUse: boolean = false;
   noMatchPasswords: boolean = false;
   errors: string[] = [];
@@ -42,26 +49,27 @@ export class RegisterComponent {
   cancelDataFetching: boolean = false;
   showLoading: boolean = false;
 
-  checkSame(input: string) {
-    const secondPassword = input;
+  checkSame() {
+    const secondPassword = this.passwordConfirmation;
     const firstPassword = this.registerData.password;
     if (secondPassword !== firstPassword) {
-      // stuff for form control
+  
       console.log('passwords not match');
-
       this.noMatchPasswords = true;
-      this.registerform.controls?.['passwordConfirmation'].markAsDirty();
-      this.registerform.form.controls?.['passwordConfirmation'].setErrors(null);
+      if (this.registerform && this.registerform.controls) {
+        this.registerform.controls['passwordConfirmation'].markAsDirty();
+        this.registerform.controls['passwordConfirmation'].setErrors(null);
+      }
+
     } else {
       // form control with errors
       this.noMatchPasswords = false;
-      this.registerform.form.controls?.['passwordConfirmation'].setErrors({
-        incorrect: true,
-      });
-      this.registerform.form.controls?.[
-        'passwordConfirmation'
-      ].markAsPristine();
-      this.registerform.form.controls?.['passwordConfirmation'].markAsTouched();
+      if (this.registerform && this.registerform.controls) {
+      this.registerform.controls['passwordConfirmation'].setErrors({incorrect: true,});
+      this.registerform.controls['passwordConfirmation'].markAsPristine();
+      this.registerform.controls['passwordConfirmation'].markAsTouched();
+    }
+
     }
   }
 
