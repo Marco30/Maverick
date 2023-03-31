@@ -105,7 +105,7 @@ public class AuthController : ControllerBase
 
     }
 
-    //[ValidateToken]
+    [ValidateToken]
     [HttpPost("resetpasswordrequest")]
     public async Task<IActionResult> sendResetPasswordEmail(ResetPasswordRequestDto request)
     {
@@ -136,7 +136,7 @@ public class AuthController : ControllerBase
         }
     }
 
-   // [ValidateToken]
+    [ValidateToken]
     [HttpPost("resetpassword")]
     public async Task<IActionResult> resetUserPassword(ResetPasswordDto reset)
     {
@@ -246,12 +246,6 @@ public class AuthController : ControllerBase
 
         return BadRequest(new ResponseMessageDto { Error = true, Message = "Fel på personnummer" });
 
-    }
-
-    [HttpPost("test")]
-    public async Task<IActionResult> test()
-    {
-        return Ok();
     }
 
     private static bool VerifySocialSecurityNumber(string number)

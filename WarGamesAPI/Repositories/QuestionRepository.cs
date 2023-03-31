@@ -23,14 +23,19 @@ public class QuestionRepository : IQuestionRepository
         return confirmedQuestion ?? null;
     }
 
-    
-    public async Task<Answer?> SaveAnswer(Answer answer)
+    public async Task<AnswerDto?> SaveAnswer(Answer answer)
     {
         answer.Id = new Random().Next();
         Json.CheckAndAddDataToJson("Answer", answer);
         List<Answer> allAnswers = Json.GetJsonData<Answer>("Answer");
         var confirmedAnswer = allAnswers.FirstOrDefault(m => m.Id == answer.Id);
-        return confirmedAnswer ?? null;
+        if (confirmedAnswer != null)
+        {
+            return new AnswerDto 
+                { Id = answer.Id, Text = answer.Text, Time = answer.Time, QuestionId = answer.QuestionId };
+        }
+
+        return null;
     }
 
     public async Task<List<QuestionDto>> GetUserQuestions(int userId)
@@ -47,6 +52,33 @@ public class QuestionRepository : IQuestionRepository
         
         var question = allQuestions.FirstOrDefault(q => q.Id == questionId);
         return question != null ? new QuestionDto { Id = question.Id, UserId = question.UserId, Text = question.Text } : null;
+    }
+
+    public async Task<List<AnswerDto>> GetAnswers(int questionId)
+    {
+        var allAnswers = Json.GetJsonData<Answer>("Answer");
+        var answersToQuestion = allAnswers.Where(a => a.QuestionId == questionId).ToList();
+        return answersToQuestion.Select(answer => 
+            new AnswerDto 
+                { Id = answer.Id, Text = answer.Text, Time = answer.Time, QuestionId = answer.QuestionId }).ToList();
+    }
+
+    public async Task DeleteQuestion(int questionId)
+    {
+        List<Question> allQuestions = Json.GetJsonData<Question>("Question");
+        
+        var question = allQuestions.FirstOrDefault(q => q.Id == questionId);
+        if (question != null) Json.RemoveDataFromJson("Question", question);
+    }
+
+    public async Task<AnswerDto?> GetAnswer(int answerId)
+    {
+        List<Answer> allAnswers = Json.GetJsonData<Answer>("Answer");
+        
+        var answer = allAnswers.FirstOrDefault(a => a.Id == answerId);
+        return answer != null 
+            ? new AnswerDto { Id = answer.Id, Text = answer.Text, Time = answer.Time, QuestionId = answer.QuestionId} 
+            : null;
     }
 
 
