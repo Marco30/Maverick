@@ -5,25 +5,25 @@ using WarGamesAPI.Model;
 
 namespace WarGamesAPI.Services;
 
-public class QuestionService : IQuestionService
+public class GptService : IGptService
 {
-    readonly IQuestionRepository _messageRepo;
+    readonly IQuestionRepository _questionRepo;
 
-    public QuestionService(IQuestionRepository messageRepo)
+    public GptService(IQuestionRepository questionRepo)
     {
-        _messageRepo = messageRepo;
+        _questionRepo = questionRepo;
     }
 
     public async Task<Answer?> AskQuestion(Question question)
     {
         var answer = await GenerateAnswer();
-        var answerToSave = new Answer
+
+        return new Answer
         {
             QuestionId = question.Id, 
             Text = answer, Time = DateTime.Now
         };
 
-        return await _messageRepo.SaveAnswer(answerToSave);
     }
 
 

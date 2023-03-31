@@ -1,0 +1,2 @@
+2023-03-31 11:49:29.664 +02:00 [INF] AskQuestion called. userId: 1598753183 Question: vad är 39 + 3.
+2023-03-31 12:43:13.068 +02:00 [INF] AskQuestion called. userId: 1598753183 Question: vad heter jag?.
