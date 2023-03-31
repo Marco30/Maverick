@@ -143,3 +143,8 @@ body {
   background-color: var(--info-bg-color);
   color: var(--info-text-color);
 }
+
+input.ng-invalid.ng-touched {
+  border: 1px solid red;
+}
+
