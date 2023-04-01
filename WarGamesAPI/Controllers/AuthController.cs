@@ -248,12 +248,6 @@ public class AuthController : ControllerBase
 
     }
 
-    [HttpPost("test")]
-    public async Task<IActionResult> test()
-    {
-        return Ok();
-    }
-
     private static bool VerifySocialSecurityNumber(string number)
     {
         const string pattern = @"^(19|20)?(\d{6}([-+]|\s)\d{4}|(?!19|20)\d{10})$";
