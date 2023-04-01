@@ -25,9 +25,10 @@
     <label for="name" class="py-1">Full Name*</label>
     <input
       type="text"
+      pattern="^[a-z0-9._%+-]"
       class="form-control"
-      id="name"
-      name="name"
+      id="fullName"
+      name="fullName"
       [(ngModel)]="registerData.fullName"
       required
       #fullNameControl="ngModel"

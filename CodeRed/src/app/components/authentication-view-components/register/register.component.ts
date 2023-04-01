@@ -66,11 +66,13 @@ export class RegisterComponent {
   }
 
   register() {
+    this.errors = [];
     console.log('Registering with data:', this.registerData);
     if (this.registerData.password !== this.passwordConfirmation) {
       this.errors.push('Passwords do not match');
     }
     if (!this.registerData.fullName) {
+      // this.registerform.form.controls?.['fullNameControl'].markAsTouched();
       this.errors.push('Full name is required');
     }
     if (!this.registerData) if (this.errors.length > 0) return;
