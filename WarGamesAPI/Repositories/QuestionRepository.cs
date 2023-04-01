@@ -1,85 +1,130 @@
+using AutoMapper;
+using AutoMapper.QueryableExtensions;
+using Microsoft.EntityFrameworkCore;
+using WarGamesAPI.Data;
 using WarGamesAPI.DTO;
 using WarGamesAPI.Interfaces;
 using WarGamesAPI.Model;
-using WarGamesAPIAPI.JsonCRUD;
 
-#pragma warning disable CS1998
 
 namespace Courses.Api.Repositories;
 
 public class QuestionRepository : IQuestionRepository
 {
-   
-    public async Task<Question?> SaveQuestion(AskQuestionDto userQuestion)
-    {
-        var question = new Question
-        {
-            Id = new Random().Next(), Text = userQuestion.Text, UserId = userQuestion.UserId
-        };
+    readonly WarGamesContext _context;
+    readonly IMapper _mapper;
 
-        Json.CheckAndAddDataToJson("Question", question);
-        List<Question> allQuestions = Json.GetJsonData<Question>("Question");
-        var confirmedQuestion = allQuestions.FirstOrDefault(m => m.Id == question.Id);
-        return confirmedQuestion ?? null;
+    public QuestionRepository(WarGamesContext context, IMapper mapper)
+    {
+        _context = context;
+        _mapper = mapper;
     }
 
-    public async Task<AnswerDto?> SaveAnswer(Answer answer)
+    public async Task<QuestionDto?> SaveQuestionAsync(AskQuestionDto userQuestion)
     {
-        answer.Id = new Random().Next();
-        Json.CheckAndAddDataToJson("Answer", answer);
-        List<Answer> allAnswers = Json.GetJsonData<Answer>("Answer");
-        var confirmedAnswer = allAnswers.FirstOrDefault(m => m.Id == answer.Id);
-        if (confirmedAnswer != null)
+        var userId = (int)userQuestion.UserId!;
+
+        if (userQuestion.ConversationId == 0)
         {
-            return new AnswerDto 
-                { Id = answer.Id, Text = answer.Text, Time = answer.Time, QuestionId = answer.QuestionId };
+
+            var conversation = await CreateConversationAsync(userId);
+            userQuestion.ConversationId = conversation!.Id;
+
         }
 
-        return null;
+        var question = new Question
+        {
+            Text = userQuestion.Text, UserId = userId, 
+            ConversationId = userQuestion.ConversationId
+        };
+
+        try
+        {
+            await _context.Question.AddAsync(question);
+            await _context.SaveChangesAsync();
+        }
+        catch (Exception e)
+        {
+            throw new Exception("Error saving question", e);
+        }
+
+        return _mapper.Map<QuestionDto>(question);
+
     }
 
-    public async Task<List<QuestionDto>> GetUserQuestions(int userId)
+    public async Task<AnswerDto?> SaveAnswerAsync(AnswerDto answer)
     {
-        List<Question> allQuestions = Json.GetJsonData<Question>("Question");
-        var result = (from question in allQuestions where question.UserId == userId 
-            select new QuestionDto { Id = question.Id, UserId = question.UserId, Text = question.Text }).ToList();
-        return result;
+        var answerToSave = new Answer
+        {
+            Text = answer.Text,
+            Time = answer.Time,
+            QuestionId = answer.QuestionId,
+            ConversationId = answer.ConversationId
+        };
+
+        await _context.Answer.AddAsync(answerToSave);
+        await _context.SaveChangesAsync();
+
+        answer.Id = answerToSave.Id;
+
+        return answer;
+
     }
 
-    public async Task<QuestionDto?> GetQuestion(int questionId)
+    public async Task<List<QuestionDto>> GetUserQuestionsAsync(int userId)
     {
-        List<Question> allQuestions = Json.GetJsonData<Question>("Question");
+        return await _context.Question.Where(q => q.UserId == userId)
+            .ProjectTo<QuestionDto>(_mapper.ConfigurationProvider).ToListAsync();
+    }
+
+    public async Task<QuestionDto?> GetQuestionAsync(int questionId)
+    {
+        return await _context.Question.Where(q => q.Id == questionId)
+            .ProjectTo<QuestionDto>(_mapper.ConfigurationProvider).SingleOrDefaultAsync();
+    }
+
+    public async Task<List<AnswerDto>> GetAnswersAsync(int questionId)
+    {
+        return await _context.Answer.Where(a => a.QuestionId == questionId)
+            .ProjectTo<AnswerDto>(_mapper.ConfigurationProvider).ToListAsync();
+    }
+
+    public async Task DeleteQuestionAsync(int questionId)
+    {
+        var question = await _context.Question.FindAsync(questionId);
+        if (question is null)
+        {
+            throw new Exception($"Question with id {questionId} not found");
+        }
+
+        _context.Question.Remove(question);
+
+        await _context.SaveChangesAsync();
+
+    }
+
+    public async Task<AnswerDto?> GetAnswerAsync(int answerId)
+    {
+        return await _context.Answer.Where(a => a.Id == answerId).ProjectTo<AnswerDto>(_mapper.ConfigurationProvider)
+            .SingleOrDefaultAsync();
+    }
+
+    private async Task<Conversation?> CreateConversationAsync(int userId)
+    {
+        var conversation = new Conversation { UserId = userId };
         
-        var question = allQuestions.FirstOrDefault(q => q.Id == questionId);
-        return question != null ? new QuestionDto { Id = question.Id, UserId = question.UserId, Text = question.Text } : null;
-    }
+        try
+        {
+            await _context.Conversation.AddAsync(conversation);
+            await _context.SaveChangesAsync();
+            return conversation;
+            
+        }
+        catch (Exception e)
+        {
+            throw new Exception("Error saving conversation", e);
+        }
 
-    public async Task<List<AnswerDto>> GetAnswers(int questionId)
-    {
-        var allAnswers = Json.GetJsonData<Answer>("Answer");
-        var answersToQuestion = allAnswers.Where(a => a.QuestionId == questionId).ToList();
-        return answersToQuestion.Select(answer => 
-            new AnswerDto 
-                { Id = answer.Id, Text = answer.Text, Time = answer.Time, QuestionId = answer.QuestionId }).ToList();
     }
-
-    public async Task DeleteQuestion(int questionId)
-    {
-        List<Question> allQuestions = Json.GetJsonData<Question>("Question");
-        
-        var question = allQuestions.FirstOrDefault(q => q.Id == questionId);
-        if (question != null) Json.RemoveDataFromJson("Question", question);
-    }
-
-    public async Task<AnswerDto?> GetAnswer(int answerId)
-    {
-        List<Answer> allAnswers = Json.GetJsonData<Answer>("Answer");
-        
-        var answer = allAnswers.FirstOrDefault(a => a.Id == answerId);
-        return answer != null 
-            ? new AnswerDto { Id = answer.Id, Text = answer.Text, Time = answer.Time, QuestionId = answer.QuestionId} 
-            : null;
-    }
-
 
 }

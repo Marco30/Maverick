@@ -73,7 +73,7 @@ public class AuthController : ControllerBase
             var id = Convert.ToInt32(TokenData.GetClaimByKey(authHeaderToken, "id"));
             var fullName = firstName + " " + lastName;
 
-            var user = new User()
+            var user = new UserDto
             {
                 Id = id,
                 FullName = fullName,
@@ -117,7 +117,7 @@ public class AuthController : ControllerBase
             var user = await _userRepo.GetUserFromEmailAsync(request.Email);
             // If no user return bad request or return OK any way to avoid giving any info about registered emails
             if (user == null) return BadRequest();
-            User newUser = new User();
+            var newUser = new UserDto();
             newUser.Id = user.Id;
             // Create token with userId and 5 minutes validation time
             string token = TokenData.CreateJwtToken(user, 5);
@@ -141,48 +141,48 @@ public class AuthController : ControllerBase
     public async Task<IActionResult> resetUserPassword(ResetPasswordDto reset)
     {
         // Validate token 
-        if(reset.Token == "resetPasswordTest")
+        if (reset.Token == "resetPasswordTest")
         {
             return Ok();
         }
+        
+        var userId = TokenData.getUserId($"Bearer {reset.Token}");
+        
         try
         {
-            int userId = TokenData.getUserId($"Bearer {reset.Token}");
             var user = await _userRepo.GetUserFromIdAsync(userId);
-            if (user == null) return BadRequest();
-            if (reset.Password != null)
+
+            if (user == null || reset.Password == null) return BadRequest();
+
+            var updateSuccess = await _userRepo.UpdateUserPassword((int)user.Id!, reset.Password);
+            if (!updateSuccess)
             {
-                var updateSuccess = await _userRepo.UpdateUserPassword(user.Id, reset.Password);
-                if (!updateSuccess)
-                {
-                    return StatusCode(500, "Error Updating user password");
-                }
+                return StatusCode(500, "Error Updating user password");
             }
+
             return Ok();
         }
         catch (Exception)
         {
-            return BadRequest();
+            return StatusCode(500, "Error updating user password");
+
         }
     }
 
     [HttpPost("getUserDataFromSecurityNumber")]
     public Task<IActionResult> GetUserData(GetUserDataDto userData)
     {
-        if(userData.SocialSecurityNumber == null)
+        if (userData.SocialSecurityNumber == null)
         {
             return Task.FromResult<IActionResult>(BadRequest());
         }
 
-        var user = Crawlers.SeleniumGetUserInfoPagesCrawler("https://mrkoll.se/", userData.SocialSecurityNumber);
+        UserDto user = Crawlers.SeleniumGetUserInfoPagesCrawler("https://mrkoll.se/", userData.SocialSecurityNumber);
 
-        if (user != null)
-        {
-            user.SocialSecurityNumber = userData.SocialSecurityNumber.ToString();
-            return Task.FromResult<IActionResult>(Ok(user));
-        }
 
-        return Task.FromResult<IActionResult>(NotFound());
+        user.SocialSecurityNumber = userData.SocialSecurityNumber;
+        return Task.FromResult<IActionResult>(Ok(user));
+
 
     }
 
@@ -190,6 +190,8 @@ public class AuthController : ControllerBase
     public async Task<ActionResult<User>> RegisterUser(RegisterUserDto register)
     {
         if (register.Email is null) return BadRequest(new ResponseMessageDto { Error = true, Message = "Email saknas" });
+        if (register.SocialSecurityNumber is null) return BadRequest(new ResponseMessageDto { Error = true, Message = "Personnummer saknas" });
+
 
         var emailUser = await _userRepo.GetUserFromEmailAsync(register.Email);
         var socialSecurityUser = await _userRepo.GetUserFromSocSecAsync(register.SocialSecurityNumber);
@@ -226,19 +228,23 @@ public class AuthController : ControllerBase
                 _logger.LogInformation($"Crawl failed, registering user anyway{e.Message}");
             }
 
+
             var registeredUser = await _userRepo.AddUser(register);
-
-            if (registeredUser != null)
+            if (registeredUser is null)
             {
-                var token = TokenData.CreateJwtToken(registeredUser);
-                var inloggedUser = new InLoggedUserDto
-                {
-                    User = registeredUser,
-                    Token = token
-                };
-                return Ok(inloggedUser);
-
+                return StatusCode(500, new ResponseMessageDto { Error = true, Message = "Error registering user" });
             }
+            
+            var token = TokenData.CreateJwtToken(registeredUser);
+
+            var inloggedUser = new InLoggedUserDto
+            {
+                User = registeredUser,
+                Token = token
+            };
+            return Ok(inloggedUser);
+
+            
 
 
         }

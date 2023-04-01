@@ -1,8 +1,8 @@
-using WarGamesAPI.Model;
+using WarGamesAPI.DTO;
 
 namespace WarGamesAPI.Interfaces;
 
 public interface IGptService
 {
-    Task<Answer?> AskQuestion(Question question);
+    Task<AnswerDto?> AskQuestion(QuestionDto question);
 }

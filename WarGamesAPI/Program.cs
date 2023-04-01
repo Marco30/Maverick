@@ -1,14 +1,22 @@
 
 using Courses.Api.Repositories;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using Serilog;
 using Serilog.Events;
+using WarGamesAPI.Data;
+using WarGamesAPI.Helpers;
 using WarGamesAPI.Interfaces;
 using WarGamesAPI.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Services.AddDbContext<WarGamesContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
+);
+
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy(name:"AllowAllOrigins",
@@ -51,15 +59,16 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
-
+builder.Services.AddAutoMapper(typeof(AutoMapperProfiles).Assembly);
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddScoped<IQuestionRepository, QuestionRepository>();
-builder.Services.AddScoped<IGptService, GptService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+
+builder.Services.AddScoped<IGptService, GptService>();
 
 
 Log.Logger = new LoggerConfiguration()

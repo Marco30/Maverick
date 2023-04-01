@@ -1,5 +1,5 @@
+using WarGamesAPI.DTO;
 using WarGamesAPI.Interfaces;
-using WarGamesAPI.Model;
 
 #pragma warning disable CS1998
 
@@ -7,18 +7,18 @@ namespace WarGamesAPI.Services;
 
 public class GptService : IGptService
 {
-    readonly IQuestionRepository _questionRepo;
+    readonly ILogger<GptService> _logger;
 
-    public GptService(IQuestionRepository questionRepo)
+    public GptService(ILogger<GptService> logger)
     {
-        _questionRepo = questionRepo;
+        _logger = logger;
     }
 
-    public async Task<Answer?> AskQuestion(Question question)
+    public async Task<AnswerDto?> AskQuestion(QuestionDto question)
     {
         var answer = await GenerateAnswer();
 
-        return new Answer
+        return new AnswerDto
         {
             QuestionId = question.Id, 
             Text = answer, Time = DateTime.Now

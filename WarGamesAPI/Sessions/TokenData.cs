@@ -159,7 +159,7 @@ public class TokenData
 
     }
 
-    public static string CreateJwtToken(User user, int timeValidity = 0 )
+    public static string CreateJwtToken(UserDto user, int timeValidity = 0 )
     {
       
 

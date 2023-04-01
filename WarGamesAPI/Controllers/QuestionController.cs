@@ -3,9 +3,7 @@ using MiracleMileAPI.Sessions;
 using WarGamesAPI.DTO;
 using WarGamesAPI.Filters;
 using WarGamesAPI.Interfaces;
-using WarGamesAPI.Model;
 
-#pragma warning disable CS1998
 
 namespace WarGamesAPI.Controllers;
 
@@ -26,89 +24,116 @@ public class QuestionController : ControllerBase
     }
 
     [ValidateToken]
+    [HttpPost("askquestion")]
+    public async Task<ActionResult<AnswerDto>> AskQuestion(AskQuestionDto userQuestion)
+    {
+        if (!Request.Headers.ContainsKey("Authorization") || string.IsNullOrEmpty(Request.Headers["Authorization"])) 
+            return BadRequest("The Authorization header is required.");
+        userQuestion.UserId = TokenData.getUserId(Request.Headers["Authorization"]!);
+
+        
+        _logger.LogInformation($"AskQuestion called. userId: {userQuestion.UserId} Question: {userQuestion.Text}.");
+
+        if (string.IsNullOrEmpty(userQuestion.Text))
+        {
+            return BadRequest("The text of the user question is required.");
+        }
+
+        if (userQuestion.UserId is null)
+        {
+            return BadRequest("Faulty userId");
+        }
+        
+        
+        try
+        {
+            
+            var question = await _questionRepo.SaveQuestionAsync(userQuestion);
+            
+            var answer = new AnswerDto();
+
+            if (question != null)
+            {
+                answer = await _gptService.AskQuestion(question);
+            }
+
+            if (answer is null)
+            {
+                return StatusCode(500);
+            }
+        
+            var result = await _questionRepo.SaveAnswerAsync(answer);
+        
+            return StatusCode(201, result);
+
+        }
+        catch (Exception e)
+        {
+            var error = new ResponseMessageDto { StatusCode = 500, Message = e.Message };
+            return StatusCode(500, error);
+        }
+
+    }
+
+
+    [ValidateToken]
     [HttpGet("getuserquestions")]
     public async Task<ActionResult<List<QuestionDto>>> GetUserQuestions()
     {
-        var userId = TokenData.getUserId(Request.Headers["Authorization"]);
+        if (!Request.Headers.ContainsKey("Authorization") || string.IsNullOrEmpty(Request.Headers["Authorization"])) 
+            return BadRequest("The Authorization header is required.");
+        var userId = TokenData.getUserId(Request.Headers["Authorization"]!);
 
         _logger.LogInformation("GetMessages called");
 
-        return Ok(await _questionRepo.GetUserQuestions(userId));
+        var questions = await _questionRepo.GetUserQuestionsAsync(userId);
+        return questions.Any() ? Ok(questions) : NotFound();
     }
 
     [ValidateToken]
-    [HttpGet("getquestion/{id}")]
-    public async Task<ActionResult<QuestionDto>> GetQuestion(int id)
+    [HttpGet("getquestion/{questionId}")]
+    public async Task<ActionResult<QuestionDto>> GetQuestion(int questionId)
     {
-        _logger.LogInformation($"GetQuestion called. QuestionId: {id}");
-
-        var question = await _questionRepo.GetQuestion(id);
-        if (question != null)
-        {
-            return Ok(question);
-        }
-
-        return NotFound();
+        _logger.LogInformation($"GetQuestion called. QuestionId: {questionId}");
+        var question = await _questionRepo.GetQuestionAsync(questionId);
+        return question is null ? NotFound() : Ok(question);
+        
     }
 
     [ValidateToken]
     [HttpGet("getanswer/{answerId}")]
     public async Task<ActionResult<AnswerDto>> GetAnswer(int answerId)
     {
-
-        var answer = await _questionRepo.GetAnswer(answerId);
-        if (answer != null)
-        {
-            return Ok(answer);
-        }
-
-        return NotFound();
+        var answer = await _questionRepo.GetAnswerAsync(answerId);
+        return answer is null ? NotFound() : Ok(answer);
     }
 
     [ValidateToken]
     [HttpGet("getanswers/{questionId}")]
     public async Task<ActionResult<List<AnswerDto>>> GetAnswers(int questionId)
     {
-
-        var answer = await _questionRepo.GetAnswers(questionId);
-        if (answer != null)
-        {
-            return Ok(answer);
-        }
-
-        return NotFound();
+        var answers = await _questionRepo.GetAnswersAsync(questionId);
+        return answers.Any() ? Ok(answers) : NotFound();
     }
 
+    
     [ValidateToken]
-    [HttpPost("askquestion")]
-    public async Task<ActionResult<AnswerDto>> AskQuestion(AskQuestionDto userQuestion)
-    {
-        userQuestion.UserId = TokenData.getUserId(Request.Headers["Authorization"]);
-
-        _logger.LogInformation($"AskQuestion called. userId: {userQuestion.UserId} Question: {userQuestion.Text}.");
-        var question = await _questionRepo.SaveQuestion(userQuestion);
-        var answer = new Answer();
-
-        if (question != null)
-        {
-            answer = await _gptService.AskQuestion(question);
-        }
-
-        if (answer is null)
-        {
-            return StatusCode(500);
-        }
-        
-        var result = await _questionRepo.SaveAnswer(answer);
-        
-        return StatusCode(201, result);
-    }
-
-    [ValidateToken]
-    [HttpDelete("{id}")]
+    [HttpDelete("{questionId}")]
     public async Task<IActionResult> DeleteQuestion(int questionId)
     {
-        await _questionRepo.DeleteQuestion(questionId);
-        return NoContent();
+
+        try
+        {
+            await _questionRepo.DeleteQuestionAsync(questionId);
+            return NoContent();
+
+        }
+        catch (Exception e)
+        {
+            var error = new ResponseMessageDto { StatusCode = 500, Message = e.Message };
+            return StatusCode(500, error);
+        }
+
+
     }
 }

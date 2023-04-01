@@ -6,4 +6,5 @@ public class AnswerDto
     public string? Text { get; set; }
     public DateTime Time { get; set; }
     public int QuestionId { get; set; }
+    public int ConversationId { get; set; }
 }

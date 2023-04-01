@@ -1,21 +1,16 @@
 using WarGamesAPI.DTO;
-using WarGamesAPI.Model;
 
 namespace WarGamesAPI.Interfaces;
 
 public interface IQuestionRepository
 {
-    Task<Question?> SaveQuestion(AskQuestionDto userQuestion);
-    Task<AnswerDto?> SaveAnswer(Answer answer);
-    Task<List<QuestionDto>> GetUserQuestions(int userId);
-    Task<QuestionDto?> GetQuestion(int questionId);
-    Task DeleteQuestion(int questionId);
-    Task<AnswerDto?> GetAnswer(int answerId);
-    Task<List<AnswerDto>> GetAnswers(int questionId);
-
-
-
-
+    Task<QuestionDto?> SaveQuestionAsync(AskQuestionDto userQuestion);
+    Task<AnswerDto?> SaveAnswerAsync(AnswerDto answer);
+    Task<List<QuestionDto>> GetUserQuestionsAsync(int userId);
+    Task<QuestionDto?> GetQuestionAsync(int questionId);
+    Task DeleteQuestionAsync(int questionId);
+    Task<AnswerDto?> GetAnswerAsync(int answerId);
+    Task<List<AnswerDto>> GetAnswersAsync(int questionId);
 }
 
 

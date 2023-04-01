@@ -1,7 +1,10 @@
+using System.ComponentModel.DataAnnotations.Schema;
+
 namespace WarGamesAPI.Model;
 
 public class Address
 {
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int Id { get; set; }
 
     public string? City { get; set; }
@@ -11,5 +14,8 @@ public class Address
     public string? Attention { get; set; }
     public string? Municipality { get; set; }
     public string? CareOf { get; set; }
-    
+
+    public int UserId { get; set; }
+    public User? User { get; set; } 
+
 }
