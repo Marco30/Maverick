@@ -57,7 +57,7 @@ export class RegisterComponent {
   noMatchPasswords: boolean = false;
   ERRORS_TYPES = ERRORS_TYPES;
   errorsMap: Map<ERRORS_TYPES, ERRORS_MSGS> = new Map();
-  info: string = 'Congratulations! Your account has been registered';
+  info: string = '';
   passwordConfirmation: string = '';
   cancelDataFetching: boolean = false;
   showLoading: boolean = false;
