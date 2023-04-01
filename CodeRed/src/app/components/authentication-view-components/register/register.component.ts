@@ -48,6 +48,7 @@ export class RegisterComponent {
   passwordConfirmation: string = '';
   cancelDataFetching: boolean = false;
   showLoading: boolean = false;
+  submitted:  boolean = false;
 
   checkSame() {
     const secondPassword = this.passwordConfirmation;
@@ -57,23 +58,26 @@ export class RegisterComponent {
       console.log('passwords not match');
       this.noMatchPasswords = true;
       if (this.registerform && this.registerform.controls) {
-        this.registerform.controls['passwordConfirmation'].markAsDirty();
-        this.registerform.controls['passwordConfirmation'].setErrors(null);
+        this.registerform.controls['passwordConfirmationControl'].markAsDirty();
+        this.registerform.controls['passwordConfirmationControl'].setErrors(null);
       }
 
     } else {
       // form control with errors
       this.noMatchPasswords = false;
       if (this.registerform && this.registerform.controls) {
-      this.registerform.controls['passwordConfirmation'].setErrors({incorrect: true,});
-      this.registerform.controls['passwordConfirmation'].markAsPristine();
-      this.registerform.controls['passwordConfirmation'].markAsTouched();
+      this.registerform.controls['passwordConfirmationControl'].setErrors({incorrect: true,});
+      this.registerform.controls['passwordConfirmationControl'].markAsPristine();
+      this.registerform.controls['passwordConfirmationControl'].markAsTouched();
     }
 
     }
   }
 
   register() {
+
+    this.submitted = true;
+
     console.log('Registering with data:', this.registerData);
     if (this.registerData.password !== this.passwordConfirmation) {
       this.errors.push('Passwords do not match');
