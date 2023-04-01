@@ -5,6 +5,24 @@ import { Address } from 'src/app/model/address/address';
 import { Register } from 'src/app/model/register/register';
 import { AuthenticationService } from 'src/app/service/authentication/authentication.service';
 
+enum ERRORS_TYPES {
+  fullName = 'Full',
+  email = 'email',
+  city = 'city',
+  street = 'street',
+  zipCode = 'zipCode',
+  matchedPasswords = 'passwordDontMatch',
+  serverError = 'serverError',
+}
+enum ERRORS_MSGS {
+  fullName = 'Full name is required',
+  email = 'email name is required',
+  city = 'city name is required',
+  street = 'street name is required',
+  zipCode = 'Zip code name is required',
+  passowrdDontMatch = "Passwords don't match",
+  serverError = 'Sorry, something went wrong',
+}
 @Component({
   selector: 'app-register',
   templateUrl: './register.component.html',
@@ -44,7 +62,9 @@ export class RegisterComponent {
 
   showTermsOfUse: boolean = false;
   noMatchPasswords: boolean = false;
-  errors: string[] = [];
+  ERRORS_TYPES = ERRORS_TYPES;
+  errorsMap: Map<ERRORS_TYPES, ERRORS_MSGS> = new Map();
+  info: string = '';
   passwordConfirmation: string = '';
   cancelDataFetching: boolean = false;
   showLoading: boolean = false;
@@ -74,29 +94,55 @@ export class RegisterComponent {
     }
   }
 
+  removeError(type: ERRORS_TYPES) {
+    this.errorsMap.delete(type);
+  }
+
   register() {
 
     this.submitted = true;
 
     console.log('Registering with data:', this.registerData);
     if (this.registerData.password !== this.passwordConfirmation) {
-      this.errors.push('Passwords do not match');
+      //  this.registerform.form.controls?.['passwordConfirmation'].markAsTouched();
+      this.errorsMap.set(
+        ERRORS_TYPES.matchedPasswords,
+        ERRORS_MSGS.passowrdDontMatch
+      );
     }
     if (!this.registerData.fullName) {
-      this.errors.push('Full name is required');
+      // this.registerform.form.controls?.['fullName'].markAsTouched();
+      this.errorsMap.set(ERRORS_TYPES.fullName, ERRORS_MSGS.fullName);
     }
-    if (!this.registerData) if (this.errors.length > 0) return;
-    // this.authenticationService.register(this.registerData).subscribe({
-    //   next: (res) => {
-    //     console.info('--------register------------');
-    //     console.info(res);
-    //     // Routing to login view won't work beacuse  the user is already at /login
-    //   },
-    //   error: (err) => {
-    //     this.errors = [];
-    //     this.errors.push('Error registering user');
-    //   },
-    // });
+    if (!this.registerData.email) {
+      // this.registerform.form.controls?.['email'].markAsTouched();
+      this.errorsMap.set(ERRORS_TYPES.email, ERRORS_MSGS.email);
+    }
+    if (!this.registerData.address.city) {
+      // this.registerform.form.controls?.['city'].markAsTouched();
+      this.errorsMap.set(ERRORS_TYPES.city, ERRORS_MSGS.city);
+    }
+    if (!this.registerData.address.street) {
+      // this.registerform.form.controls?.['street'].markAsTouched();
+      this.errorsMap.set(ERRORS_TYPES.street, ERRORS_MSGS.street);
+    }
+    if (!this.registerData.address.zipCode) {
+      // this.registerform.form.controls?.['zipCode'].markAsTouched();
+      this.errorsMap.set(ERRORS_TYPES.zipCode, ERRORS_MSGS.zipCode);
+    }
+    if (this.errorsMap.size > 0) return;
+    this.authenticationService.register(this.registerData).subscribe({
+      next: (res) => {
+        console.info('--------register------------');
+        console.info(res);
+        this.info = 'Congratulations! Your account has been registered';
+        // Routing to login view won't work beacuse  the user is already at /login
+      },
+      error: (err) => {
+        this.errorsMap.clear();
+        this.errorsMap.set(ERRORS_TYPES.serverError, ERRORS_MSGS.serverError);
+      },
+    });
   }
   getUserData(): void {
     let num = this.registerData.socialSecurityNumber;

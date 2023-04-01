@@ -32,6 +32,7 @@
     <label for="name" class="py-1">Full Name*</label>
     <input
       type="text"
+      pattern="^[a-z0-9._%+-]"
       class="form-control"
       id="name"
       name="name"
@@ -232,15 +233,20 @@
     </span>
   </p>
 
-  <div *ngIf="errors.length > 0">
+  <div *ngIf="errorsMap.size > 0">
     <span
-      class="text-danger help-block d-block mt-1 text-center"
-      *ngFor="let error of errors"
+      class="text-danger help-block d-block mt-1"
+      *ngFor="let error of errorsMap | keyvalue"
     >
-      {{ error }}
+      {{ error.value }}
     </span>
   </div>
 
+  <div *ngIf="info">
+    <p class="info-bg-color rounded mt-3 p-3 text-center">
+      {{ info }}
+    </p>
+  </div>
   <button type="submit" class="custom-btn w-100 mt-3">Register</button>
 </form>
 <app-modal *ngIf="showTermsOfUse" (closeModal)="closeModal()">

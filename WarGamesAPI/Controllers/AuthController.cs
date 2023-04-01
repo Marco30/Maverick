@@ -166,7 +166,6 @@ public class AuthController : ControllerBase
         }
     }
 
-    [ValidateToken]
     [HttpPost("getUserDataFromSecurityNumber")]
     public Task<IActionResult> GetUserData(GetUserDataDto userData)
     {
