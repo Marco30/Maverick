@@ -32,7 +32,6 @@
     <label for="name" class="py-1">Full Name*</label>
     <input
       type="text"
-      pattern="^[a-z0-9._%+-]"
       class="form-control"
       id="name"
       name="name"
@@ -40,7 +39,7 @@
       [(ngModel)]="registerData.fullName"
       required
       #fullNameControl="ngModel"
-      [ngClass]="{ 'is-invalid': submitted && fullNameControl.errors}"
+      [ngClass]="{ 'is-invalid': submitted && fullNameControl.errors || fullNameControl.touched && fullNameControl.errors}"
     />
     <span
       class="text-danger help-block d-block mt-1"
@@ -62,7 +61,7 @@
       [(ngModel)]="registerData.email"
       required
       #emailControl="ngModel"
-      [ngClass]="{ 'is-invalid': submitted && emailControl.errors}"
+      [ngClass]="{ 'is-invalid': submitted && emailControl.errors || emailControl.touched && emailControl.errors}"
     />
     <span
       class="text-danger help-block d-block mt-1"
@@ -89,7 +88,7 @@
       [(ngModel)]="registerData.address.city"
       name="city"
       #cityControl="ngModel"
-      [ngClass]="{ 'is-invalid': submitted && cityControl.errors}"
+      [ngClass]="{ 'is-invalid': submitted && cityControl.errors || cityControl.touched && cityControl.errors}"
     />
 
     <span
@@ -110,7 +109,7 @@
       [(ngModel)]="registerData.address.street"
       name="street"
       #streetControl="ngModel"
-      [ngClass]="{ 'is-invalid': submitted && streetControl.errors}"
+      [ngClass]="{ 'is-invalid': submitted && streetControl.errors || streetControl.touched && streetControl.errors}"
     />
 
     <span
@@ -132,7 +131,7 @@
       [(ngModel)]="registerData.address.zipCode"
       name="zipCode"
       #zipCodeControl="ngModel"
-      [ngClass]="{ 'is-invalid': submitted && zipCodeControl.errors}"
+      [ngClass]="{ 'is-invalid': submitted && zipCodeControl.errors || zipCodeControl.touched && zipCodeControl.errors}"
     />
 
     <span
@@ -154,7 +153,7 @@
       required
       #passwordControl="ngModel"
       (ngModelChange)="checkSame()"
-      [ngClass]="{ 'is-invalid': submitted && passwordControl.errors || noMatchPasswords && passwordControl.touched && confirmPasswordControl.touched }"
+      [ngClass]="{ 'is-invalid': submitted && passwordControl.errors || noMatchPasswords && passwordControl.touched && confirmPasswordControl.touched || passwordControl.errors && passwordControl.touched}"
     />
 
     <span
@@ -181,7 +180,7 @@
       name="confirmPassword"
       #confirmPasswordControl="ngModel"
       (ngModelChange)="checkSame()"
-      [ngClass]="{ 'is-invalid': submitted && confirmPasswordControl.errors || noMatchPasswords && confirmPasswordControl.dirty}"
+      [ngClass]="{ 'is-invalid': submitted && confirmPasswordControl.errors || noMatchPasswords && confirmPasswordControl.dirty || confirmPasswordControl.errors && confirmPasswordControl.touched}"
     />
     <span
       class="text-danger help-block d-block mt-1"
