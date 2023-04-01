@@ -32,6 +32,7 @@
       [(ngModel)]="registerData.fullName"
       required
       #fullNameControl="ngModel"
+      (ngModelChange)="removeError(ERRORS_TYPES.fullName)"
     />
     <span
       class="text-danger help-block d-block mt-1"
@@ -52,6 +53,7 @@
       [(ngModel)]="registerData.email"
       required
       #emailControl="ngModel"
+      (ngModelChange)="removeError(ERRORS_TYPES.email)"
     />
     <span
       class="text-danger help-block d-block mt-1"
@@ -78,6 +80,7 @@
       [(ngModel)]="registerData.address.city"
       name="city"
       #cityControl="ngModel"
+      (ngModelChange)="removeError(ERRORS_TYPES.city)"
     />
 
     <span
@@ -98,6 +101,7 @@
       [(ngModel)]="registerData.address.street"
       name="street"
       #streetControl="ngModel"
+      (ngModelChange)="removeError(ERRORS_TYPES.street)"
     />
 
     <span
@@ -119,6 +123,7 @@
       [(ngModel)]="registerData.address.zipCode"
       name="zipCode"
       #zipCodeControl="ngModel"
+      (ngModelChange)="removeError(ERRORS_TYPES.zipCode)"
     />
 
     <span
@@ -215,15 +220,20 @@
     </span>
   </p>
 
-  <div *ngIf="errors.length > 0">
+  <div *ngIf="errorsMap.size > 0">
     <span
-      class="text-danger help-block d-block mt-1 text-center"
-      *ngFor="let error of errors"
+      class="text-danger help-block d-block mt-1"
+      *ngFor="let error of errorsMap | keyvalue"
     >
-      {{ error }}
+      {{ error.value }}
     </span>
   </div>
 
+  <div *ngIf="info">
+    <p class="info-bg-color rounded mt-3 p-3 text-center">
+      {{ info }}
+    </p>
+  </div>
   <button type="submit" class="custom-btn w-100 mt-3">Register</button>
 </form>
 <app-modal *ngIf="showTermsOfUse" (closeModal)="closeModal()">
