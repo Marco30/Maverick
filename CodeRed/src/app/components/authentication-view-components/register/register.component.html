@@ -41,8 +41,9 @@
   </div>
 
   <div class="form-group pb-2">
-    <label for="email" class="py-1">Email</label>
+    <label for="email" class="py-1">Email*</label>
     <input
+      pattern="^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$"
       type="email"
       class="form-control"
       id="email"
@@ -53,9 +54,15 @@
     />
     <span
       class="text-danger help-block d-block mt-1"
-      *ngIf="emailControl.errors?.['required'] && emailControl.touched"
+      *ngIf=" emailControl.touched && emailControl.errors?.['required']   "
     >
       This field is required
+    </span>
+    <span
+      class="text-danger help-block d-block mt-1"
+      *ngIf=" emailControl.touched && emailControl.errors?.['pattern'] "
+    >
+      Email is not valid
     </span>
   </div>
 
@@ -66,7 +73,7 @@
       type="text"
       class="form-control input-line"
       id="city"
-      placeholder="Stad"
+      placeholder="City"
       [(ngModel)]="registerData.address.city"
       name="city"
       #cityControl="ngModel"
@@ -86,7 +93,7 @@
       type="text"
       class="form-control input-line"
       id="street"
-      placeholder="Gata"
+      placeholder="Street"
       [(ngModel)]="registerData.address.street"
       name="street"
       #streetControl="ngModel"
@@ -127,9 +134,21 @@
       class="form-control"
       id="password"
       name="password"
+      placeholder="Enter your Password"
       [(ngModel)]="registerData.password"
       required
+      #passwordControl1="ngModel"
     />
+
+    <span
+      class="text-danger help-block"
+      *ngIf="
+          passwordControl1.errors?.['required'] &&
+          passwordControl1.touched 
+        "
+    >
+      password field must not be empty
+    </span>
   </div>
 
   <div class="form-group pb-2">
@@ -149,7 +168,7 @@
       class="text-danger help-block d-block mt-1"
       *ngIf="confirmPassword.errors?.['required'] && confirmPassword.touched"
     >
-      This field is required
+      Confirm password field is required
     </span>
     <span
       class="text-danger help-block d-block mt-1"

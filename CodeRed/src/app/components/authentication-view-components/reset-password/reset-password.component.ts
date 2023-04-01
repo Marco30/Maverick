@@ -59,8 +59,7 @@ export class ResetPasswordComponent {
       .subscribe({
         next: (res) => {
           console.log('success resetting password:', res);
-          this.info = 'Success resetting password';
-          // this.router.navigate(['authView']);
+          this.info = 'Success your password has been reset, Now you can login';
         },
         error: (err) => {
           console.log('error resetting password: ', err);

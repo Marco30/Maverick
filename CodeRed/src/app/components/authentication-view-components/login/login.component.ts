@@ -23,6 +23,7 @@ export class LoginComponent {
   login(): void {
     console.log('Logging in with data:', this.loginData);
     this.showLoading = true;
+    // Validate empty fields
     setTimeout(() => {
       this.authenticationService.login(this.loginData).subscribe({
         next: (res) => {

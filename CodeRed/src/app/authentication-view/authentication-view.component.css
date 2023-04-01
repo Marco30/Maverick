@@ -1,0 +1,27 @@
+.card-header,
+.card-footer {
+  background-color: transparent;
+  border: none;
+}
+.h1-size {
+  font-size: var(--h1-font-size);
+  font-weight: bold;
+}
+
+.h4-size {
+  font-size: var(--h4-font-size);
+  font-weight: bold;
+}
+.bg-primary-color {
+  background-color: var(--bg-primary-color);
+}
+
+.text-primary-color {
+  color: var(--text-primary-color);
+}
+.text-secondary-color {
+  color: var(--text-secondary-color);
+}
+.custom-link-color {
+  color: var(--link-color);
+}
