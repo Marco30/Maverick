@@ -33,7 +33,7 @@ export class RegisterComponent {
   constructor(
     private authenticationService: AuthenticationService,
     private router: Router
-  ) { }
+  ) {}
 
   address: Address = {
     city: '',
@@ -68,29 +68,34 @@ export class RegisterComponent {
   passwordConfirmation: string = '';
   cancelDataFetching: boolean = false;
   showLoading: boolean = false;
-  submitted:  boolean = false;
+  submitted: boolean = false;
 
   checkSame() {
     const secondPassword = this.passwordConfirmation;
     const firstPassword = this.registerData.password;
     if (secondPassword !== firstPassword) {
-  
       console.log('passwords not match');
       this.noMatchPasswords = true;
       if (this.registerform && this.registerform.controls) {
         this.registerform.controls['passwordConfirmationControl'].markAsDirty();
-        this.registerform.controls['passwordConfirmationControl'].setErrors(null);
+        this.registerform.controls['passwordConfirmationControl'].setErrors(
+          null
+        );
       }
-
     } else {
       // form control with errors
       this.noMatchPasswords = false;
       if (this.registerform && this.registerform.controls) {
-      this.registerform.controls['passwordConfirmationControl'].setErrors({incorrect: true,});
-      this.registerform.controls['passwordConfirmationControl'].markAsPristine();
-      this.registerform.controls['passwordConfirmationControl'].markAsTouched();
-    }
-
+        this.registerform.controls['passwordConfirmationControl'].setErrors({
+          incorrect: true,
+        });
+        this.registerform.controls[
+          'passwordConfirmationControl'
+        ].markAsPristine();
+        this.registerform.controls[
+          'passwordConfirmationControl'
+        ].markAsTouched();
+      }
     }
   }
 
@@ -99,35 +104,28 @@ export class RegisterComponent {
   }
 
   register() {
-
     this.submitted = true;
 
     console.log('Registering with data:', this.registerData);
     if (this.registerData.password !== this.passwordConfirmation) {
-      //  this.registerform.form.controls?.['passwordConfirmation'].markAsTouched();
       this.errorsMap.set(
         ERRORS_TYPES.matchedPasswords,
         ERRORS_MSGS.passowrdDontMatch
       );
     }
     if (!this.registerData.fullName) {
-      // this.registerform.form.controls?.['fullName'].markAsTouched();
       this.errorsMap.set(ERRORS_TYPES.fullName, ERRORS_MSGS.fullName);
     }
     if (!this.registerData.email) {
-      // this.registerform.form.controls?.['email'].markAsTouched();
       this.errorsMap.set(ERRORS_TYPES.email, ERRORS_MSGS.email);
     }
     if (!this.registerData.address.city) {
-      // this.registerform.form.controls?.['city'].markAsTouched();
       this.errorsMap.set(ERRORS_TYPES.city, ERRORS_MSGS.city);
     }
     if (!this.registerData.address.street) {
-      // this.registerform.form.controls?.['street'].markAsTouched();
       this.errorsMap.set(ERRORS_TYPES.street, ERRORS_MSGS.street);
     }
     if (!this.registerData.address.zipCode) {
-      // this.registerform.form.controls?.['zipCode'].markAsTouched();
       this.errorsMap.set(ERRORS_TYPES.zipCode, ERRORS_MSGS.zipCode);
     }
     if (this.errorsMap.size > 0) return;

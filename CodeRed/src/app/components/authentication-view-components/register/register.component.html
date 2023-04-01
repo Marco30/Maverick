@@ -1,4 +1,4 @@
-<form (ngSubmit)="register()" #registerForm="ngForm" class='needs-validation' >
+<form (ngSubmit)="register()" #registerForm="ngForm" class="needs-validation">
   <app-loader
     *ngIf="showLoading"
     [showCancel]="showLoading"
@@ -18,14 +18,14 @@
       minlength="12"
       #socialSecurityNumberControl="ngModel"
       (input)="getUserData()"
-      [ngClass]="{ 'is-invalid': socialSecurityNumberControl.errors}"
+      [ngClass]="{ 'is-invalid': socialSecurityNumberControl.errors }"
     />
     <span
-    class="text-danger help-block d-block mt-1"
-    *ngIf=" socialSecurityNumberControl.touched && socialSecurityNumberControl.errors?.['pattern'] "
-  >
-   SocialSecurityNumber is not complete
-  </span>
+      class="text-danger help-block d-block mt-1"
+      *ngIf=" socialSecurityNumberControl.touched && socialSecurityNumberControl.errors?.['pattern'] "
+    >
+      SocialSecurityNumber is not complete
+    </span>
   </div>
 
   <div class="form-group pb-2">
@@ -37,9 +37,14 @@
       name="name"
       placeholder="Name"
       [(ngModel)]="registerData.fullName"
+      (ngModelChange)="removeError(ERRORS_TYPES.fullName)"
       required
       #fullNameControl="ngModel"
-      [ngClass]="{ 'is-invalid': submitted && fullNameControl.errors || fullNameControl.touched && fullNameControl.errors}"
+      [ngClass]="{
+        'is-invalid':
+          (submitted && fullNameControl.errors) ||
+          (fullNameControl.touched && fullNameControl.errors)
+      }"
     />
     <span
       class="text-danger help-block d-block mt-1"
@@ -59,9 +64,14 @@
       name="email"
       placeholder="Email"
       [(ngModel)]="registerData.email"
+      (ngModelChange)="removeError(ERRORS_TYPES.email)"
       required
       #emailControl="ngModel"
-      [ngClass]="{ 'is-invalid': submitted && emailControl.errors || emailControl.touched && emailControl.errors}"
+      [ngClass]="{
+        'is-invalid':
+          (submitted && emailControl.errors) ||
+          (emailControl.touched && emailControl.errors)
+      }"
     />
     <span
       class="text-danger help-block d-block mt-1"
@@ -86,9 +96,14 @@
       id="city"
       placeholder="City"
       [(ngModel)]="registerData.address.city"
+      (ngModelChange)="removeError(ERRORS_TYPES.city)"
       name="city"
       #cityControl="ngModel"
-      [ngClass]="{ 'is-invalid': submitted && cityControl.errors || cityControl.touched && cityControl.errors}"
+      [ngClass]="{
+        'is-invalid':
+          (submitted && cityControl.errors) ||
+          (cityControl.touched && cityControl.errors)
+      }"
     />
 
     <span
@@ -107,9 +122,14 @@
       id="street"
       placeholder="Street"
       [(ngModel)]="registerData.address.street"
+      (ngModelChange)="removeError(ERRORS_TYPES.street)"
       name="street"
       #streetControl="ngModel"
-      [ngClass]="{ 'is-invalid': submitted && streetControl.errors || streetControl.touched && streetControl.errors}"
+      [ngClass]="{
+        'is-invalid':
+          (submitted && streetControl.errors) ||
+          (streetControl.touched && streetControl.errors)
+      }"
     />
 
     <span
@@ -129,9 +149,14 @@
       id="zipCode"
       placeholder="ZipCode"
       [(ngModel)]="registerData.address.zipCode"
+      (ngModelChange)="removeError(ERRORS_TYPES.zipCode)"
       name="zipCode"
       #zipCodeControl="ngModel"
-      [ngClass]="{ 'is-invalid': submitted && zipCodeControl.errors || zipCodeControl.touched && zipCodeControl.errors}"
+      [ngClass]="{
+        'is-invalid':
+          (submitted && zipCodeControl.errors) ||
+          (zipCodeControl.touched && zipCodeControl.errors)
+      }"
     />
 
     <span
@@ -153,7 +178,14 @@
       required
       #passwordControl="ngModel"
       (ngModelChange)="checkSame()"
-      [ngClass]="{ 'is-invalid': submitted && passwordControl.errors || noMatchPasswords && passwordControl.touched && confirmPasswordControl.touched || passwordControl.errors && passwordControl.touched}"
+      [ngClass]="{
+        'is-invalid':
+          (submitted && passwordControl.errors) ||
+          (noMatchPasswords &&
+            passwordControl.touched &&
+            confirmPasswordControl.touched) ||
+          (passwordControl.errors && passwordControl.touched)
+      }"
     />
 
     <span
@@ -165,7 +197,6 @@
     >
       password field must not be empty
     </span>
-
   </div>
 
   <div class="form-group pb-2">
@@ -180,7 +211,13 @@
       name="confirmPassword"
       #confirmPasswordControl="ngModel"
       (ngModelChange)="checkSame()"
-      [ngClass]="{ 'is-invalid': submitted && confirmPasswordControl.errors || noMatchPasswords && confirmPasswordControl.dirty || confirmPasswordControl.errors && confirmPasswordControl.touched}"
+      (ngModelChange)="removeError(ERRORS_TYPES.matchedPasswords)"
+      [ngClass]="{
+        'is-invalid':
+          (submitted && confirmPasswordControl.errors) ||
+          (noMatchPasswords && confirmPasswordControl.dirty) ||
+          (confirmPasswordControl.errors && confirmPasswordControl.touched)
+      }"
     />
     <span
       class="text-danger help-block d-block mt-1"
@@ -286,4 +323,3 @@
     </button>
   </div>
 </app-modal>
-
