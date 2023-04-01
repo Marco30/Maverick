@@ -13,6 +13,7 @@
       [(ngModel)]="loginData.email"
       #emailControl="ngModel"
       required
+      [ngClass]="{ 'is-invalid': emailControl.errors }"
     />
     <span
       class="text-danger help-block d-block mt-1"
@@ -39,6 +40,7 @@
       [(ngModel)]="loginData.password"
       required
       #passwordControl="ngModel"
+      [ngClass]="{ 'is-invalid': passwordControl.errors }"
     />
     <span
       class="text-danger help-block d-block mt-1"

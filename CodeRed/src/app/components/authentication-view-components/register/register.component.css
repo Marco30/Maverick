@@ -24,3 +24,7 @@
 .custom-link-color {
   color: var(--link-color);
 }
+.info-bg-color {
+  background-color: var(--info-bg-color);
+  color: var(--info-text-color);
+}

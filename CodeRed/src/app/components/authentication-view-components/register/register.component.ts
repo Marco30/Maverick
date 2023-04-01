@@ -1,9 +1,28 @@
 import { Component, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
+import { Address } from 'src/app/model/address/address';
 import { Register } from 'src/app/model/register/register';
 import { AuthenticationService } from 'src/app/service/authentication/authentication.service';
 
+enum ERRORS_TYPES {
+  fullName = 'Full',
+  email = 'email',
+  city = 'city',
+  street = 'street',
+  zipCode = 'zipCode',
+  matchedPasswords = 'passwordDontMatch',
+  serverError = 'serverError',
+}
+enum ERRORS_MSGS {
+  fullName = 'Full name is required',
+  email = 'email name is required',
+  city = 'city name is required',
+  street = 'street name is required',
+  zipCode = 'Zip code name is required',
+  passowrdDontMatch = "Passwords don't match",
+  serverError = 'Sorry, something went wrong',
+}
 @Component({
   selector: 'app-register',
   templateUrl: './register.component.html',
@@ -15,6 +34,16 @@ export class RegisterComponent {
     private authenticationService: AuthenticationService,
     private router: Router
   ) {}
+
+  address: Address = {
+    city: '',
+    country: '',
+    street: '',
+    zipCode: '',
+    attention: '',
+    careOf: '',
+  };
+
   registerData: Register = {
     socialSecurityNumber: '',
     fullName: '',
@@ -28,63 +57,90 @@ export class RegisterComponent {
     birthDay: 0,
     birthMonth: 0,
     birthYear: 0,
-    address: {
-      city: '',
-      street: '',
-      zipCode: '',
-      country: '',
-    },
+    address: this.address,
   };
+
   showTermsOfUse: boolean = false;
   noMatchPasswords: boolean = false;
-  errors: string[] = [];
+  ERRORS_TYPES = ERRORS_TYPES;
+  errorsMap: Map<ERRORS_TYPES, ERRORS_MSGS> = new Map();
+  info: string = '';
   passwordConfirmation: string = '';
   cancelDataFetching: boolean = false;
   showLoading: boolean = false;
+  submitted: boolean = false;
 
-  checkSame(input: string) {
-    const secondPassword = input;
+  checkSame() {
+    const secondPassword = this.passwordConfirmation;
     const firstPassword = this.registerData.password;
     if (secondPassword !== firstPassword) {
-      // stuff for form control
       console.log('passwords not match');
-
       this.noMatchPasswords = true;
-      this.registerform.controls?.['passwordConfirmation'].markAsDirty();
-      this.registerform.form.controls?.['passwordConfirmation'].setErrors(null);
+      if (this.registerform && this.registerform.controls) {
+        this.registerform.controls['passwordConfirmationControl'].markAsDirty();
+        this.registerform.controls['passwordConfirmationControl'].setErrors(
+          null
+        );
+      }
     } else {
       // form control with errors
       this.noMatchPasswords = false;
-      this.registerform.form.controls?.['passwordConfirmation'].setErrors({
-        incorrect: true,
-      });
-      this.registerform.form.controls?.[
-        'passwordConfirmation'
-      ].markAsPristine();
-      this.registerform.form.controls?.['passwordConfirmation'].markAsTouched();
+      if (this.registerform && this.registerform.controls) {
+        this.registerform.controls['passwordConfirmationControl'].setErrors({
+          incorrect: true,
+        });
+        this.registerform.controls[
+          'passwordConfirmationControl'
+        ].markAsPristine();
+        this.registerform.controls[
+          'passwordConfirmationControl'
+        ].markAsTouched();
+      }
     }
   }
 
+  removeError(type: ERRORS_TYPES) {
+    this.errorsMap.delete(type);
+  }
+
   register() {
+    this.submitted = true;
+
     console.log('Registering with data:', this.registerData);
     if (this.registerData.password !== this.passwordConfirmation) {
-      this.errors.push('Passwords do not match');
+      this.errorsMap.set(
+        ERRORS_TYPES.matchedPasswords,
+        ERRORS_MSGS.passowrdDontMatch
+      );
     }
     if (!this.registerData.fullName) {
-      this.errors.push('Full name is required');
+      this.errorsMap.set(ERRORS_TYPES.fullName, ERRORS_MSGS.fullName);
     }
-    if (!this.registerData) if (this.errors.length > 0) return;
-    // this.authenticationService.register(this.registerData).subscribe({
-    //   next: (res) => {
-    //     console.info('--------register------------');
-    //     console.info(res);
-    //     // Routing to login view won't work beacuse  the user is already at /login
-    //   },
-    //   error: (err) => {
-    //     this.errors = [];
-    //     this.errors.push('Error registering user');
-    //   },
-    // });
+    if (!this.registerData.email) {
+      this.errorsMap.set(ERRORS_TYPES.email, ERRORS_MSGS.email);
+    }
+    if (!this.registerData.address.city) {
+      this.errorsMap.set(ERRORS_TYPES.city, ERRORS_MSGS.city);
+    }
+    if (!this.registerData.address.street) {
+      this.errorsMap.set(ERRORS_TYPES.street, ERRORS_MSGS.street);
+    }
+    if (!this.registerData.address.zipCode) {
+      this.errorsMap.set(ERRORS_TYPES.zipCode, ERRORS_MSGS.zipCode);
+    }
+    if (this.errorsMap.size > 0) return;
+    this.authenticationService.register(this.registerData).subscribe({
+      next: (res) => {
+        console.info('--------register------------');
+        console.info(res);
+        this.info = 'Congratulations! Your account has been registered';
+        // Routing to login view won't work beacuse  the user is already at /login
+      },
+      error: (err) => {
+        this.errorsMap.clear();
+        this.errorsMap.set(ERRORS_TYPES.serverError, ERRORS_MSGS.serverError);
+      },
+    });
   }
   getUserData(): void {
     let num = this.registerData.socialSecurityNumber;

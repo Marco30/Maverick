@@ -18,11 +18,15 @@ export class ResetPasswordRequestComponent {
     error: '',
     info: ' Enter your Email and instructions will be sent to you!',
   };
-
+  submitted: boolean = false;
+  removeError() {
+    this.resetPasswordData.error = '';
+  }
   resetPasswordRequest() {
+    this.submitted = true;
     console.log('reset password request submitted: ', this.resetPasswordData);
 
-    const regex = /^[a-zA-Z0-9._%+-]+@[a-z0-9.-]+.[a-z]{2,4}$/;
+    const regex = /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$/;
     const match = regex.test(this.resetPasswordData.email);
     if (!match) {
       this.resetPasswordData.error = 'Email is not valid';

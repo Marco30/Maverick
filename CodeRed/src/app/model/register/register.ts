@@ -1,9 +1,4 @@
-interface Address {
-  city: string | null;
-  zipCode: string | null;
-  country: string | null;
-  street: string | null;
-}
+import { Address } from "../address/address";
 
 export class Register {
   firstName: string;
@@ -18,12 +13,7 @@ export class Register {
   birthYear: number;
   birthMonth: number;
   birthDay: number;
-  address: Address = {
-    city: null,
-    street: null,
-    zipCode: null,
-    country: null,
-  };
+  address: Address;
   constructor(
     socialSecurityNumber: string,
     email: string,
@@ -36,7 +26,8 @@ export class Register {
     subscribeToEmailNotification: boolean,
     birthDay: number,
     birthYear: number,
-    birthMonth: number
+    birthMonth: number,
+    address: Address 
   ) {
     this.socialSecurityNumber = socialSecurityNumber;
     this.email = email;
@@ -50,5 +41,6 @@ export class Register {
     this.birthDay = birthDay;
     this.birthMonth = birthMonth;
     this.birthYear = birthYear;
+    this.address = address; 
   }
 }
