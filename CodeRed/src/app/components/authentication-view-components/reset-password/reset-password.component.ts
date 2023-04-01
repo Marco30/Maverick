@@ -24,6 +24,7 @@ export class ResetPasswordComponent {
     private route: ActivatedRoute
   ) {}
 
+  submitted: boolean = false;
   toLogin() {
     this.router.navigate(['auth']);
   }
@@ -40,6 +41,7 @@ export class ResetPasswordComponent {
 
   // Send the new password
   submitResetPassword() {
+    this.submitted = true;
     if (
       this.noMatchPasswords ||
       !this.data.confirmPassword ||
