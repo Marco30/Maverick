@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace MiracleMileAPI.JsonCRUD;
+namespace WarGamesAPIAPI.JsonCRUD;
 
 public class Json
 {

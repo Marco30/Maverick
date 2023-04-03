@@ -1,0 +1,65 @@
+<form (ngSubmit)="login()" #loginForm="ngForm" class="position-relative">
+  <h3 class="h2-size text-center">Login</h3>
+  <app-loader *ngIf="showLoading"></app-loader>
+  <p
+    *ngIf="loginData.error"
+    class="error-bg-color rounded mt-3 p-3 text-center"
+  >
+    {{ loginData.error }}
+  </p>
+  <div class="form-group has-error pb-2">
+    <label for="email" class="py-1">Email</label>
+    <input
+      pattern="^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$"
+      type="email"
+      class="form-control"
+      id="email"
+      placeholder="Mejl"
+      name="email"
+      [(ngModel)]="loginData.email"
+      #emailControl="ngModel"
+      required
+      [ngClass]="{ 'is-invalid': emailControl.errors }"
+    />
+    <span
+      class="text-danger help-block d-block mt-1"
+      *ngIf=" emailControl.touched && emailControl.errors?.['required']   "
+    >
+      This field is required
+    </span>
+    <span
+      class="text-danger help-block d-block mt-1"
+      *ngIf=" emailControl.touched && emailControl.errors?.['pattern'] "
+    >
+      Email is not valid
+    </span>
+  </div>
+
+  <div class="form-group has-error pb-2">
+    <label for="password" class="py-1">Password</label>
+    <input
+      type="password"
+      class="form-control"
+      id="password"
+      placeholder="Password"
+      name="password"
+      [(ngModel)]="loginData.password"
+      required
+      #passwordControl="ngModel"
+      [ngClass]="{ 'is-invalid': passwordControl.errors }"
+    />
+    <span
+      class="text-danger help-block d-block mt-1"
+      *ngIf=" passwordControl.touched && passwordControl.errors?.['required']   "
+    >
+      This field is required
+    </span>
+  </div>
+  <!-- <span
+    class="text-danger help-block d-block mt-1 text-center"
+    *ngIf="loginData.error"
+  >
+    {{ loginData.error }}
+  </span> -->
+  <button type="submit" class="custom-btn w-100 mt-3">Login</button>
+</form>

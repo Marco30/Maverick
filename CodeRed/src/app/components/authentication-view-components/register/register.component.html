@@ -1,0 +1,327 @@
+<div class="position-relative">
+  <form (ngSubmit)="register()" #registerForm="ngForm" class="needs-validation">
+    <app-loader
+      *ngIf="showLoading"
+      [showCancel]="showLoading"
+      (cancelLoader)="cancelLoader()"
+    ></app-loader>
+    <h3 class="h2-size text-center">Register</h3>
+    <div class="form-group pb-2">
+      <label for="socialSecurityNumber" class="py-1">Personnummer*</label>
+      <input
+        pattern="^(19|20)?(\d{6}([-+]|\s)\d{4}|(?!19|20)\d{10})$"
+        type="text"
+        class="form-control"
+        id="socialSecurityNumber"
+        placeholder="ååååmmdd-xxxx"
+        [(ngModel)]="registerData.socialSecurityNumber"
+        name="socialSecurityNumber"
+        minlength="12"
+        #socialSecurityNumberControl="ngModel"
+        (input)="getUserData()"
+        [ngClass]="{ 'is-invalid': socialSecurityNumberControl.errors }"
+      />
+      <span
+        class="text-danger help-block d-block mt-1"
+        *ngIf=" socialSecurityNumberControl.touched && socialSecurityNumberControl.errors?.['pattern'] "
+      >
+        SocialSecurityNumber is not complete
+      </span>
+    </div>
+
+    <div class="form-group pb-2">
+      <label for="name" class="py-1">Full Name*</label>
+      <input
+        type="text"
+        class="form-control"
+        id="name"
+        name="name"
+        placeholder="Name"
+        [(ngModel)]="registerData.fullName"
+        (ngModelChange)="removeError(ERRORS_TYPES.fullName)"
+        required
+        #fullNameControl="ngModel"
+        [ngClass]="{
+          'is-invalid':
+            (submitted && fullNameControl.errors) ||
+            (fullNameControl.touched && fullNameControl.errors)
+        }"
+      />
+      <span
+        class="text-danger help-block d-block mt-1"
+        *ngIf="fullNameControl.errors?.['required'] && fullNameControl.touched"
+      >
+        This field is required
+      </span>
+    </div>
+
+    <div class="form-group pb-2">
+      <label for="email" class="py-1">Email*</label>
+      <input
+        pattern="^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$"
+        type="email"
+        class="form-control"
+        id="email"
+        name="email"
+        placeholder="Email"
+        [(ngModel)]="registerData.email"
+        (ngModelChange)="removeError(ERRORS_TYPES.email)"
+        required
+        #emailControl="ngModel"
+        [ngClass]="{
+          'is-invalid':
+            (submitted && emailControl.errors) ||
+            (emailControl.touched && emailControl.errors)
+        }"
+      />
+      <span
+        class="text-danger help-block d-block mt-1"
+        *ngIf=" emailControl.touched && emailControl.errors?.['required']   "
+      >
+        This field is required
+      </span>
+      <span
+        class="text-danger help-block d-block mt-1"
+        *ngIf=" emailControl.touched && emailControl.errors?.['pattern'] "
+      >
+        Email is not valid
+      </span>
+    </div>
+
+    <div class="form-group has-error pb-2">
+      <label for="city" class="py-1">City*</label>
+      <input
+        required
+        type="text"
+        class="form-control input-line"
+        id="city"
+        placeholder="City"
+        [(ngModel)]="registerData.address.city"
+        (ngModelChange)="removeError(ERRORS_TYPES.city)"
+        name="city"
+        #cityControl="ngModel"
+        [ngClass]="{
+          'is-invalid':
+            (submitted && cityControl.errors) ||
+            (cityControl.touched && cityControl.errors)
+        }"
+      />
+
+      <span
+        class="text-danger help-block d-block mt-1"
+        *ngIf="cityControl.errors?.['required'] && cityControl.touched"
+      >
+        This field is required
+      </span>
+    </div>
+    <div class="form-group has-error pb-2">
+      <label for="street" class="py-1">Street*</label>
+      <input
+        required
+        type="text"
+        class="form-control input-line"
+        id="street"
+        placeholder="Street"
+        [(ngModel)]="registerData.address.street"
+        (ngModelChange)="removeError(ERRORS_TYPES.street)"
+        name="street"
+        #streetControl="ngModel"
+        [ngClass]="{
+          'is-invalid':
+            (submitted && streetControl.errors) ||
+            (streetControl.touched && streetControl.errors)
+        }"
+      />
+
+      <span
+        class="text-danger help-block d-block mt-1"
+        *ngIf="streetControl.errors?.['required']&& streetControl.touched"
+      >
+        This field is required
+      </span>
+    </div>
+
+    <div class="form-group has-error pb-2">
+      <label for="zipCode" class="py-1">Zip Code*</label>
+      <input
+        required
+        type="text"
+        class="form-control input-line"
+        id="zipCode"
+        placeholder="ZipCode"
+        [(ngModel)]="registerData.address.zipCode"
+        (ngModelChange)="removeError(ERRORS_TYPES.zipCode)"
+        name="zipCode"
+        #zipCodeControl="ngModel"
+        [ngClass]="{
+          'is-invalid':
+            (submitted && zipCodeControl.errors) ||
+            (zipCodeControl.touched && zipCodeControl.errors)
+        }"
+      />
+
+      <span
+        class="text-danger help-block d-block mt-1"
+        *ngIf="zipCodeControl.errors?.['required'] && zipCodeControl.touched"
+      >
+        This field is required
+      </span>
+    </div>
+    <div class="form-group pb-2">
+      <label for="password" class="py-1">Password</label>
+      <input
+        type="password"
+        class="form-control"
+        id="password"
+        name="password"
+        placeholder="Enter your Password"
+        [(ngModel)]="registerData.password"
+        required
+        #passwordControl="ngModel"
+        (ngModelChange)="checkSame()"
+        [ngClass]="{
+          'is-invalid':
+            (submitted && passwordControl.errors) ||
+            (noMatchPasswords &&
+              passwordControl.touched &&
+              confirmPasswordControl.touched) ||
+            (passwordControl.errors && passwordControl.touched)
+        }"
+      />
+
+      <span
+        class="text-danger help-block"
+        *ngIf="
+          passwordControl.errors?.['required'] &&
+          passwordControl.touched 
+        "
+      >
+        password field must not be empty
+      </span>
+    </div>
+
+    <div class="form-group pb-2">
+      <label for="password_confirmation" class="py-1">Confirm Password</label>
+      <input
+        required
+        type="password"
+        class="form-control input-line"
+        id="confirmPassword"
+        placeholder="Repeat password"
+        [(ngModel)]="passwordConfirmation"
+        name="confirmPassword"
+        #confirmPasswordControl="ngModel"
+        (ngModelChange)="checkSame()"
+        (ngModelChange)="removeError(ERRORS_TYPES.matchedPasswords)"
+        [ngClass]="{
+          'is-invalid':
+            (submitted && confirmPasswordControl.errors) ||
+            (noMatchPasswords && confirmPasswordControl.dirty) ||
+            (confirmPasswordControl.errors && confirmPasswordControl.touched)
+        }"
+      />
+      <span
+        class="text-danger help-block d-block mt-1"
+        *ngIf="confirmPasswordControl.errors?.['required'] && confirmPasswordControl.touched"
+      >
+        Confirm password field is required
+      </span>
+      <span
+        class="text-danger help-block d-block mt-1"
+        *ngIf="noMatchPasswords === true && confirmPasswordControl.dirty"
+      >
+        Passwords don't match
+      </span>
+    </div>
+    <div class="form-group pb-2">
+      <input
+        #AgreeMarketing
+        name="agreeMarketing"
+        type="checkbox"
+        class="p-1"
+        id="agreeMarketing"
+        (change)="onAgreeMarketingChanged(AgreeMarketing.checked)"
+        [checked]="registerData.agreeMarketing"
+      />
+      <label class="ms-2" for="agreeMarketing">Agree Marketing</label>
+    </div>
+    <div class="form-group pb-2">
+      <input
+        #SubscribeToEmailNotification
+        name="SubscribeToEmailNotification"
+        type="checkbox"
+        class="p-1"
+        id="SubscribeToEmailNotification"
+        (change)="
+          onSubscribeToEmailChanged(SubscribeToEmailNotification.checked)
+        "
+        [checked]="registerData.subscribeToEmailNotification"
+      />
+      <label class="ms-2" for="SubscribeToEmailNotification"
+        >Subscribe to email notification</label
+      >
+    </div>
+    <p class="my-2">
+      By registering you agree to the Doot
+      <span
+        class="custom-link-color"
+        role="button"
+        (click)="showTermsOfUse = true"
+      >
+        Terms of use
+      </span>
+    </p>
+
+    <div *ngIf="errorsMap.size > 0">
+      <span
+        class="text-danger help-block d-block mt-1"
+        *ngFor="let error of errorsMap | keyvalue"
+      >
+        {{ error.value }}
+      </span>
+    </div>
+
+    <div *ngIf="info">
+      <p class="info-bg-color rounded mt-3 p-3 text-center">
+        {{ info }}
+      </p>
+    </div>
+    <button type="submit" class="custom-btn w-100 mt-3">Register</button>
+  </form>
+  <app-modal *ngIf="showTermsOfUse" (closeModal)="closeModal()">
+    <div>
+      <h3>Our terms of use</h3>
+      <p>
+        Lorem ipsum dolor sit amet consectetur adipisicing elit. Culpa,
+        exercitationem. Est fugiat harum ipsa accusamus id suscipit laboriosam,
+        nostrum minima eos esse reprehenderit error assumenda quo eum quasi
+        veritatis. Accusantium deleniti impedit perferendis. Repellendus ea
+        quaerat eligendi voluptate ipsa molestiae explicabo suscipit asperiores
+        cum, minus, nihil voluptas fugit praesentium beatae veniam labore alias
+        rem nulla laborum libero odit tenetur? Asperiores fugiat ipsa excepturi
+        sapiente culpa illo deleniti id at pariatur harum in officiis, libero
+        eligendi voluptas. Aperiam blanditiis quibusdam voluptates repellat id
+        quis ratione provident, in exercitationem rerum reprehenderit quam
+        mollitia sequi ipsam labore amet doloribus laborum incidunt sint
+        cupiditate, aliquid cum aspernatur quos? Modi obcaecati, vero, nostrum
+        voluptatum quas, molestiae reiciendis voluptates porro quisquam
+        molestias eos. Cum rem id ab, iste dolorem adipisci. Minima dignissimos
+        velit necessitatibus natus ad quam numquam optio quaerat ab nulla
+        eligendi porro debitis deleniti molestias sunt accusantium explicabo
+        quod animi iure, aspernatur ipsa totam laborum ut. Asperiores enim
+        error, modi tenetur Lorem ipsum dolor sit amet consectetur adipisicing
+        elit. Ipsum qui in quae vel inventore rerum quisquam harum natus
+        temporibus hic, id fugit odio aliquid! Tempora, veniam. Dolores, cumque
+        non! Similique deleniti doloremque quos temporibus quas assumenda beatae
+        nulla voluptas pariatur nesciunt atque provident inventore culpa, quis
+        debitis mollitia doloribus! Dolore officiis dolorem iste distinctio,
+        aperiam ut sapiente laborum. Libero aut corporis, obcaecati magni autem
+        quia, provident pariatur commodi quidem quis optio odio! Unde incidunt
+        ex cum eius voluptatum in illo vero explicabo iusto at facere ipsam
+        tenetur animi aut ad, dicta nostrum veritatis necessitatibus, ipsum sint
+        autem inventore provident dolorum?
+      </p>
+      <span role="button" (click)="closeModal()">Close terms of use</span>
+    </div>
+  </app-modal>
+</div>

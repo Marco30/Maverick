@@ -2,6 +2,7 @@
 using WarGamesAPI.DTO;
 using WarGamesAPI.Interfaces;
 using WarGamesAPI.Model;
+using WarGamesAPI.Filters;
 #pragma warning disable CS1998
 
 namespace WarGamesAPI.Controllers;
@@ -19,6 +20,7 @@ public class MessageController : ControllerBase
         _questionService = questionService;
     }
 
+    [ValidateToken]
     [HttpGet("getmessages")]
     public async Task<ActionResult<List<Message>>> GetMessages()
     {
@@ -51,6 +53,7 @@ public class MessageController : ControllerBase
         return result;
     }
 
+    [ValidateToken]
     [HttpGet("getmessage/{id}")]
     public async Task<ActionResult<Message>> Get(int id)
     {
@@ -66,6 +69,7 @@ public class MessageController : ControllerBase
         return Ok(message);
     }
 
+    [ValidateToken]
     [HttpPost("askquestion")]
     public async Task<ActionResult<Message>> AskQuestion(QuestionDto question)
     {
@@ -78,6 +82,7 @@ public class MessageController : ControllerBase
         return StatusCode(201, message);
     }
 
+    [ValidateToken]
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {

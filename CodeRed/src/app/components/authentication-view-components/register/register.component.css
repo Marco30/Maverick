@@ -1,0 +1,30 @@
+.custom-btn {
+  border: none;
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  background-color: var(--btn-bg-color);
+  color: var(--btn-text-color);
+}
+.custom-btn:disabled,
+.custom-btn:disabled:hover {
+  background-color: gray;
+  color: white;
+}
+
+.custom-btn:hover,
+.custom-btn:active {
+  background-color: var(--btn-bg-color);
+  color: var(--btn-text-color);
+}
+.h2-size {
+  font-size: var(--h2-font-size);
+  font-weight: bold;
+}
+
+.custom-link-color {
+  color: var(--link-color);
+}
+.info-bg-color {
+  background-color: var(--info-bg-color);
+  color: var(--info-text-color);
+}

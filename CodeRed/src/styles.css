@@ -1,8 +1,91 @@
+@font-face {
+  font-family: "Cerebri";
+  src: url(./assets/fonts/Cerebri.Sans.Pro/CerebriSansPro-Regular.otf)
+    format("opentype");
+}
+
 /* You can add global styles to this file, and also import other style files */
 :root {
-    --primary-color: #007bff;
-    --secondary-color: #444;
-    --background-color: #1e1e1e;
-    --border-color: #353740;
-    --text-color: #fff;
-  }
+  --bg-primary-color: #ffffff;
+  --text-primary-color: #111314;
+  /* --text-color-primary: #495057; */
+  --bg-secondary-color: #4eac6d;
+  --text-secondary-color: #fefffe;
+  --btn-bg-color: #4eac6d;
+  --btn-text-color: #fcfefd;
+  --link-color: var(--bg-secondary-color);
+  --h1-font-size: calc(1.3rem + 0.46875vw);
+  --h2-font-size: calc(1.2rem + 0.46875vw);
+  --h3-font-size: calc(1.1rem + 0.46875vw);
+  --h4-font-size: calc(1rem + 0.46875vw);
+
+  --info-bg-color: #dcedfc;
+  --info-text-color: #306391;
+
+  --error-bg-color: #ef476f;
+  --error-text-color: #fff;
+  --bs-font-sans-serif: "Cerebri", "arial", sans-serif;
+  --bs-font-monospace: SFMono-Regular, Menlo, Monaco, Consolas,
+    "Liberation Mono", "Courier New", monospace;
+  --bs-body-font-family: var(--bs-font-sans-serif);
+  --bs-body-font-size: 0.9375rem;
+  --bs-body-font-weight: 400;
+  --bs-body-line-height: 1.5;
+
+  /* COPIED FROM  */
+  --bs-blue: #4eac6d;
+  --bs-indigo: #560bad;
+  --bs-purple: #6153cc;
+  --bs-pink: #e83e8c;
+  --bs-red: #ef476f;
+  --bs-orange: #fc814a;
+  --bs-yellow: #ffd166;
+  --bs-green: #06d6a0;
+  --bs-teal: #050505;
+  --bs-cyan: #50a5f1;
+  --bs-white: #fff;
+  --bs-gray: #797c8c;
+  --bs-gray-dark: #343a40;
+  --bs-gray-100: #f8f9fa;
+  --bs-gray-200: #f9f9f9;
+  --bs-gray-300: #f6f6f9;
+  --bs-gray-400: #e6ebf5;
+  --bs-gray-500: #adb5bd;
+  --bs-gray-600: #797c8c;
+  --bs-gray-700: #495057;
+  --bs-gray-800: #343a40;
+  --bs-gray-900: #212529;
+  --bs-primary: #4eac6d;
+  --bs-secondary: #797c8c;
+  --bs-success: #06d6a0;
+  --bs-info: #50a5f1;
+  --bs-warning: #ffd166;
+  --bs-danger: #ef476f;
+  --bs-purple: #6153cc;
+  --bs-pink: #e83e8c;
+  --bs-light: #f6f6f9;
+  --bs-indigo: #560bad;
+  --bs-dark: #343a40;
+}
+
+:root.dark-theme {
+  --bg-primary-color: #2e2e2e;
+  --text-primary-color: #e2e6e3;
+  --bg-secondary-color: #262626;
+  --text-secondary-color: #fefefe;
+
+  --link-color: #0d6efd;
+}
+
+body {
+  transition: all 0.5s ease-in-out;
+  background-color: var(--bg-secondary-color);
+
+  margin: 0;
+  font-family: var(--bs-body-font-family);
+  /* font-size: var(--bs-body-font-size); */
+  font-weight: var(--bs-body-font-weight);
+  line-height: var(--bs-body-line-height);
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+}

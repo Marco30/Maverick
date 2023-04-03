@@ -1,0 +1,28 @@
+.modal {
+  z-index: 1;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  /* background-color: rgba(0, 0, 0, 0.4); */
+  display: flex;
+  justify-content: center;
+}
+
+.content {
+  /* margin: auto; */
+  top: 50%;
+  transform: translateY(-50%);
+  min-width: 300px;
+  max-width: 600px;
+  margin: 2rem;
+  max-height: 70vh;
+  overflow-x: hidden;
+  overflow-y: scroll;
+  position: fixed;
+  background-color: var(--bg-secondary-color);
+  color: var(--text-secondary-color);
+  padding: 0.7rem;
+  border-radius: 8px;
+}
