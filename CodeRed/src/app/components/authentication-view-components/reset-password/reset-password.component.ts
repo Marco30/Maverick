@@ -17,6 +17,7 @@ export class ResetPasswordComponent {
   };
   noMatchPasswords: boolean = false;
   info: string = '';
+  success: boolean = false;
   error: string = '';
   constructor(
     private router: Router,
@@ -66,6 +67,7 @@ export class ResetPasswordComponent {
           console.log('success resetting password:', res);
           this.info = 'Success your password has been reset, Now you can login';
           this.showLoading = false;
+          this.success = true;
         },
         error: (err) => {
           console.log('error resetting password: ', err);
