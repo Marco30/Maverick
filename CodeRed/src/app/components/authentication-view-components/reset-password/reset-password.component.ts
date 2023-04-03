@@ -17,6 +17,7 @@ export class ResetPasswordComponent {
   };
   noMatchPasswords: boolean = false;
   info: string = '';
+  success: boolean = false;
   error: string = '';
   constructor(
     private router: Router,
@@ -25,6 +26,7 @@ export class ResetPasswordComponent {
   ) {}
 
   submitted: boolean = false;
+  showLoading: boolean = false;
   toLogin() {
     this.router.navigate(['auth']);
   }
@@ -53,6 +55,8 @@ export class ResetPasswordComponent {
       this.error = 'Passwords do not match';
       return;
     }
+    this.showLoading = true;
+
     const token = this.route.snapshot.params['token'];
     console.log('resetting password: ', this);
     console.log('params: ', token);
@@ -62,10 +66,13 @@ export class ResetPasswordComponent {
         next: (res) => {
           console.log('success resetting password:', res);
           this.info = 'Success your password has been reset, Now you can login';
+          this.showLoading = false;
+          this.success = true;
         },
         error: (err) => {
           console.log('error resetting password: ', err);
           this.error = 'Sorry, Something went wrong!';
+          this.showLoading = false;
         },
       });
     // this.router.navigate([PATHES.login]);

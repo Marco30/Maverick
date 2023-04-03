@@ -60,6 +60,7 @@ export class RegisterComponent {
     address: this.address,
   };
 
+  showLoading: boolean = false;
   showTermsOfUse: boolean = false;
   noMatchPasswords: boolean = false;
   ERRORS_TYPES = ERRORS_TYPES;
@@ -67,7 +68,6 @@ export class RegisterComponent {
   info: string = '';
   passwordConfirmation: string = '';
   cancelDataFetching: boolean = false;
-  showLoading: boolean = false;
   submitted: boolean = false;
 
   checkSame() {
@@ -76,8 +76,12 @@ export class RegisterComponent {
     if (secondPassword !== firstPassword) {
       console.log('passwords not match');
       this.noMatchPasswords = true;
+      console.log('this line is working outside if statment');
       if (this.registerform && this.registerform.controls) {
+        console.log('this line is working inside if statement');
+
         this.registerform.controls['passwordConfirmationControl'].markAsDirty();
+
         this.registerform.controls['passwordConfirmationControl'].setErrors(
           null
         );
@@ -129,16 +133,20 @@ export class RegisterComponent {
       this.errorsMap.set(ERRORS_TYPES.zipCode, ERRORS_MSGS.zipCode);
     }
     if (this.errorsMap.size > 0) return;
+    this.showLoading = true;
     this.authenticationService.register(this.registerData).subscribe({
       next: (res) => {
         console.info('--------register------------');
         console.info(res);
         this.info = 'Congratulations! Your account has been registered';
+        this.showLoading = false;
+
         // Routing to login view won't work beacuse  the user is already at /login
       },
       error: (err) => {
         this.errorsMap.clear();
         this.errorsMap.set(ERRORS_TYPES.serverError, ERRORS_MSGS.serverError);
+        this.showLoading = false;
       },
     });
   }
