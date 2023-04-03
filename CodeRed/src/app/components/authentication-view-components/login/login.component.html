@@ -1,6 +1,12 @@
-<form (ngSubmit)="login()" #loginForm="ngForm">
+<form (ngSubmit)="login()" #loginForm="ngForm" class="position-relative">
   <h3 class="h2-size text-center">Login</h3>
   <app-loader *ngIf="showLoading"></app-loader>
+  <p
+    *ngIf="loginData.error"
+    class="error-bg-color rounded mt-3 p-3 text-center"
+  >
+    {{ loginData.error }}
+  </p>
   <div class="form-group has-error pb-2">
     <label for="email" class="py-1">Email</label>
     <input
@@ -49,11 +55,11 @@
       This field is required
     </span>
   </div>
-  <span
+  <!-- <span
     class="text-danger help-block d-block mt-1 text-center"
     *ngIf="loginData.error"
   >
     {{ loginData.error }}
-  </span>
+  </span> -->
   <button type="submit" class="custom-btn w-100 mt-3">Login</button>
 </form>

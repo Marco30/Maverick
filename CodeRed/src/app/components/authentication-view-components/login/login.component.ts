@@ -37,12 +37,14 @@ export class LoginComponent {
           this.authenticationService.setToken(res.token);
           this.authenticationService.startCountingDown();
           this.authenticationService.setChatUser(res.user);
+          this.showLoading = false;
           this.router.navigate(['MainView/ChatView']);
         },
         error: () => {
+          this.showLoading = false;
           this.loginData.error = 'Wrong credentials';
         },
-        complete: () => (this.showLoading = false),
+        // complete: () => (this.showLoading = false),
       });
     }, 1000);
   }

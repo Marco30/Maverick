@@ -1,56 +1,207 @@
-<div class="container py-4 text-primary-color">
-  <h1 class="text-uppercase h1-size text-center pt-2 pb-5 text-secondary-color">
-    ultimate ai
-  </h1>
-  <div class="row justify-content-center">
-    <div class="col-sm-10 col-md-8 col-lg-6 col-xxl-4">
-      <div class="card bg-primary-color p-3">
-        <!-- <h2 class="h2-size text-center py-2"></h2> -->
-        <h3 class="card-header p-4 rounded h4-size text-center">
-          Welcome to AI world
-        </h3>
-
-        <div class="card-body mt-4">
-          <app-login *ngIf="currentView == VIEWS.login"></app-login>
-          <app-register *ngIf="currentView == VIEWS.register"></app-register>
-          <app-reset-password-request
-            *ngIf="currentView == VIEWS.resetPasswordRequest"
-          ></app-reset-password-request>
-          <app-reset-password
-            *ngIf="currentView == VIEWS.resetPassword"
-          ></app-reset-password>
-
-          <div class="d-flex justify-content-between mt-4">
-            <button
-              *ngIf="currentView !== VIEWS.login"
-              type="button"
-              class="btn btn-link custom-link-color"
-              (click)="setView(VIEWS.login)"
+<div class="container-fluid p-0">
+  <div class="row g-0">
+    <div class="aside col-xl-3 col-lg-4">
+      <div class="p-4 pb-0 p-lg-5 pb-lg-0 auth-logo-section">
+        <div class="text-white-50">
+          <h3>
+            <i
+              class="bx bxs-message-alt-detail align-middle text-white h3 mb-1 me-2"
             >
-              Back to Login
-            </button>
-            <button
-              *ngIf="
-                currentView !== VIEWS.register &&
-                currentView !== VIEWS.resetPassword
-              "
-              type="button"
-              class="btn btn-link custom-link-color"
-              (click)="setView(VIEWS.register)"
+              AI World</i
             >
-              Register
-            </button>
-            <button
-              *ngIf="currentView === VIEWS.login"
-              type="button"
-              class="btn btn-link custom-link-color"
-              (click)="setView(VIEWS.resetPasswordRequest)"
-            >
-              Forgot Password
-            </button>
-          </div>
+          </h3>
+          <p class="font-size-16">Your ultimate AI tool</p>
         </div>
-        <div class="card-footer text-center mt-4">Copyright</div>
+        <div class="mt-auto">
+          <img src="assets/images/auth-img.png" alt="" class="auth-img" />
+        </div>
+      </div>
+    </div>
+    <div class="main col-xl-9 col-lg-8 p-4">
+      <div class="authentication-page-content">
+        <div class="d-flex flex-column h-100 px-4 pt-4">
+          <div class="row justify-content-center my-auto">
+            <div class="col-sm-8 col-lg-6 col-xl-5 col-xxl-4">
+              <div class="py-md-5 py-4">
+                <div class="text-center mb-5">
+                  <h3>Welcome Back !</h3>
+                  <p class="text-muted">Sign in to continue to AI world.</p>
+                </div>
+                <!-- <form action="index.html">
+                  <div class="mb-3">
+                    <label for="username" class="form-label">Username</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="username"
+                      placeholder="Enter username"
+                    />
+                  </div>
+
+                  <div class="mb-3">
+                    <div class="float-end">
+                      <a href="auth-recoverpw.html" class="text-muted"
+                        >Forgot password?</a
+                      >
+                    </div>
+                    <label for="userpassword" class="form-label"
+                      >Password</label
+                    >
+                    <div class="position-relative auth-pass-inputgroup mb-3">
+                      <input
+                        type="password"
+                        class="form-control pe-5"
+                        placeholder="Enter Password"
+                        id="password-input"
+                      />
+                      <button
+                        class="btn btn-link position-absolute end-0 top-0 text-decoration-none text-muted"
+                        type="button"
+                        id="password-addon"
+                      >
+                        <i class="ri-eye-fill align-middle"></i>
+                      </button>
+                    </div>
+                  </div>
+
+                  <div class="form-check form-check-info font-size-16">
+                    <input
+                      class="form-check-input"
+                      type="checkbox"
+                      id="remember-check"
+                    />
+                    <label
+                      class="form-check-label font-size-14"
+                      for="remember-check"
+                    >
+                      Remember me
+                    </label>
+                  </div>
+
+                  <div class="text-center mt-4">
+                    <button class="btn btn-primary w-100" type="submit">
+                      Log In
+                    </button>
+                  </div>
+                  <div class="mt-4 text-center">
+                    <div class="signin-other-title">
+                      <h5 class="font-size-14 mb-4 title">Sign in with</h5>
+                    </div>
+                    <div class="row">
+                      <div class="col-6">
+                        <div>
+                          <button
+                            type="button"
+                            class="btn btn-light w-100"
+                            data-bs-toggle="tooltip"
+                            data-bs-trigger="hover"
+                            data-bs-placement="top"
+                            title="Facebook"
+                          >
+                            <i class="mdi mdi-facebook text-indigo"></i>
+                          </button>
+                        </div>
+                      </div>
+                      <div class="col-6">
+                        <div>
+                          <button
+                            type="button"
+                            class="btn btn-light w-100"
+                            data-bs-toggle="tooltip"
+                            data-bs-trigger="hover"
+                            data-bs-placement="top"
+                            title="Google"
+                          >
+                            <i class="mdi mdi-google text-danger"></i>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </form> -->
+                <app-login *ngIf="currentView == VIEWS.login"></app-login>
+                <app-register
+                  *ngIf="currentView == VIEWS.register"
+                ></app-register>
+                <app-reset-password-request
+                  *ngIf="currentView == VIEWS.resetPasswordRequest"
+                ></app-reset-password-request>
+                <app-reset-password
+                  *ngIf="currentView == VIEWS.resetPassword"
+                ></app-reset-password>
+                <!-- end form -->
+
+                <div class="mt-5 text-center text-muted">
+                  <p *ngIf="currentView == VIEWS.resetPasswordRequest">
+                    Remember It ?
+                    <span
+                      (click)="setView(VIEWS.login)"
+                      class="custom-link-color"
+                      >Login</span
+                    >
+                  </p>
+                  <p *ngIf="currentView == VIEWS.resetPassword">
+                    To login
+                    <span
+                      role="button"
+                      (click)="setView(VIEWS.login)"
+                      class="custom-link-color"
+                      >Login</span
+                    >
+                  </p>
+                  <p *ngIf="currentView == VIEWS.login">
+                    Don't have an account ?
+                    <span
+                      role="button"
+                      (click)="setView(VIEWS.register)"
+                      class="custom-link-color"
+                    >
+                      Register
+                    </span>
+                  </p>
+                  <p *ngIf="currentView == VIEWS.login">
+                    Did you forget your password ?
+                    <span
+                      role="button"
+                      (click)="setView(VIEWS.resetPasswordRequest)"
+                      class="custom-link-color"
+                    >
+                      Reset Password
+                    </span>
+                  </p>
+                  <p *ngIf="currentView == VIEWS.register">
+                    Already have an account ?
+                    <span
+                      role="button"
+                      (click)="setView(VIEWS.login)"
+                      class="custom-link-color"
+                      >Login</span
+                    >
+                  </p>
+                </div>
+              </div>
+            </div>
+            <!-- end col -->
+          </div>
+          <!-- end row -->
+
+          <div class="row">
+            <div class="col-xl-12">
+              <div class="text-center text-muted p-4">
+                <p class="mb-0">
+                  &copy;
+                  <script>
+                    document.write(new Date().getFullYear());
+                  </script>
+                  AI World. crafted with
+                  <i class="mdi mdi-heart text-danger"></i> love and care
+                </p>
+              </div>
+            </div>
+            <!-- end col -->
+          </div>
+          <!-- end row -->
+        </div>
       </div>
     </div>
   </div>

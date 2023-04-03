@@ -1,3 +1,17 @@
+* {
+  box-sizing: border-box;
+}
+.aside {
+  text-align: center;
+}
+
+.authentication-page-content {
+  background-color: var(--bg-primary-color);
+  border-radius: 25px;
+}
+.card {
+  border: none;
+}
 .card-header,
 .card-footer {
   background-color: transparent;
@@ -24,4 +38,14 @@
 }
 .custom-link-color {
   color: var(--link-color);
+}
+
+@media screen and (min-width: 892px) {
+  /* .aside {
+    min-width: 300px;
+  }
+  .main {
+    flex-grow: 2;
+    min-height: 100vh;
+  } */
 }

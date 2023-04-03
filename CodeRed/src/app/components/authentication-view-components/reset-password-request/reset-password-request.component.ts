@@ -16,8 +16,9 @@ export class ResetPasswordRequestComponent {
   resetPasswordData = {
     email: '',
     error: '',
-    info: ' Enter your Email and instructions will be sent to you!',
+    info: '',
   };
+  showLoading: boolean = false;
   submitted: boolean = false;
   removeError() {
     this.resetPasswordData.error = '';
@@ -32,11 +33,11 @@ export class ResetPasswordRequestComponent {
       this.resetPasswordData.error = 'Email is not valid';
       return;
     }
+    this.showLoading = true;
+
     console.log('reset password request submitted: ', this.resetPasswordData);
 
     this.resetPasswordData.error = '';
-    this.resetPasswordData.info =
-      'Check your email and follow the instructions';
     this.authenticationService
       .sendResetPasswordRequest(this.resetPasswordData.email)
       .subscribe({
@@ -44,9 +45,11 @@ export class ResetPasswordRequestComponent {
           console.log('response from server: ', res);
           this.resetPasswordData.error = '';
           this.resetPasswordData.info = 'Check your email!';
+          this.showLoading = false;
         },
         error: (err) => {
           this.resetPasswordData.error = 'Sorry, Something went wrong!';
+          this.showLoading = false;
         },
       });
   }

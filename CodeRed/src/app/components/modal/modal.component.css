@@ -5,7 +5,7 @@
   bottom: 0;
   left: 0;
   right: 0;
-  background-color: rgba(0, 0, 0, 0.4);
+  /* background-color: rgba(0, 0, 0, 0.4); */
   display: flex;
   justify-content: center;
 }
@@ -16,12 +16,13 @@
   transform: translateY(-50%);
   min-width: 300px;
   max-width: 600px;
-  margin: 0 1rem;
+  margin: 2rem;
   max-height: 70vh;
   overflow-x: hidden;
   overflow-y: scroll;
   position: fixed;
-  background-color: var(--bg-primary-color);
+  background-color: var(--bg-secondary-color);
+  color: var(--text-secondary-color);
   padding: 0.7rem;
   border-radius: 8px;
 }
