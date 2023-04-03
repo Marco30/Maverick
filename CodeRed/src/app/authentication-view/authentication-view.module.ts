@@ -9,6 +9,7 @@ import { ResetPasswordComponent } from '../components/authentication-view-compon
 import { ResetPasswordRequestComponent } from '../components/authentication-view-components/reset-password-request/reset-password-request.component';
 import { LoaderModule } from '../components/loader/loader.module';
 import { ModalModule } from '../components/modal/modal.module';
+import { FooterComponent } from '../components/footer/footer.component';
 
 @NgModule({
   declarations: [
@@ -24,6 +25,7 @@ import { ModalModule } from '../components/modal/modal.module';
     AuthenticationViewRoutingModule,
     LoaderModule,
     ModalModule,
+    FooterComponent,
   ],
 })
 export class AuthenticationViewModule {}
