@@ -2,26 +2,34 @@ import { Component, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Address } from 'src/app/model/address/address';
-import { Register } from 'src/app/model/register/register';
+import { GENDERS, Register } from 'src/app/model/register/register';
 import { AuthenticationService } from 'src/app/service/authentication/authentication.service';
 
 enum ERRORS_TYPES {
   fullName = 'Full',
+  firstName = 'firstName',
+  lastName = 'lastName',
   email = 'email',
   city = 'city',
   street = 'street',
   zipCode = 'zipCode',
   matchedPasswords = 'passwordDontMatch',
   serverError = 'serverError',
+  birthDate = 'birthDate',
+  gender = 'gender',
 }
 enum ERRORS_MSGS {
   fullName = 'Full name is required',
+  firstName = 'First name is required',
+  lastName = 'Last name is required',
   email = 'email name is required',
   city = 'city name is required',
   street = 'street name is required',
   zipCode = 'Zip code name is required',
   passowrdDontMatch = "Passwords don't match",
   serverError = 'Sorry, something went wrong',
+  birthDate = 'Birth Date is required',
+  gender = 'Gender is required',
 }
 @Component({
   selector: 'app-register',
@@ -53,13 +61,16 @@ export class RegisterComponent {
     subscribeToEmailNotification: true,
     email: '',
     password: '',
-    gender: '',
+    gender: GENDERS.other,
+    birthDate: new Date(),
+    phoneNumber: 0,
+    mobilePhoneNumber: 0,
     birthDay: 0,
     birthMonth: 0,
     birthYear: 0,
     address: this.address,
   };
-
+  GENDERS = GENDERS;
   showLoading: boolean = false;
   showTermsOfUse: boolean = false;
   noMatchPasswords: boolean = false;
@@ -117,8 +128,11 @@ export class RegisterComponent {
         ERRORS_MSGS.passowrdDontMatch
       );
     }
-    if (!this.registerData.fullName) {
-      this.errorsMap.set(ERRORS_TYPES.fullName, ERRORS_MSGS.fullName);
+    if (!this.registerData.firstName) {
+      this.errorsMap.set(ERRORS_TYPES.firstName, ERRORS_MSGS.firstName);
+    }
+    if (!this.registerData.lastName) {
+      this.errorsMap.set(ERRORS_TYPES.lastName, ERRORS_MSGS.lastName);
     }
     if (!this.registerData.email) {
       this.errorsMap.set(ERRORS_TYPES.email, ERRORS_MSGS.email);
@@ -134,21 +148,21 @@ export class RegisterComponent {
     }
     if (this.errorsMap.size > 0) return;
     this.showLoading = true;
-    this.authenticationService.register(this.registerData).subscribe({
-      next: (res) => {
-        console.info('--------register------------');
-        console.info(res);
-        this.info = 'Congratulations! Your account has been registered';
-        this.showLoading = false;
+    // this.authenticationService.register(this.registerData).subscribe({
+    //   next: (res) => {
+    //     console.info('--------register------------');
+    //     console.info(res);
+    //     this.info = 'Congratulations! Your account has been registered';
+    //     this.showLoading = false;
 
-        // Routing to login view won't work beacuse  the user is already at /login
-      },
-      error: (err) => {
-        this.errorsMap.clear();
-        this.errorsMap.set(ERRORS_TYPES.serverError, ERRORS_MSGS.serverError);
-        this.showLoading = false;
-      },
-    });
+    //     // Routing to login view won't work beacuse  the user is already at /login
+    //   },
+    //   error: (err) => {
+    //     this.errorsMap.clear();
+    //     this.errorsMap.set(ERRORS_TYPES.serverError, ERRORS_MSGS.serverError);
+    //     this.showLoading = false;
+    //   },
+    // });
   }
   getUserData(): void {
     let num = this.registerData.socialSecurityNumber;
@@ -186,9 +200,15 @@ export class RegisterComponent {
             this.registerData.birthMonth = Number(month);
             this.registerData.birthDay = Number(day);
             this.showLoading = false;
+            // Add Action after register
           },
           error: (err) => {
             console.log(err);
+            // Show erros from backend, Avoid revealign existing emails
+            this.errorsMap.set(
+              ERRORS_TYPES.serverError,
+              ERRORS_MSGS.serverError
+            );
             this.showLoading = false;
           },
         });
