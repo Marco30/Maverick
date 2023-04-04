@@ -61,15 +61,15 @@ export class RegisterComponent {
     subscribeToEmailNotification: true,
     email: '',
     password: '',
-    gender: GENDERS.other,
-    birthDate: new Date(),
-    phoneNumber: 0,
-    mobilePhoneNumber: 0,
-    birthDay: 0,
-    birthMonth: 0,
-    birthYear: 0,
+    gender: null,
+    birthDate: null,
+    phoneNumber: null,
+    mobilePhoneNumber: null,
     address: this.address,
   };
+  birthDay = 0;
+  birthMonth = 0;
+  birthYear = 0;
   GENDERS = GENDERS;
   showLoading: boolean = false;
   showTermsOfUse: boolean = false;
@@ -134,6 +134,12 @@ export class RegisterComponent {
     if (!this.registerData.lastName) {
       this.errorsMap.set(ERRORS_TYPES.lastName, ERRORS_MSGS.lastName);
     }
+    if (!this.registerData.birthDate) {
+      this.errorsMap.set(ERRORS_TYPES.birthDate, ERRORS_MSGS.birthDate);
+    }
+    if (!this.registerData.gender) {
+      this.errorsMap.set(ERRORS_TYPES.gender, ERRORS_MSGS.gender);
+    }
     if (!this.registerData.email) {
       this.errorsMap.set(ERRORS_TYPES.email, ERRORS_MSGS.email);
     }
@@ -147,22 +153,24 @@ export class RegisterComponent {
       this.errorsMap.set(ERRORS_TYPES.zipCode, ERRORS_MSGS.zipCode);
     }
     if (this.errorsMap.size > 0) return;
-    this.showLoading = true;
-    // this.authenticationService.register(this.registerData).subscribe({
-    //   next: (res) => {
-    //     console.info('--------register------------');
-    //     console.info(res);
-    //     this.info = 'Congratulations! Your account has been registered';
-    //     this.showLoading = false;
+    console.log('register data: ', this.registerData);
 
-    //     // Routing to login view won't work beacuse  the user is already at /login
-    //   },
-    //   error: (err) => {
-    //     this.errorsMap.clear();
-    //     this.errorsMap.set(ERRORS_TYPES.serverError, ERRORS_MSGS.serverError);
-    //     this.showLoading = false;
-    //   },
-    // });
+    this.showLoading = true;
+    this.authenticationService.register(this.registerData).subscribe({
+      next: (res) => {
+        console.info('--------register------------');
+        console.info(res);
+        this.info = 'Congratulations! Your account has been registered';
+        this.showLoading = false;
+
+        // Routing to login view won't work beacuse  the user is already at /login
+      },
+      error: (err) => {
+        this.errorsMap.clear();
+        this.errorsMap.set(ERRORS_TYPES.serverError, ERRORS_MSGS.serverError);
+        this.showLoading = false;
+      },
+    });
   }
   getUserData(): void {
     let num = this.registerData.socialSecurityNumber;
@@ -196,9 +204,9 @@ export class RegisterComponent {
               userData?.address?.zipCode || this.registerData.address.zipCode;
             this.registerData.gender =
               userData?.gender || this.registerData.gender;
-            this.registerData.birthYear = Number(year);
-            this.registerData.birthMonth = Number(month);
-            this.registerData.birthDay = Number(day);
+            this.birthYear = Number(year);
+            this.birthMonth = Number(month);
+            this.birthDay = Number(day);
             this.showLoading = false;
             // Add Action after register
           },

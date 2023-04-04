@@ -17,14 +17,12 @@ export class Register {
   password: string;
   agreeMarketing: boolean;
   subscribeToEmailNotification: boolean;
-  gender: Genders;
-  birthYear: number;
-  birthMonth: number;
-  birthDay: number;
+  gender: Genders | null;
+
   address: Address;
-  phoneNumber: number;
-  mobilePhoneNumber: number;
-  birthDate: Date;
+  phoneNumber: number | null;
+  mobilePhoneNumber: number | null;
+  birthDate: Date | null;
   constructor(
     socialSecurityNumber: string,
     email: string,
@@ -35,9 +33,7 @@ export class Register {
     gender: Genders,
     fullName: string,
     subscribeToEmailNotification: boolean,
-    birthDay: number,
-    birthYear: number,
-    birthMonth: number,
+
     address: Address,
     phoneNumber: number,
     mobilePhoneNumber: number,
@@ -52,9 +48,7 @@ export class Register {
     this.subscribeToEmailNotification = subscribeToEmailNotification;
     this.gender = gender;
     this.fullName = fullName;
-    this.birthDay = birthDay;
-    this.birthMonth = birthMonth;
-    this.birthYear = birthYear;
+
     this.address = address;
     this.phoneNumber = phoneNumber;
     this.mobilePhoneNumber = mobilePhoneNumber;
