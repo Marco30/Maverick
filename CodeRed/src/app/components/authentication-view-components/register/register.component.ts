@@ -1,6 +1,5 @@
 import { Component, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
-import { Router } from '@angular/router';
 import { Address } from 'src/app/model/address/address';
 import { GENDERS, Register } from 'src/app/model/register/register';
 import { AuthenticationService } from 'src/app/service/authentication/authentication.service';
@@ -40,7 +39,6 @@ export class RegisterComponent {
   @ViewChild('registerform', { static: false }) registerform!: NgForm;
   constructor(
     private authenticationService: AuthenticationService,
-    private router: Router
   ) {}
 
   address: Address = {
@@ -61,15 +59,13 @@ export class RegisterComponent {
     subscribeToEmailNotification: true,
     email: '',
     password: '',
-    gender: null,
-    birthDate: null,
-    phoneNumber: null,
-    mobilePhoneNumber: null,
+    gender: GENDERS.other,
+    birthDate: new Date("2010-01-16"),
+    phoneNumber: undefined,
+    mobilePhoneNumber: undefined,
     address: this.address,
   };
-  birthDay = 0;
-  birthMonth = 0;
-  birthYear = 0;
+
   GENDERS = GENDERS;
   showLoading: boolean = false;
   showTermsOfUse: boolean = false;
@@ -119,6 +115,9 @@ export class RegisterComponent {
   }
 
   register() {
+  
+    console.log('register date: ', this.registerData.birthDate);
+    
     this.submitted = true;
 
     console.log('Registering with data:', this.registerData);
@@ -156,7 +155,7 @@ export class RegisterComponent {
     console.log('register data: ', this.registerData);
 
     this.showLoading = true;
-    this.authenticationService.register(this.registerData).subscribe({
+   this.authenticationService.register(this.registerData).subscribe({
       next: (res) => {
         console.info('--------register------------');
         console.info(res);
@@ -172,15 +171,16 @@ export class RegisterComponent {
       },
     });
   }
+
   getUserData(): void {
     let num = this.registerData.socialSecurityNumber;
     if (this.registerData.socialSecurityNumber.includes('-')) {
       num = this.registerData.socialSecurityNumber.replace('-', '');
     }
     if (num.length == 12) {
-      const { year, month, day } = this.getBirthDay(
+      /*const { year, month, day } = this.getBirthDay(
         this.registerData.socialSecurityNumber
-      );
+      );*/
 
       this.cancelDataFetching = false;
       this.showLoading = true;
@@ -191,9 +191,9 @@ export class RegisterComponent {
           next: (userData) => {
             if (this.cancelDataFetching) return;
             console.log('uploaded image to server, event: ', userData);
-            const { year, month, day } = this.getBirthDay(
+            /*const { year, month, day } = this.getBirthDay(
               this.registerData.socialSecurityNumber
-            );
+            ); */
             this.registerData.fullName =
               userData.fullName || this.registerData.fullName;
             this.registerData.firstName =
@@ -208,10 +208,10 @@ export class RegisterComponent {
               userData?.address?.zipCode || this.registerData.address.zipCode;
             this.registerData.gender =
               userData?.gender || this.registerData.gender;
-            this.birthYear = Number(year);
-            this.birthMonth = Number(month);
-            this.birthDay = Number(day);
-            this.registerData.birthDate = `${year}-${month}-${day}`;
+           // this.registerData.birthDate = `${year}-${month}-${day}`;
+            this.registerData.birthDate = this.getBirthDay(
+              this.registerData.socialSecurityNumber
+            );
             this.showLoading = false;
 
             // Add Action after register
@@ -235,7 +235,9 @@ export class RegisterComponent {
     const year = bd.slice(0, 4);
     const month = bd.slice(4, 6);
     const day = bd.slice(6, 8);
-    return { year, month, day };
+    //return { year, month, day };
+
+    return new Date(year+'-'+month+'-'+day);  
   }
 
   cancelLoader() {
