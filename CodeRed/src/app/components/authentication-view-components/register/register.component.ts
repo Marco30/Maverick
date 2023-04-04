@@ -178,6 +178,10 @@ export class RegisterComponent {
       num = this.registerData.socialSecurityNumber.replace('-', '');
     }
     if (num.length == 12) {
+      const { year, month, day } = this.getBirthDay(
+        this.registerData.socialSecurityNumber
+      );
+
       this.cancelDataFetching = false;
       this.showLoading = true;
       this.registerData.socialSecurityNumber = num;
@@ -207,7 +211,9 @@ export class RegisterComponent {
             this.birthYear = Number(year);
             this.birthMonth = Number(month);
             this.birthDay = Number(day);
+            this.registerData.birthDate = `${year}-${month}-${day}`;
             this.showLoading = false;
+
             // Add Action after register
           },
           error: (err) => {

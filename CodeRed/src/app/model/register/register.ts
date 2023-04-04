@@ -22,7 +22,7 @@ export class Register {
   address: Address;
   phoneNumber: number | null;
   mobilePhoneNumber: number | null;
-  birthDate: Date | null;
+  birthDate: string | null;
   constructor(
     socialSecurityNumber: string,
     email: string,
@@ -37,7 +37,7 @@ export class Register {
     address: Address,
     phoneNumber: number,
     mobilePhoneNumber: number,
-    birthDate: Date
+    birthDate: string
   ) {
     this.socialSecurityNumber = socialSecurityNumber;
     this.email = email;

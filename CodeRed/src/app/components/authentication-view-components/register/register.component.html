@@ -95,6 +95,7 @@
             id="birthDate"
             name="birthDate"
             placeholder="Your birth date"
+            max="2010-04-20"
             required
             [(ngModel)]="registerData.birthDate"
             (ngModelChange)="removeError(ERRORS_TYPES.birthDate)"
@@ -113,7 +114,7 @@
           <select
             name="gender"
             id="gender"
-            class="form-select form-select-md mb-3"
+            class="form-select form-select-md"
             [(ngModel)]="registerData.gender"
             (ngModelChange)="removeError(ERRORS_TYPES.gender)"
             #genderControl="ngModel"
@@ -171,7 +172,7 @@
     <div class="form-group pb-2">
       <label for="mobilePhoneNumber" class="py-1">Mobile phone number*</label>
       <input
-        pattern="^(?:\+46|0046|0)[\s-]?[1-9]\d{1,2}[\s-]?\d{7}$"
+        pattern="^\+?\d{1,3}[-.\s]?\d{3,4}[-.\s]?\d{4,6}$"
         type="text"
         class="form-control"
         id="mobilePhoneNumber"
