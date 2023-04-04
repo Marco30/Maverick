@@ -1,6 +1,5 @@
 import { Component, ViewChild, Output, EventEmitter } from '@angular/core';
 import { NgForm } from '@angular/forms';
-import { Router } from '@angular/router';
 import { Address } from 'src/app/model/address/address';
 import { Login } from 'src/app/model/login/login';
 import { GENDERS, Register } from 'src/app/model/register/register';
@@ -15,7 +14,8 @@ enum ERRORS_TYPES {
   street = 'street',
   zipCode = 'zipCode',
   matchedPasswords = 'passwordDontMatch',
-  birthDate = 'birthDate',
+  serverError = 'serverError',
+  dateOfBirth = 'dateOfBirth',
   gender = 'gender',
   mobile = 'mobile',
 }
@@ -28,7 +28,8 @@ enum ERRORS_MSGS {
   street = 'street name is required',
   zipCode = 'Zip code name is required',
   passowrdDontMatch = "Passwords don't match",
-  birthDate = 'Birth Date is required',
+  serverError = 'Sorry, something went wrong',
+  dateOfBirth = 'Birth Date is required',
   gender = 'Gender is required',
   mobile = 'Mobile number is required',
 }
@@ -40,10 +41,7 @@ enum ERRORS_MSGS {
 export class RegisterComponent {
   @ViewChild('registerform', { static: false }) registerform!: NgForm;
   @Output() success: EventEmitter<Login> = new EventEmitter();
-  constructor(
-    private authenticationService: AuthenticationService,
-    private router: Router
-  ) {}
+  constructor(private authenticationService: AuthenticationService) {}
 
   address: Address = {
     city: '',
@@ -63,10 +61,10 @@ export class RegisterComponent {
     subscribeToEmailNotification: true,
     email: '',
     password: '',
-    gender: null,
-    birthDate: null,
-    phoneNumber: '',
-    mobilePhoneNumber: '',
+    gender: GENDERS.other,
+    dateOfBirth: new Date('2010-01-16'),
+    phoneNumber: undefined,
+    mobilePhoneNumber: undefined,
     address: this.address,
   };
 
@@ -81,7 +79,8 @@ export class RegisterComponent {
   cancelDataFetching: boolean = false;
   submitted: boolean = false;
   serverError: string = '';
-  successRegistration: boolean = true;
+  successRegistration: boolean = false;
+  isFetchingUserData: boolean = false;
   checkSame() {
     const secondPassword = this.passwordConfirmation;
     const firstPassword = this.registerData.password;
@@ -121,6 +120,8 @@ export class RegisterComponent {
   }
 
   register() {
+    console.log('register date: ', this.registerData.dateOfBirth);
+
     this.submitted = true;
 
     console.log('Registering with data:', this.registerData);
@@ -136,8 +137,8 @@ export class RegisterComponent {
     if (!this.registerData.lastName) {
       this.errorsMap.set(ERRORS_TYPES.lastName, ERRORS_MSGS.lastName);
     }
-    if (!this.registerData.birthDate) {
-      this.errorsMap.set(ERRORS_TYPES.birthDate, ERRORS_MSGS.birthDate);
+    if (!this.registerData.dateOfBirth) {
+      this.errorsMap.set(ERRORS_TYPES.dateOfBirth, ERRORS_MSGS.dateOfBirth);
     }
     if (!this.registerData.gender) {
       this.errorsMap.set(ERRORS_TYPES.gender, ERRORS_MSGS.gender);
@@ -158,14 +159,13 @@ export class RegisterComponent {
     console.log('register data: ', this.registerData);
 
     this.showLoading = true;
+    this.isFetchingUserData = false;
     this.authenticationService.register(this.registerData).subscribe({
       next: (res) => {
         console.info('--------register------------');
         console.info(res);
         this.successRegistration = true;
         this.showLoading = false;
-
-        // Routing to login view won't work beacuse  the user is already at /login
       },
       error: (err) => {
         this.errorsMap.clear();
@@ -174,13 +174,14 @@ export class RegisterComponent {
       },
     });
   }
+
   getUserData(): void {
     let num = this.registerData.socialSecurityNumber;
     if (this.registerData.socialSecurityNumber.includes('-')) {
       num = this.registerData.socialSecurityNumber.replace('-', '');
     }
     if (num.length == 12) {
-      this.cancelDataFetching = false;
+      this.isFetchingUserData = true;
       this.showLoading = true;
       this.registerData.socialSecurityNumber = num;
       this.authenticationService
@@ -189,9 +190,6 @@ export class RegisterComponent {
           next: (userData) => {
             if (this.cancelDataFetching) return;
             console.log('uploaded image to server, event: ', userData);
-            const { year, month, day } = this.getBirthDay(
-              this.registerData.socialSecurityNumber
-            );
             this.registerData.fullName =
               userData.fullName || this.registerData.fullName;
             this.registerData.firstName =
@@ -206,8 +204,9 @@ export class RegisterComponent {
               userData?.address?.zipCode || this.registerData.address.zipCode;
             this.registerData.gender =
               userData?.gender || this.registerData.gender;
-
-            this.registerData.birthDate = `${year}-${month}-${day}`;
+            this.registerData.dateOfBirth = this.getDateOfBirth(
+              this.registerData.socialSecurityNumber
+            );
             this.showLoading = false;
           },
           error: (err) => {
@@ -221,16 +220,16 @@ export class RegisterComponent {
     }
   }
 
-  getBirthDay(socialSecurityNumber: string) {
+  getDateOfBirth(socialSecurityNumber: string) {
     console.log('socialSecurityNumber: ', socialSecurityNumber);
     const bd = socialSecurityNumber.slice(0, 8);
     const year = bd.slice(0, 4);
     const month = bd.slice(4, 6);
     const day = bd.slice(6, 8);
-    return { year, month, day };
+    return new Date(year + '-' + month + '-' + day);
   }
 
-  cancelLoader() {
+  abortUserDataFetching() {
     this.cancelDataFetching = true;
     this.showLoading = false;
   }
@@ -249,8 +248,8 @@ export class RegisterComponent {
     console.log('To login');
     this.success.emit({
       socialSecurityNumber: '',
-      email: 'test email',
-      password: 'test password',
+      email: this.registerData.email,
+      password: this.registerData.password,
     });
   }
 }
