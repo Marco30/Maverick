@@ -8,10 +8,12 @@ namespace WarGamesAPI.Services;
 public class GptService : IGptService
 {
     readonly ILogger<GptService> _logger;
+    readonly string? _apiKey;
 
-    public GptService(ILogger<GptService> logger)
+    public GptService(ILogger<GptService> logger, IConfiguration configuration)
     {
         _logger = logger;
+        _apiKey = configuration["openAiKey"];
     }
 
     public async Task<AnswerDto?> AskQuestion(QuestionDto question)

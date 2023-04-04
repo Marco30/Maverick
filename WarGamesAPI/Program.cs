@@ -1,4 +1,5 @@
 
+using System.Reflection;
 using Courses.Api.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
@@ -12,6 +13,9 @@ using WarGamesAPI.Services;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+
+builder.Configuration.AddEnvironmentVariables().AddUserSecrets(Assembly.GetExecutingAssembly(), true);
+
 builder.Services.AddDbContext<WarGamesContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
 );
@@ -67,6 +71,8 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddScoped<IQuestionRepository, QuestionRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+//builder.Services.AddSingleton<IConfiguration>(configuration);
+
 
 builder.Services.AddScoped<IGptService, GptService>();
 
