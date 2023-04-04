@@ -10,7 +10,7 @@ public class Answer
     public DateTime Time { get; set; }
 
     [ForeignKey("QuestionId")]
-    public int QuestionId { get; set; }
+    public int? QuestionId { get; set; }
     public Question? Question { get; set; }
 
     [ForeignKey("ConversationId")]

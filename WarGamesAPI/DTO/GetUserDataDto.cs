@@ -1,7 +1,6 @@
-﻿namespace WarGamesAPI.DTO
+﻿namespace WarGamesAPI.DTO;
+
+public class GetUserDataDto
 {
-    public class GetUserDataDto
-    {
-        public string? SocialSecurityNumber { get; set; } 
-    }
+    public string? SocialSecurityNumber { get; set; } 
 }

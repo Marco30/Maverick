@@ -1,4 +1,6 @@
-﻿using System.Text.RegularExpressions;
+﻿using System.Net;
+using System.Text.RegularExpressions;
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using MiracleMileAPI.Sessions;
 using WarGamesAPI.Crawler;
@@ -16,11 +18,13 @@ public class AuthController : ControllerBase
 {
     readonly ILogger<AuthController> _logger;
     readonly IUserRepository _userRepo;
+    readonly IMapper _mapper;
 
-    public AuthController(ILogger<AuthController> logger, IUserRepository userRepo)
+    public AuthController(ILogger<AuthController> logger, IUserRepository userRepo, IMapper mapper)
     {
         _logger = logger;
         _userRepo = userRepo;
+        _mapper = mapper;
     }
 
     [HttpPost("authenticate")]
@@ -189,67 +193,71 @@ public class AuthController : ControllerBase
     [HttpPost("registeruser")]
     public async Task<ActionResult<User>> RegisterUser(RegisterUserDto register)
     {
-        if (register.Email is null) return BadRequest(new ResponseMessageDto { Error = true, Message = "Email saknas" });
-        if (register.SocialSecurityNumber is null) return BadRequest(new ResponseMessageDto { Error = true, Message = "Personnummer saknas" });
+        register.Address = _mapper.Map<AddressDto>(register.Address);
 
-
-        var emailUser = await _userRepo.GetUserFromEmailAsync(register.Email);
-        var socialSecurityUser = await _userRepo.GetUserFromSocSecAsync(register.SocialSecurityNumber);
-
-        if (emailUser != null )
-            return BadRequest(new ResponseMessageDto { Error = true, Message = "En användare med denna email är redan registrerad" });
-
-        if (socialSecurityUser != null)
-            return BadRequest(new ResponseMessageDto { Error = true, Message = "En användare med detta peronnummer är redan registrerad" });
-
-        if (register.Password is null)
+        if (register.Email is null) 
+            return BadRequest(new ResponseMessageDto { Error = true, Message = "Email saknas" });
+        
+        if (register.SocialSecurityNumber is null) 
+            return BadRequest(new ResponseMessageDto { Error = true, Message = "Personnummer saknas" });
+        
+        if (register.Password is null) 
             return BadRequest(new ResponseMessageDto { Error = true, Message = "Lösenord saknas" });
 
-        if (register.SocialSecurityNumber != null && VerifySocialSecurityNumber(register.SocialSecurityNumber))
+        if (await _userRepo.GetUserFromEmailAsync(register.Email) != null )
+            return BadRequest(new ResponseMessageDto { Error = true, Message = "En användare med denna email är redan registrerad" });
+
+        if (await _userRepo.GetUserFromSocSecAsync(register.SocialSecurityNumber) != null)
+            return BadRequest(new ResponseMessageDto { Error = true, Message = "En användare med detta peronnummer är redan registrerad" });
+
+        if (!VerifySocialSecurityNumber(register.SocialSecurityNumber)) return BadRequest(new ResponseMessageDto { Error = true, Message = "Fel på personnummer" });
+
+        try
         {
+            //var crawlResult = Crawlers.SeleniumGetUserInfoPagesCrawler("https://mrkoll.se/", register.SocialSecurityNumber);
+            //AddressDto? address = crawlResult.Address;
 
             try
             {
-                UserDto crawlResult = Crawlers.SeleniumGetUserInfoPagesCrawler("https://mrkoll.se/", register.SocialSecurityNumber);
-                AddressDto? address = crawlResult.Address;
+                //register.AddressId = await _userRepo.AddAddress(address!);
 
-                var registeredAddress = await _userRepo.AddAddress(address!);
-
-                if (registeredAddress is null)
-                {
-                    return StatusCode(500, new ResponseMessageDto { Error = true, Message = "Error saving address" });
-                }
-
-                register.AddressId = registeredAddress.Id;
+                register.AddressId = await _userRepo.AddAddress(register.Address);
 
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                _logger.LogInformation($"Crawl failed, registering user anyway{e.Message}");
-            }
-
-
-            var registeredUser = await _userRepo.AddUser(register);
-            if (registeredUser is null)
-            {
-                return StatusCode(500, new ResponseMessageDto { Error = true, Message = "Error registering user" });
+                return StatusCode(500, new ResponseMessageDto { Error = true, Message = "Error saving address" });
             }
             
-            var token = TokenData.CreateJwtToken(registeredUser);
-
-            var inloggedUser = new InLoggedUserDto
-            {
-                User = registeredUser,
-                Token = token
-            };
-            return Ok(inloggedUser);
-
-            
-
-
+        }
+        catch (Exception e)
+        {
+            _logger.LogInformation($"Crawl failed, registering user anyway{e.Message}");
         }
 
-        return BadRequest(new ResponseMessageDto { Error = true, Message = "Fel på personnummer" });
+        try
+        {
+            var registeredUser = await _userRepo.AddUser(register);
+            
+            var token = TokenData.CreateJwtToken(registeredUser!);
+
+            return Ok(new InLoggedUserDto { User = registeredUser, Token = token });
+
+        }
+        catch (Exception)
+        {
+            return StatusCode(500, new ResponseMessageDto { Error = true, Message = "Error registering user" });
+
+        }
+        
+            
+
+
+            
+
+
+        
+
 
     }
 

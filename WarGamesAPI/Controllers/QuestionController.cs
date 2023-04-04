@@ -39,7 +39,7 @@ public class QuestionController : ControllerBase
             return BadRequest("The text of the user question is required.");
         }
 
-        if (userQuestion.UserId is null)
+        if (userQuestion.UserId == 0)
         {
             return BadRequest("Faulty userId");
         }
@@ -52,15 +52,12 @@ public class QuestionController : ControllerBase
             
             var answer = new AnswerDto();
 
-            if (question != null)
-            {
-                answer = await _gptService.AskQuestion(question);
-            }
+            if (question != null) answer = await _gptService.AskQuestion(question);
 
-            if (answer is null)
-            {
-                return StatusCode(500);
-            }
+            if (answer is null) return StatusCode(500);
+            
+            answer.ConversationId = userQuestion.ConversationId;
+
         
             var result = await _questionRepo.SaveAnswerAsync(answer);
         
@@ -118,13 +115,65 @@ public class QuestionController : ControllerBase
 
     
     [ValidateToken]
-    [HttpDelete("{questionId}")]
+    [HttpDelete("deletequestion/{questionId}")]
     public async Task<IActionResult> DeleteQuestion(int questionId)
     {
 
         try
         {
             await _questionRepo.DeleteQuestionAsync(questionId);
+            return NoContent();
+
+        }
+        catch (Exception e)
+        {
+            var error = new ResponseMessageDto { StatusCode = 500, Message = e.Message };
+            return StatusCode(500, error);
+        }
+
+
+    }
+
+    [ValidateToken]
+    [HttpDelete("deleteanswer/{answerId}")]
+    public async Task<IActionResult> DeleteAnswer(int answerId)
+    {
+
+        try
+        {
+            var answer = await _questionRepo.GetAnswerAsync(answerId);
+            if (answer == null)
+            {
+                return NotFound(new ResponseMessageDto { Message = $"Answer with id {answerId} not found" });
+            }
+
+            await _questionRepo.DeleteAnswerAsync(answerId);
+            return NoContent();
+
+        }
+        catch (Exception e)
+        {
+            var error = new ResponseMessageDto { StatusCode = 500, Message = e.Message };
+            return StatusCode(500, error);
+        }
+
+
+    }
+
+    [ValidateToken]
+    [HttpDelete("deleteconversation/{conversationId}")]
+    public async Task<IActionResult> DeleteConversation(int conversationId)
+    {
+
+        try
+        {
+            var conversation = await _questionRepo.GetAnswerAsync(conversationId);
+            if (conversation == null)
+            {
+                return NotFound(new ResponseMessageDto { Message = $"Conversation with id {conversationId} not found" });
+            }
+
+            await _questionRepo.DeleteConversationAsync(conversationId);
             return NoContent();
 
         }

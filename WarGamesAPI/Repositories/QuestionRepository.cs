@@ -56,7 +56,7 @@ public class QuestionRepository : IQuestionRepository
     {
         var answerToSave = new Answer
         {
-            Text = answer.Text,
+            Text = answer.AnswerText,
             Time = answer.Time,
             QuestionId = answer.QuestionId,
             ConversationId = answer.ConversationId
@@ -89,6 +89,12 @@ public class QuestionRepository : IQuestionRepository
             .ProjectTo<AnswerDto>(_mapper.ConfigurationProvider).ToListAsync();
     }
 
+    public async Task<AnswerDto?> GetAnswerAsync(int answerId)
+    {
+        return await _context.Answer.Where(a => a.Id == answerId).ProjectTo<AnswerDto>(_mapper.ConfigurationProvider)
+            .SingleOrDefaultAsync();
+    }
+
     public async Task DeleteQuestionAsync(int questionId)
     {
         var question = await _context.Question.FindAsync(questionId);
@@ -97,17 +103,65 @@ public class QuestionRepository : IQuestionRepository
             throw new Exception($"Question with id {questionId} not found");
         }
 
+        var answersToQuestion = _context.Answer.Where(a => a.QuestionId == questionId);
+        
         _context.Question.Remove(question);
+        _context.Answer.RemoveRange(answersToQuestion);
 
         await _context.SaveChangesAsync();
 
     }
 
-    public async Task<AnswerDto?> GetAnswerAsync(int answerId)
+    public async Task DeleteAnswerAsync(int answerId)
     {
-        return await _context.Answer.Where(a => a.Id == answerId).ProjectTo<AnswerDto>(_mapper.ConfigurationProvider)
-            .SingleOrDefaultAsync();
+        var answer = await _context.Answer.FindAsync(answerId);
+        if (answer is null)
+        {
+            throw new Exception($"Answer with id {answerId} not found");
+        }
+
+        _context.Answer.Remove(answer);
+
+        await _context.SaveChangesAsync();
+
     }
+
+    public async Task DeleteConversationAsync(int conversationId)
+    {
+        var conversation = await _context.Conversation.FindAsync(conversationId);
+        if (conversation is null)
+        {
+            throw new Exception($"Conversation with id {conversationId} not found");
+        }
+
+        var questions = await _context.Question.Where(q => q.ConversationId == conversationId).ToListAsync();
+        var answers = await _context.Answer.Where(a => a.ConversationId == conversationId).ToListAsync();
+
+        _context.Question.RemoveRange(questions);
+        _context.Answer.RemoveRange(answers);
+        _context.Conversation.Remove(conversation);
+
+        await _context.SaveChangesAsync();
+
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     private async Task<Conversation?> CreateConversationAsync(int userId)
     {
@@ -126,5 +180,8 @@ public class QuestionRepository : IQuestionRepository
         }
 
     }
+
+
+
 
 }

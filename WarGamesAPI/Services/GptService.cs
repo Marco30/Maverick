@@ -21,7 +21,7 @@ public class GptService : IGptService
         return new AnswerDto
         {
             QuestionId = question.Id, 
-            Text = answer, Time = DateTime.Now
+            AnswerText = answer, Time = DateTime.Now
         };
 
     }

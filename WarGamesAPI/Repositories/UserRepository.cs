@@ -78,13 +78,19 @@ public class UserRepository : IUserRepository
         
     }
 
-    public async Task<Address?> AddAddress(AddressDto address)
+    public async Task<int> AddAddress(AddressDto address)
     {
-        address.Id = new Random().Next();
-        Json.CheckAndAddDataToJson("Address", address);
-        List<Address> allAddresses = Json.GetJsonData<Address>("Address");
-        var confirmedAddress = allAddresses.FirstOrDefault(a => a.Id == address.Id);
-        return confirmedAddress ?? null;
+        try
+        {
+            var addressToAdd = _mapper.Map<Address>(address);
+            await _context.Address.AddAsync(addressToAdd);
+            await _context.SaveChangesAsync();
+            return addressToAdd.Id;
+        }
+        catch (Exception e)
+        {
+            throw new Exception("Error saving Address", e);
+        }
     }
 
 

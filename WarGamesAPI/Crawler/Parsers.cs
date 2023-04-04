@@ -113,7 +113,12 @@ public class Parsers
 
                 var Street = htmlDocument.DocumentNode.SelectSingleNode("/html/body/div[1]/div[3]/div/div/div[1]/div/div[7]/div[2]/span[2]");
 
-                address.Street = Street.InnerText.Trim();
+
+                if (Street != null)
+                {
+                    address.Street = Street.InnerText.Trim();
+                }
+
 
                 /* var city = htmlDocument.DocumentNode.SelectSingleNode("/html/body/div[1]/div[3]/div/div/div[1]/div/div[7]/div[1]/div[4]/span[2]");
 

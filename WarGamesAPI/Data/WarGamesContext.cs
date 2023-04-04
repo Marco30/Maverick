@@ -33,7 +33,7 @@ public class WarGamesContext : DbContext
             .WithMany(u => u.Questions)
             .HasForeignKey(q => q.UserId)
             .OnDelete(DeleteBehavior.NoAction);
-
+        
         modelBuilder.Entity<Answer>()
             .HasOne(a => a.Question)
             .WithMany(q => q.Answers)
