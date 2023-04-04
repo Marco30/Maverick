@@ -9,7 +9,7 @@
     <div class="form-group pb-2">
       <label for="socialSecurityNumber" class="py-1">Personnummer*</label>
       <input
-        pattern="^(19|20)?(\d{6}([-+]|\s)\d{4}|(?!19|20)\d{10})$"
+        [pattern]="securityNumberRegex"
         type="text"
         class="form-control"
         id="socialSecurityNumber"
@@ -34,7 +34,7 @@
         <div class="form-group pb-2">
           <label for="firstName" class="py-1">First Name*</label>
           <input
-            pattern="^[A-Za-zÀ-ÖØ-öø-ÿ\s]+$"
+            [pattern]="nameRegex"
             type="text"
             class="form-control"
             id="firstName"
@@ -68,7 +68,7 @@
         <div class="form-group pb-2">
           <label for="lastName" class="py-1">Last Name*</label>
           <input
-            pattern="^[A-Za-zÀ-ÖØ-öø-ÿ\s]+$"
+            [pattern]="nameRegex"
             type="text"
             class="form-control"
             id="lastName"
@@ -155,7 +155,7 @@
     <div class="form-group pb-2">
       <label for="email" class="py-1">Email*</label>
       <input
-        pattern="^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$"
+        [pattern]="emailRegex"
         type="email"
         class="form-control"
         id="email"
@@ -187,7 +187,7 @@
     <div class="form-group pb-2">
       <label for="mobilePhoneNumber" class="py-1">Mobile phone number*</label>
       <input
-        pattern="^\+?\d{1,3}[-.\s]?\d{3,4}[-.\s]?\d{4,6}$"
+        [pattern]="phoneRegex"
         type="text"
         class="form-control"
         id="mobilePhoneNumber"
@@ -220,7 +220,7 @@
     <div class="form-group pb-2">
       <label for="phoneNumber" class="py-1">Phone number</label>
       <input
-        pattern="^(?:\+46|0046|0)[\s-]?[1-9]\d{1,2}[\s-]?\d{7}$"
+        [pattern]="phoneRegex"
         type="text"
         class="form-control"
         id="phoneNumber"

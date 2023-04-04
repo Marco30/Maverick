@@ -68,6 +68,14 @@ export class RegisterComponent {
     address: this.address,
   };
 
+  // name regex No numbers, minimum two letter, no leading or trailing white spaces
+  nameRegex = /^[A-Za-zÀ-ÖØ-öø-ÿ]{2,}(?:\s+[A-Za-zÀ-ÖØ-öø-ÿ]+)*$/;
+  // email regex
+  emailRegex = /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$/;
+  // personal security number
+  securityNumberRegex = /^(19|20)?(\d{6}([-+]|\s)\d{4}|(?!19|20)\d{10})$/;
+  // phone number regex, allows internationals phone numbers, wrong phone number might pass
+  phoneRegex = /^\+?\d{1,3}[-.\s]?\d{3,4}[-.\s]?\d{4,6}$/;
   GENDERS = GENDERS;
   showLoading: boolean = false;
   showTermsOfUse: boolean = false;
@@ -131,10 +139,12 @@ export class RegisterComponent {
         ERRORS_MSGS.passowrdDontMatch
       );
     }
-    if (!this.registerData.firstName) {
+    const firstNameValide = this.nameRegex.test(this.registerData.firstName);
+    const lastNameValide = this.nameRegex.test(this.registerData.lastName);
+    if (!this.registerData.firstName || !firstNameValide) {
       this.errorsMap.set(ERRORS_TYPES.firstName, ERRORS_MSGS.firstName);
     }
-    if (!this.registerData.lastName) {
+    if (!this.registerData.lastName || !lastNameValide) {
       this.errorsMap.set(ERRORS_TYPES.lastName, ERRORS_MSGS.lastName);
     }
     if (!this.registerData.dateOfBirth) {
