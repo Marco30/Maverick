@@ -20,8 +20,8 @@ export class Register {
   gender: Genders | null;
 
   address: Address;
-  phoneNumber: number | null;
-  mobilePhoneNumber: number | null;
+  phoneNumber: string;
+  mobilePhoneNumber: string;
   birthDate: string | null;
   constructor(
     socialSecurityNumber: string,
@@ -35,8 +35,8 @@ export class Register {
     subscribeToEmailNotification: boolean,
 
     address: Address,
-    phoneNumber: number,
-    mobilePhoneNumber: number,
+    phoneNumber: string,
+    mobilePhoneNumber: string,
     birthDate: string
   ) {
     this.socialSecurityNumber = socialSecurityNumber;

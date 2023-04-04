@@ -33,6 +33,7 @@
         <div class="form-group pb-2">
           <label for="firstName" class="py-1">First Name*</label>
           <input
+            pattern="^[A-Za-zÀ-ÖØ-öø-ÿ\s]+$"
             type="text"
             class="form-control"
             id="firstName"
@@ -54,12 +55,19 @@
           >
             This field is required
           </span>
+          <span
+            class="text-danger help-block d-block mt-1"
+            *ngIf="firstNameControl.errors?.['pattern'] && firstNameControl.touched"
+          >
+            First name is not valid
+          </span>
         </div>
       </div>
       <div class="col-6">
         <div class="form-group pb-2">
           <label for="lastName" class="py-1">Last Name*</label>
           <input
+            pattern="^[A-Za-zÀ-ÖØ-öø-ÿ\s]+$"
             type="text"
             class="form-control"
             id="lastName"
@@ -80,6 +88,12 @@
             *ngIf="lastNameControl.errors?.['required'] && lastNameControl.touched"
           >
             This field is required
+          </span>
+          <span
+            class="text-danger help-block d-block mt-1"
+            *ngIf="lastNameControl.errors?.['pattern'] && lastNameControl.touched"
+          >
+            Last name is not valid
           </span>
         </div>
       </div>
@@ -179,6 +193,7 @@
         name="mobilePhoneNumber"
         placeholder="Enter your phone number"
         [(ngModel)]="registerData.mobilePhoneNumber"
+        (ngModelChange)="removeError(ERRORS_TYPES.mobile)"
         required
         #mobilePhoneNumberControl="ngModel"
         [ngClass]="{
@@ -422,13 +437,30 @@
         Please fill the required fields!
       </span>
     </div>
+    <span *ngIf="serverError" class="text-danger help-block d-block mt-1">
+      {{ serverError }}
+    </span>
 
-    <div *ngIf="info">
+    <div *ngIf="successRegistration">
       <p class="info-bg-color rounded mt-3 p-3 text-center">
-        {{ info }}
+        Congratulations! Your account has been registered , you can login in
+        with your credentials now
+        <button
+          type="button"
+          (click)="toLogin()"
+          class="btn btn-link custom-link-color"
+        >
+          to login
+        </button>
       </p>
     </div>
-    <button type="submit" class="custom-btn w-100 mt-3">Register</button>
+    <button
+      type="submit"
+      class="custom-btn w-100 mt-3"
+      [disabled]="successRegistration"
+    >
+      Register
+    </button>
   </form>
   <app-modal *ngIf="showTermsOfUse" (closeModal)="closeModal()">
     <div>

@@ -1,7 +1,8 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, ViewChild, Output, EventEmitter } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Address } from 'src/app/model/address/address';
+import { Login } from 'src/app/model/login/login';
 import { GENDERS, Register } from 'src/app/model/register/register';
 import { AuthenticationService } from 'src/app/service/authentication/authentication.service';
 
@@ -14,9 +15,9 @@ enum ERRORS_TYPES {
   street = 'street',
   zipCode = 'zipCode',
   matchedPasswords = 'passwordDontMatch',
-  serverError = 'serverError',
   birthDate = 'birthDate',
   gender = 'gender',
+  mobile = 'mobile',
 }
 enum ERRORS_MSGS {
   fullName = 'Full name is required',
@@ -27,9 +28,9 @@ enum ERRORS_MSGS {
   street = 'street name is required',
   zipCode = 'Zip code name is required',
   passowrdDontMatch = "Passwords don't match",
-  serverError = 'Sorry, something went wrong',
   birthDate = 'Birth Date is required',
   gender = 'Gender is required',
+  mobile = 'Mobile number is required',
 }
 @Component({
   selector: 'app-register',
@@ -38,6 +39,7 @@ enum ERRORS_MSGS {
 })
 export class RegisterComponent {
   @ViewChild('registerform', { static: false }) registerform!: NgForm;
+  @Output() success: EventEmitter<Login> = new EventEmitter();
   constructor(
     private authenticationService: AuthenticationService,
     private router: Router
@@ -63,13 +65,11 @@ export class RegisterComponent {
     password: '',
     gender: null,
     birthDate: null,
-    phoneNumber: null,
-    mobilePhoneNumber: null,
+    phoneNumber: '',
+    mobilePhoneNumber: '',
     address: this.address,
   };
-  birthDay = 0;
-  birthMonth = 0;
-  birthYear = 0;
+
   GENDERS = GENDERS;
   showLoading: boolean = false;
   showTermsOfUse: boolean = false;
@@ -80,7 +80,8 @@ export class RegisterComponent {
   passwordConfirmation: string = '';
   cancelDataFetching: boolean = false;
   submitted: boolean = false;
-
+  serverError: string = '';
+  successRegistration: boolean = true;
   checkSame() {
     const secondPassword = this.passwordConfirmation;
     const firstPassword = this.registerData.password;
@@ -116,6 +117,7 @@ export class RegisterComponent {
 
   removeError(type: ERRORS_TYPES) {
     this.errorsMap.delete(type);
+    this.serverError = '';
   }
 
   register() {
@@ -160,14 +162,14 @@ export class RegisterComponent {
       next: (res) => {
         console.info('--------register------------');
         console.info(res);
-        this.info = 'Congratulations! Your account has been registered';
+        this.successRegistration = true;
         this.showLoading = false;
 
         // Routing to login view won't work beacuse  the user is already at /login
       },
       error: (err) => {
         this.errorsMap.clear();
-        this.errorsMap.set(ERRORS_TYPES.serverError, ERRORS_MSGS.serverError);
+        this.serverError = 'Sorry, something went wrog!';
         this.showLoading = false;
       },
     });
@@ -178,10 +180,6 @@ export class RegisterComponent {
       num = this.registerData.socialSecurityNumber.replace('-', '');
     }
     if (num.length == 12) {
-      const { year, month, day } = this.getBirthDay(
-        this.registerData.socialSecurityNumber
-      );
-
       this.cancelDataFetching = false;
       this.showLoading = true;
       this.registerData.socialSecurityNumber = num;
@@ -208,21 +206,15 @@ export class RegisterComponent {
               userData?.address?.zipCode || this.registerData.address.zipCode;
             this.registerData.gender =
               userData?.gender || this.registerData.gender;
-            this.birthYear = Number(year);
-            this.birthMonth = Number(month);
-            this.birthDay = Number(day);
+
             this.registerData.birthDate = `${year}-${month}-${day}`;
             this.showLoading = false;
-
-            // Add Action after register
           },
           error: (err) => {
+            if (this.cancelDataFetching) return;
             console.log(err);
             // Show erros from backend, Avoid revealign existing emails
-            this.errorsMap.set(
-              ERRORS_TYPES.serverError,
-              ERRORS_MSGS.serverError
-            );
+            this.serverError = 'Sorry, something went wrong!';
             this.showLoading = false;
           },
         });
@@ -251,5 +243,14 @@ export class RegisterComponent {
 
   closeModal() {
     this.showTermsOfUse = false;
+  }
+
+  toLogin() {
+    console.log('To login');
+    this.success.emit({
+      socialSecurityNumber: '',
+      email: 'test email',
+      password: 'test password',
+    });
   }
 }
