@@ -28,31 +28,109 @@
         SocialSecurityNumber is not complete
       </span>
     </div>
+    <div class="row">
+      <div class="col-6">
+        <div class="form-group pb-2">
+          <label for="firstName" class="py-1">First Name*</label>
+          <input
+            type="text"
+            class="form-control"
+            id="firstName"
+            name="firstName"
+            placeholder="First name"
+            [(ngModel)]="registerData.firstName"
+            (ngModelChange)="removeError(ERRORS_TYPES.firstName)"
+            required
+            #firstNameControl="ngModel"
+            [ngClass]="{
+              'is-invalid':
+                (submitted && firstNameControl.errors) ||
+                (firstNameControl.touched && firstNameControl.errors)
+            }"
+          />
+          <span
+            class="text-danger help-block d-block mt-1"
+            *ngIf="firstNameControl.errors?.['required'] && firstNameControl.touched"
+          >
+            This field is required
+          </span>
+        </div>
+      </div>
+      <div class="col-6">
+        <div class="form-group pb-2">
+          <label for="lastName" class="py-1">Last Name*</label>
+          <input
+            type="text"
+            class="form-control"
+            id="lastName"
+            name="lastName"
+            placeholder="Last name"
+            [(ngModel)]="registerData.lastName"
+            (ngModelChange)="removeError(ERRORS_TYPES.lastName)"
+            required
+            #lastNameControl="ngModel"
+            [ngClass]="{
+              'is-invalid':
+                (submitted && lastNameControl.errors) ||
+                (lastNameControl.touched && lastNameControl.errors)
+            }"
+          />
+          <span
+            class="text-danger help-block d-block mt-1"
+            *ngIf="lastNameControl.errors?.['required'] && lastNameControl.touched"
+          >
+            This field is required
+          </span>
+        </div>
+      </div>
+    </div>
 
-    <div class="form-group pb-2">
-      <label for="name" class="py-1">Full Name*</label>
-      <input
-        type="text"
-        class="form-control"
-        id="name"
-        name="name"
-        placeholder="Name"
-        [(ngModel)]="registerData.fullName"
-        (ngModelChange)="removeError(ERRORS_TYPES.fullName)"
-        required
-        #fullNameControl="ngModel"
-        [ngClass]="{
-          'is-invalid':
-            (submitted && fullNameControl.errors) ||
-            (fullNameControl.touched && fullNameControl.errors)
-        }"
-      />
-      <span
-        class="text-danger help-block d-block mt-1"
-        *ngIf="fullNameControl.errors?.['required'] && fullNameControl.touched"
-      >
-        This field is required
-      </span>
+    <div class="row">
+      <div class="col-6">
+        <div class="form-group pb-2">
+          <label for="name" class="py-1">Birth Date*</label>
+          <input
+            type="date"
+            class="form-control"
+            id="birthDate"
+            name="birthDate"
+            placeholder="Your birth date"
+            required
+            [(ngModel)]="registerData.birthDate"
+            (ngModelChange)="removeError(ERRORS_TYPES.birthDate)"
+            #birthDateControl="ngModel"
+            [ngClass]="{
+              'is-invalid':
+                (submitted && birthDateControl.errors) ||
+                (birthDateControl.touched && birthDateControl.errors)
+            }"
+          />
+        </div>
+      </div>
+      <div class="col-6">
+        <div class="form-group pb-2">
+          <label for="gender" class="py-1 d-block">Gender*</label>
+          <select
+            class="form-select form-select-md mb-3"
+            [(ngModel)]="registerData.gender"
+            (ngModelChange)="removeError(ERRORS_TYPES.gender)"
+            #genderControl="ngModel"
+            [ngClass]="{
+              'is-invalid':
+                (submitted && genderControl.errors) ||
+                (genderControl.touched && genderControl.errors)
+            }"
+          >
+            <option
+              class="mb-1"
+              *ngFor="let gender of GENDERS | keyvalue"
+              [value]="gender"
+            >
+              {{ gender.value }}
+            </option>
+          </select>
+        </div>
+      </div>
     </div>
 
     <div class="form-group pb-2">

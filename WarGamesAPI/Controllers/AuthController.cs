@@ -8,7 +8,6 @@ using WarGamesAPI.DTO;
 using WarGamesAPI.Filters;
 using WarGamesAPI.Interfaces;
 using WarGamesAPI.Model;
-#pragma warning disable CS1998
 
 namespace WarGamesAPI.Controllers;
 
@@ -64,7 +63,7 @@ public class AuthController : ControllerBase
 
     [ValidateToken]
     [HttpPost("newtoken")]
-    public async Task<IActionResult> NewToken()
+    public Task<IActionResult> NewToken()
     {
         try
         {
@@ -90,11 +89,11 @@ public class AuthController : ControllerBase
             {
                 string token = TokenData.CreateJwtToken(user);
 
-                return Ok(new InLoggedUserDto { Token = token });
+                return Task.FromResult<IActionResult>(Ok(new InLoggedUserDto { Token = token }));
             }
             else
             {
-                return Ok(new InLoggedUserDto() { Token = "", });
+                return Task.FromResult<IActionResult>(Ok(new InLoggedUserDto() { Token = "", }));
             }
 
 
@@ -104,7 +103,7 @@ public class AuthController : ControllerBase
         {
 
             Console.WriteLine(e);
-            return NotFound();
+            return Task.FromResult<IActionResult>(NotFound());
         }
 
     }
