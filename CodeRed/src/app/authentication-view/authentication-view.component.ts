@@ -15,7 +15,7 @@ type ViewsType = Object<typeof VIEWS>;
 })
 export class AuthenticationViewComponent {
   VIEWS = VIEWS;
-  currentView: ViewsType = this.VIEWS.register;
+  currentView: ViewsType = this.VIEWS.login;
   constructor(private router: Router) {
     console.log('url: ', this.router.url);
     if (this.router.url.includes('reset')) {

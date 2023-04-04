@@ -27,8 +27,10 @@ export class LoginComponent {
     // setTimeout(() => {
     this.authenticationService.login(this.loginData).subscribe({
       next: (res) => {
+        this.showLoading = false;
         if (!res.user) {
           this.loginData.error = 'Wrong credentials!';
+          return;
         }
         console.info('-----login-----');
         console.info(res);
@@ -37,12 +39,11 @@ export class LoginComponent {
         this.authenticationService.setToken(res.token);
         this.authenticationService.startCountingDown();
         this.authenticationService.setChatUser(res.user);
-        this.showLoading = false;
         this.router.navigate(['MainView/ChatView']);
       },
       error: () => {
-        this.showLoading = false;
         this.loginData.error = 'Wrong credentials';
+        this.showLoading = false;
       },
       // complete: () => (this.showLoading = false),
     });
