@@ -21,7 +21,7 @@ export class Register {
   address: Address;
   phoneNumber: number | undefined;
   mobilePhoneNumber: number | undefined;
-  birthDate: Date;
+  dateOfBirth: Date;
   constructor(
     socialSecurityNumber: string,
     email: string,
@@ -36,7 +36,7 @@ export class Register {
     address: Address,
     phoneNumber: number,
     mobilePhoneNumber: number,
-    birthDate: Date
+    dateOfBirth: Date
   ) {
     this.socialSecurityNumber = socialSecurityNumber;
     this.email = email;
@@ -51,6 +51,6 @@ export class Register {
     this.address = address;
     this.phoneNumber = phoneNumber;
     this.mobilePhoneNumber = mobilePhoneNumber;
-    this.birthDate = birthDate;
+    this.dateOfBirth= dateOfBirth;
   }
 }

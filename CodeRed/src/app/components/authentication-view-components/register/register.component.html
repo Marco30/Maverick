@@ -92,18 +92,18 @@
           <input
             type="date"
             class="form-control"
-            id="birthDate"
-            name="birthDate"
+            id="dateOfBirth"
+            name="dateOfBirth"
             placeholder="Your birth date"
             max="2010-04-20"
             required
-            [(ngModel)]="registerData.birthDate"
-            (ngModelChange)="removeError(ERRORS_TYPES.birthDate)"
-            #birthDateControl="ngModel"
+            [(ngModel)]="registerData.dateOfBirth"
+            (ngModelChange)="removeError(ERRORS_TYPES.dateOfBirth)"
+            #dateOfBirthControl="ngModel"
             [ngClass]="{
               'is-invalid':
-                (submitted && birthDateControl.errors) ||
-                (birthDateControl.touched && birthDateControl.errors)
+                (submitted && dateOfBirthControl.errors) ||
+                (dateOfBirthControl.touched && dateOfBirthControl.errors)
             }"
           />
         </div>

@@ -14,7 +14,7 @@ enum ERRORS_TYPES {
   zipCode = 'zipCode',
   matchedPasswords = 'passwordDontMatch',
   serverError = 'serverError',
-  birthDate = 'birthDate',
+  dateOfBirth = 'dateOfBirth',
   gender = 'gender',
 }
 enum ERRORS_MSGS {
@@ -27,7 +27,7 @@ enum ERRORS_MSGS {
   zipCode = 'Zip code name is required',
   passowrdDontMatch = "Passwords don't match",
   serverError = 'Sorry, something went wrong',
-  birthDate = 'Birth Date is required',
+  dateOfBirth = 'Birth Date is required',
   gender = 'Gender is required',
 }
 @Component({
@@ -60,7 +60,7 @@ export class RegisterComponent {
     email: '',
     password: '',
     gender: GENDERS.other,
-    birthDate: new Date("2010-01-16"),
+    dateOfBirth: new Date("2010-01-16"),
     phoneNumber: undefined,
     mobilePhoneNumber: undefined,
     address: this.address,
@@ -116,7 +116,7 @@ export class RegisterComponent {
 
   register() {
   
-    console.log('register date: ', this.registerData.birthDate);
+    console.log('register date: ', this.registerData.dateOfBirth);
     
     this.submitted = true;
 
@@ -133,8 +133,8 @@ export class RegisterComponent {
     if (!this.registerData.lastName) {
       this.errorsMap.set(ERRORS_TYPES.lastName, ERRORS_MSGS.lastName);
     }
-    if (!this.registerData.birthDate) {
-      this.errorsMap.set(ERRORS_TYPES.birthDate, ERRORS_MSGS.birthDate);
+    if (!this.registerData.dateOfBirth) {
+      this.errorsMap.set(ERRORS_TYPES.dateOfBirth, ERRORS_MSGS.dateOfBirth);
     }
     if (!this.registerData.gender) {
       this.errorsMap.set(ERRORS_TYPES.gender, ERRORS_MSGS.gender);
@@ -209,7 +209,7 @@ export class RegisterComponent {
             this.registerData.gender =
               userData?.gender || this.registerData.gender;
            // this.registerData.birthDate = `${year}-${month}-${day}`;
-            this.registerData.birthDate = this.getBirthDay(
+            this.registerData.dateOfBirth= this.getDateOfBirth(
               this.registerData.socialSecurityNumber
             );
             this.showLoading = false;
@@ -229,7 +229,7 @@ export class RegisterComponent {
     }
   }
 
-  getBirthDay(socialSecurityNumber: string) {
+  getDateOfBirth(socialSecurityNumber: string) {
     console.log('socialSecurityNumber: ', socialSecurityNumber);
     const bd = socialSecurityNumber.slice(0, 8);
     const year = bd.slice(0, 4);
