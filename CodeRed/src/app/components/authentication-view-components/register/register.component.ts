@@ -1,5 +1,6 @@
 import { Component, ViewChild, Output, EventEmitter } from '@angular/core';
 import { NgForm } from '@angular/forms';
+import { Observable, Subject, takeUntil } from 'rxjs';
 import { Address } from 'src/app/model/address/address';
 import { Login } from 'src/app/model/login/login';
 import { GENDERS, Register } from 'src/app/model/register/register';
@@ -84,7 +85,7 @@ export class RegisterComponent {
   errorsMap: Map<ERRORS_TYPES, ERRORS_MSGS> = new Map();
   info: string = '';
   passwordConfirmation: string = '';
-  cancelDataFetching: boolean = false;
+  dataFetchingCancelled$: Subject<void> = new Subject();
   submitted: boolean = false;
   serverError: string = '';
   successRegistration: boolean = false;
@@ -196,9 +197,9 @@ export class RegisterComponent {
       this.registerData.socialSecurityNumber = num;
       this.authenticationService
         .getUserDataFromSecurityNumber(this.registerData)
+        .pipe(takeUntil(this.dataFetchingCancelled$))
         .subscribe({
           next: (userData) => {
-            if (this.cancelDataFetching) return;
             console.log('uploaded image to server, event: ', userData);
             this.registerData.fullName =
               userData.fullName || this.registerData.fullName;
@@ -220,7 +221,6 @@ export class RegisterComponent {
             this.showLoading = false;
           },
           error: (err) => {
-            if (this.cancelDataFetching) return;
             console.log(err);
             // Show erros from backend, Avoid revealign existing emails
             this.serverError = 'Sorry, something went wrong!';
@@ -240,7 +240,7 @@ export class RegisterComponent {
   }
 
   abortUserDataFetching() {
-    this.cancelDataFetching = true;
+    this.dataFetchingCancelled$.next();
     this.showLoading = false;
   }
   public onAgreeMarketingChanged(value: boolean) {

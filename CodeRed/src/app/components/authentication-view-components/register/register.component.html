@@ -18,7 +18,6 @@
         name="socialSecurityNumber"
         minlength="12"
         #socialSecurityNumberControl="ngModel"
-        (ngModelChange)="cancelDataFetching = false"
         (input)="getUserData()"
         [ngClass]="{ 'is-invalid': socialSecurityNumberControl.errors }"
       />
