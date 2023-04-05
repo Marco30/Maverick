@@ -1,11 +1,8 @@
 <form (ngSubmit)="login()" #loginForm="ngForm" class="position-relative">
   <h3 class="h2-size text-center">Login</h3>
   <app-loader *ngIf="showLoading"></app-loader>
-  <p
-    *ngIf="loginData.error"
-    class="error-bg-color rounded mt-3 p-3 text-center"
-  >
-    {{ loginData.error }}
+  <p *ngIf="error" class="error-bg-color rounded mt-3 p-3 text-center">
+    {{ error }}
   </p>
   <div class="form-group has-error pb-2">
     <label for="email" class="py-1">Email</label>

@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
+import { Login } from '../model/login/login';
 const VIEWS = {
   login: 'login',
   register: 'register',
@@ -16,6 +17,7 @@ type ViewsType = Object<typeof VIEWS>;
 export class AuthenticationViewComponent {
   VIEWS = VIEWS;
   currentView: ViewsType = this.VIEWS.login;
+  loginData: null | Login = null;
   constructor(private router: Router) {
     console.log('url: ', this.router.url);
     if (this.router.url.includes('reset')) {
@@ -28,5 +30,11 @@ export class AuthenticationViewComponent {
       return;
     }
     this.currentView = view;
+  }
+
+  setCredentials(credentials: Login) {
+    console.log('success login, credentials :', credentials);
+    this.loginData = credentials;
+    this.currentView = VIEWS.login;
   }
 }
