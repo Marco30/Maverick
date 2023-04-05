@@ -1,5 +1,4 @@
-﻿using System.Net;
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using MiracleMileAPI.Sessions;
@@ -180,11 +179,20 @@ public class AuthController : ControllerBase
             return Task.FromResult<IActionResult>(BadRequest());
         }
 
-        UserDto user = Crawlers.SeleniumGetUserInfoPagesCrawler("https://mrkoll.se/", userData.SocialSecurityNumber);
+        try
+        {
+            
+            var user = Crawlers.SeleniumGetUserInfoPagesCrawler("https://mrkoll.se/", userData.SocialSecurityNumber);
+            user.SocialSecurityNumber = userData.SocialSecurityNumber;
+            return Task.FromResult<IActionResult>(Ok(user));
 
+        }
+        catch (Exception e)
+        {
+            var error = new ResponseMessageDto {Error = true, StatusCode = 500, Message = e.Message};
 
-        user.SocialSecurityNumber = userData.SocialSecurityNumber;
-        return Task.FromResult<IActionResult>(Ok(user));
+            return Task.FromResult<IActionResult>(StatusCode(500, error));
+        }
 
 
     }
@@ -192,8 +200,8 @@ public class AuthController : ControllerBase
     [HttpPost("registeruser")]
     public async Task<ActionResult<User>> RegisterUser(RegisterUserDto register)
     {
-        register.Address = _mapper.Map<AddressDto>(register.Address);
-
+        register.Address = _mapper.Map<RegisterAddressDto>(register.Address);
+        
         if (register.Email is null) 
             return BadRequest(new ResponseMessageDto { Error = true, Message = "Email saknas" });
         
@@ -218,7 +226,6 @@ public class AuthController : ControllerBase
 
             try
             {
-                //register.AddressId = await _userRepo.AddAddress(address!);
 
                 register.AddressId = await _userRepo.AddAddress(register.Address);
 
@@ -249,15 +256,6 @@ public class AuthController : ControllerBase
 
         }
         
-            
-
-
-            
-
-
-        
-
-
     }
 
     private static bool VerifySocialSecurityNumber(string number)

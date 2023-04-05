@@ -20,7 +20,7 @@ public class QuestionRepository : IQuestionRepository
         _mapper = mapper;
     }
 
-    public async Task<QuestionDto?> SaveQuestionAsync(AskQuestionDto userQuestion)
+    public async Task<QuestionDto?> SaveQuestionAsync(QuestionDto userQuestion)
     {
         var userId = (int)userQuestion.UserId!;
 
@@ -35,7 +35,7 @@ public class QuestionRepository : IQuestionRepository
         var question = new Question
         {
             Text = userQuestion.Text, UserId = userId, 
-            ConversationId = userQuestion.ConversationId
+            ConversationId = (int)userQuestion.ConversationId
         };
 
         try
@@ -92,6 +92,12 @@ public class QuestionRepository : IQuestionRepository
     public async Task<AnswerDto?> GetAnswerAsync(int answerId)
     {
         return await _context.Answer.Where(a => a.Id == answerId).ProjectTo<AnswerDto>(_mapper.ConfigurationProvider)
+            .SingleOrDefaultAsync();
+    }
+
+    public async Task<ConversationDto?> GetConversationAsync(int conversationId)
+    {
+        return await _context.Conversation.Where(c => c.Id == conversationId).ProjectTo<ConversationDto>(_mapper.ConfigurationProvider)
             .SingleOrDefaultAsync();
     }
 
