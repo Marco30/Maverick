@@ -12,8 +12,8 @@ using WarGamesAPI.Data;
 namespace WarGamesAPI.Migrations
 {
     [DbContext(typeof(WarGamesContext))]
-    [Migration("20230404093508_updateFKRelationship")]
-    partial class updateFKRelationship
+    [Migration("20230405173045_UpdateConversationObject")]
+    partial class UpdateConversationObject
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -73,7 +73,7 @@ namespace WarGamesAPI.Migrations
                     b.Property<int>("ConversationId")
                         .HasColumnType("int");
 
-                    b.Property<int>("QuestionId")
+                    b.Property<int?>("QuestionId")
                         .HasColumnType("int");
 
                     b.Property<string>("Text")
@@ -98,6 +98,9 @@ namespace WarGamesAPI.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ConversationText")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("UserId")
                         .HasColumnType("int");
@@ -201,8 +204,7 @@ namespace WarGamesAPI.Migrations
                     b.HasOne("WarGamesAPI.Model.Question", "Question")
                         .WithMany("Answers")
                         .HasForeignKey("QuestionId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.Navigation("Conversation");
 

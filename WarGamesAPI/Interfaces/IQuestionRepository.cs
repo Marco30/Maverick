@@ -9,11 +9,13 @@ public interface IQuestionRepository
     Task<List<QuestionDto>> GetUserQuestionsAsync(int userId);
     Task<QuestionDto?> GetQuestionAsync(int questionId);
     Task<AnswerDto?> GetAnswerAsync(int answerId);
+    Task<ConversationDto?> GetConversationAsync(int conversationId);
     Task<List<AnswerDto>> GetAnswersAsync(int questionId);
-
     Task DeleteQuestionAsync(int questionId);
     Task DeleteAnswerAsync(int answerId);
     Task DeleteConversationAsync(int conversationId);
+    Task<List<QuestionDto>> GetQuestionsFromConversationAsync(int conversationId);
+    Task<List<AnswerDto>> GetAnswersFromConversationAsync(int conversationId);
 
 
 }

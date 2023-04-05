@@ -1,5 +1,4 @@
-﻿using System.Net;
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using MiracleMileAPI.Sessions;
@@ -107,38 +106,7 @@ public class AuthController : ControllerBase
         }
 
     }
-
-    [ValidateToken]
-    [HttpPost("resetpasswordrequest")]
-    public async Task<IActionResult> sendResetPasswordEmail(ResetPasswordRequestDto request)
-    {
-        if (request.Email is null) return BadRequest();
-
-        try
-        {
-
-            var user = await _userRepo.GetUserFromEmailAsync(request.Email);
-            // If no user return bad request or return OK any way to avoid giving any info about registered emails
-            if (user == null) return BadRequest();
-            var newUser = new UserDto();
-            newUser.Id = user.Id;
-            // Create token with userId and 5 minutes validation time
-            string token = TokenData.CreateJwtToken(user, 5);
-            // Create URL http://localhost:4200/resetPassword/token
-            var resetPasswordURL = $"http://localhost:4200/resetPassword/{token}";
-
-            // Send the token in a url to user email
-            //await _mailRepo.SendResetPasswordEmailAsync(resetPasswordURL, user.Email, user.FirstName);
-
-            // Return OK to user if everything went well
-            return Ok();
-        }
-        catch (Exception)
-        {
-            return BadRequest();
-        }
-    }
-
+    
     [ValidateToken]
     [HttpPost("resetpassword")]
     public async Task<IActionResult> resetUserPassword(ResetPasswordDto reset)

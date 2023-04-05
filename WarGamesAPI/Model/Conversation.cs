@@ -11,6 +11,9 @@ public class Conversation
     public int UserId { get; set; }
     public User? User { get; set; }
 
+    public string? ConversationText { get; set; }
+
+
     public ICollection<Question> Questions { get; set; } = new List<Question>();
     public ICollection<Answer> Answers { get; set; } = new List<Answer>();
 

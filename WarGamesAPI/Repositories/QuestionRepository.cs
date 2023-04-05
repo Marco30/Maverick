@@ -83,6 +83,12 @@ public class QuestionRepository : IQuestionRepository
             .ProjectTo<QuestionDto>(_mapper.ConfigurationProvider).SingleOrDefaultAsync();
     }
 
+    public async Task<ConversationDto?> GetConversationAsync(int conversationId)
+    {
+        return await _context.Conversation.Where(c => c.Id == conversationId)
+            .ProjectTo<ConversationDto>(_mapper.ConfigurationProvider).SingleOrDefaultAsync();
+    }
+
     public async Task<List<AnswerDto>> GetAnswersAsync(int questionId)
     {
         return await _context.Answer.Where(a => a.QuestionId == questionId)
@@ -93,6 +99,18 @@ public class QuestionRepository : IQuestionRepository
     {
         return await _context.Answer.Where(a => a.Id == answerId).ProjectTo<AnswerDto>(_mapper.ConfigurationProvider)
             .SingleOrDefaultAsync();
+    }
+
+    public async Task<List<QuestionDto>> GetQuestionsFromConversationAsync(int conversationId)
+    {
+        return await _context.Question.Where(q => q.ConversationId == conversationId)
+            .ProjectTo<QuestionDto>(_mapper.ConfigurationProvider).ToListAsync();
+    }
+
+    public async Task<List<AnswerDto>> GetAnswersFromConversationAsync(int conversationId)
+    {
+        return await _context.Answer.Where(a => a.ConversationId == conversationId)
+            .ProjectTo<AnswerDto>(_mapper.ConfigurationProvider).ToListAsync();
     }
 
     public async Task DeleteQuestionAsync(int questionId)
@@ -145,24 +163,6 @@ public class QuestionRepository : IQuestionRepository
 
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     private async Task<Conversation?> CreateConversationAsync(int userId)
     {
         var conversation = new Conversation { UserId = userId };
@@ -180,8 +180,5 @@ public class QuestionRepository : IQuestionRepository
         }
 
     }
-
-
-
 
 }

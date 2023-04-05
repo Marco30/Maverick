@@ -14,6 +14,7 @@ public class AutoMapperProfiles : Profile
         CreateMap<RegisterUserDto, User>().ForMember(dest => dest.FullName, options => options.MapFrom(src => string.Concat(src.FirstName, " ", src.LastName)));
         CreateMap<AddressDto, Address>();
         CreateMap<Address, AddressDto>();
+        CreateMap<Conversation, ConversationDto>();
 
 
     }
