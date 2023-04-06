@@ -4,7 +4,6 @@ using Microsoft.OpenApi.Models;
 using Serilog;
 using Serilog.Events;
 using WarGamesAPI.Interfaces;
-using WarGamesAPI.Repositories;
 using WarGamesAPI.Services;
 using WarGamesAPI.Settings;
 
@@ -67,7 +66,7 @@ builder.Services.AddSwaggerGen(c =>
 
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("MailSettings"));
 
-builder.Services.AddTransient<IEmailRepository, EmailRepository>();
+builder.Services.AddTransient<IEmailService, EmailService>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

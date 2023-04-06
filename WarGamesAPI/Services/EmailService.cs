@@ -7,12 +7,13 @@ using WarGamesAPI.Settings;
 using WarGamesAPI.DTO;
 using System.IO;
 using System.Threading.Tasks;
-namespace WarGamesAPI.Repositories
+
+namespace WarGamesAPI.Services
 {
-    public class EmailRepository : IEmailRepository
+    public class EmailService : IEmailService
     {
         private readonly EmailSettings _emailSettings;
-        public EmailRepository(IOptions<EmailSettings> emailSettings)
+        public EmailService(IOptions<EmailSettings> emailSettings)
         {
             _emailSettings = emailSettings.Value;
         }
@@ -93,6 +94,7 @@ namespace WarGamesAPI.Repositories
             await smtp.SendAsync(email);
             smtp.Disconnect(true);
         }
+
 
 
     }
