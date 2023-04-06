@@ -66,11 +66,13 @@ export class ResetPasswordComponent {
         next: (res) => {
           console.log('success resetting password:', res);
           this.info = 'Success your password has been reset, Now you can login';
+          this.error = '';
           this.showLoading = false;
           this.success = true;
         },
         error: (err) => {
           console.log('error resetting password: ', err);
+          this.info = '';
           this.error = 'Sorry, Something went wrong!';
           this.showLoading = false;
         },
