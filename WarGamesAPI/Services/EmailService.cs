@@ -13,9 +13,11 @@ namespace WarGamesAPI.Services
     public class EmailService : IEmailService
     {
         private readonly EmailSettings _emailSettings;
-        public EmailService(IOptions<EmailSettings> emailSettings)
+        readonly string? _google_password;
+        public EmailService(IOptions<EmailSettings> emailSettings, IConfiguration configuration)
         {
             _emailSettings = emailSettings.Value;
+            _google_password = configuration["gmail_Password"];
         }
 
         public async Task SendEmailAsync(EmailRequestDto mailRequest)
@@ -45,7 +47,7 @@ namespace WarGamesAPI.Services
             email.Body = builder.ToMessageBody();
             using var smtp = new SmtpClient();
             smtp.Connect(_emailSettings.Host, _emailSettings.Port, SecureSocketOptions.StartTls);
-            smtp.Authenticate(_emailSettings.Mail, _emailSettings.Password);
+            smtp.Authenticate(_emailSettings.Mail, _google_password);
             await smtp.SendAsync(email);
             smtp.Disconnect(true);
         }
@@ -68,7 +70,7 @@ namespace WarGamesAPI.Services
             email.Body = builder.ToMessageBody();
             using var smtp = new SmtpClient();
             smtp.Connect(_emailSettings.Host, _emailSettings.Port, SecureSocketOptions.StartTls);
-            smtp.Authenticate(_emailSettings.Mail, _emailSettings.Password);
+            smtp.Authenticate(_emailSettings.Mail, _google_password);
             await smtp.SendAsync(email);
             smtp.Disconnect(true);
         }
@@ -90,7 +92,7 @@ namespace WarGamesAPI.Services
             email.Body = builder.ToMessageBody();
             using var smtp = new SmtpClient();
             smtp.Connect(_emailSettings.Host, _emailSettings.Port, SecureSocketOptions.StartTls);
-            smtp.Authenticate(_emailSettings.Mail, _emailSettings.Password);
+            smtp.Authenticate(_emailSettings.Mail, _google_password);
             await smtp.SendAsync(email);
             smtp.Disconnect(true);
         }

@@ -3,6 +3,8 @@ using Courses.Api.Repositories;
 using Microsoft.OpenApi.Models;
 using Serilog;
 using Serilog.Events;
+using System.Diagnostics.Metrics;
+using System.Reflection;
 using WarGamesAPI.Interfaces;
 using WarGamesAPI.Services;
 using WarGamesAPI.Settings;
@@ -10,6 +12,9 @@ using WarGamesAPI.Settings;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+
+builder.Configuration.AddEnvironmentVariables().AddUserSecrets(Assembly.GetExecutingAssembly(), true);
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy(name:"AllowAllOrigins",
@@ -51,15 +56,6 @@ builder.Services.AddSwaggerGen(c =>
         }
     });
 });
-
-
-
-
-
-
-
-
-
 
 
 
