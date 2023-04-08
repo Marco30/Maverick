@@ -226,6 +226,12 @@ public class AuthController : ControllerBase
             catch (Exception e)
             {
                 _logger.LogInformation($"Crawl failed, registering user anyway{e.Message}");
+                if (register.Address != null)
+                {
+                    var address = await _userRepo.AddAddress(register.Address);
+                    if (address != null) register.AddressId = address.Id;
+                }
+
             }
 
             var registeredUser = await _userRepo.AddUser(register);

@@ -1,0 +1,6 @@
+2023-04-08 10:17:52.425 +02:00 [INF] Crawl failed, registering user anywayObject reference not set to an instance of an object.
+2023-04-08 10:23:38.715 +02:00 [INF] Crawl failed, registering user anywayelement click intercepted: Element <a href="/person/peter-alexander-lindholm-vasavagen-24-b-mariestad/cYfruerAulaTpuhQkyqRaQbTAQmcYfrcYfrkyqRaQdYQamUxauerA">...</a> is not clickable at point (1078, 414). Other element would receive the click: <figure>...</figure>
+  (Session info: headless chrome=112.0.5615.49)
+2023-04-08 10:36:14.032 +02:00 [INF] Crawl failed, registering user anywayObject reference not set to an instance of an object.
+2023-04-08 11:08:25.560 +02:00 [INF] Crawl failed, registering user anywayObject reference not set to an instance of an object.
+2023-04-08 11:09:46.064 +02:00 [INF] Crawl failed, registering user anywayObject reference not set to an instance of an object.
