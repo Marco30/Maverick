@@ -107,7 +107,6 @@ public class AuthController : ControllerBase
 
     }
 
-    //[ValidateToken]
     [HttpPost("resetpasswordrequest")]
     public async Task<IActionResult> sendResetPasswordEmail(ResetPasswordRequestDto request)
     {
@@ -132,8 +131,9 @@ public class AuthController : ControllerBase
             // Return OK to user if everything went well
             return Ok();
         }
-        catch (Exception)
+        catch (Exception e )
         {
+
             return BadRequest();
         }
     }
@@ -176,13 +176,31 @@ public class AuthController : ControllerBase
             return Task.FromResult<IActionResult>(BadRequest());
         }
 
-        var user = Crawlers.SeleniumGetUserInfoPagesCrawler("https://mrkoll.se/", userData.SocialSecurityNumber);
 
-        if (user != null)
+        try
         {
-            user.SocialSecurityNumber = userData.SocialSecurityNumber.ToString();
-            return Task.FromResult<IActionResult>(Ok(user));
+            var user = Crawlers.SeleniumGetUserInfoPagesCrawler("https://mrkoll.se/", userData.SocialSecurityNumber);
+
+            if (user != null)
+            {
+                user.SocialSecurityNumber = userData.SocialSecurityNumber.ToString();
+                return Task.FromResult<IActionResult>(Ok(user));
+            }
         }
+        catch (Exception e)
+        {
+            _logger.LogInformation($"Crawl failed: {e.Message}");
+            
+            var responseMessage = new ResponseMessageDto
+            {
+                Error = true,
+                StatusCode = StatusCodes.Status500InternalServerError,
+                Message = "Error retrieving user data: " + e.Message
+            };
+            return Task.FromResult<IActionResult>(StatusCode(StatusCodes.Status500InternalServerError, responseMessage));
+        }
+
+        
 
         return Task.FromResult<IActionResult>(NotFound());
 
@@ -226,6 +244,12 @@ public class AuthController : ControllerBase
             catch (Exception e)
             {
                 _logger.LogInformation($"Crawl failed, registering user anyway{e.Message}");
+                if (register.Address != null)
+                {
+                    var address = await _userRepo.AddAddress(register.Address);
+                    if (address != null) register.AddressId = address.Id;
+                }
+
             }
 
             var registeredUser = await _userRepo.AddUser(register);

@@ -47,6 +47,10 @@ namespace WarGamesAPI.Services
             email.Body = builder.ToMessageBody();
             using var smtp = new SmtpClient();
             smtp.Connect(_emailSettings.Host, _emailSettings.Port, SecureSocketOptions.StartTls);
+            if (_google_password is null)
+            {
+                throw new NullReferenceException("Missing Password");
+            }
             smtp.Authenticate(_emailSettings.Mail, _google_password);
             await smtp.SendAsync(email);
             smtp.Disconnect(true);
@@ -70,6 +74,10 @@ namespace WarGamesAPI.Services
             email.Body = builder.ToMessageBody();
             using var smtp = new SmtpClient();
             smtp.Connect(_emailSettings.Host, _emailSettings.Port, SecureSocketOptions.StartTls);
+            if (_google_password is null)
+            {
+                throw new NullReferenceException("Missing Password");
+            }
             smtp.Authenticate(_emailSettings.Mail, _google_password);
             await smtp.SendAsync(email);
             smtp.Disconnect(true);
@@ -92,6 +100,10 @@ namespace WarGamesAPI.Services
             email.Body = builder.ToMessageBody();
             using var smtp = new SmtpClient();
             smtp.Connect(_emailSettings.Host, _emailSettings.Port, SecureSocketOptions.StartTls);
+            if (_google_password is null)
+            {
+                throw new NullReferenceException("Missing Password");
+            }
             smtp.Authenticate(_emailSettings.Mail, _google_password);
             await smtp.SendAsync(email);
             smtp.Disconnect(true);

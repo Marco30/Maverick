@@ -3,7 +3,6 @@ using Courses.Api.Repositories;
 using Microsoft.OpenApi.Models;
 using Serilog;
 using Serilog.Events;
-using System.Diagnostics.Metrics;
 using System.Reflection;
 using WarGamesAPI.Interfaces;
 using WarGamesAPI.Services;
