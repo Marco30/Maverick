@@ -1,8 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
 using MiracleMileAPI.Sessions;
 using WarGamesAPI.DTO;
 using WarGamesAPI.Filters;
 using WarGamesAPI.Interfaces;
+using WarGamesAPI.Model;
 
 
 namespace WarGamesAPI.Controllers;
@@ -14,50 +16,58 @@ public class QuestionController : ControllerBase
     readonly ILogger<QuestionController> _logger;
     readonly IGptService _gptService;
     readonly IQuestionRepository _questionRepo;
+    readonly IMapper _mapper;
 
     public QuestionController(ILogger<QuestionController> logger, IGptService gptService, 
-        IQuestionRepository questionRepo)
+        IQuestionRepository questionRepo, IMapper mapper)
     {
         _logger = logger;
         _gptService = gptService;
         _questionRepo = questionRepo;
+        _mapper = mapper;
     }
 
     //[ValidateToken]
     [HttpPost("askquestion")]
     public async Task<ActionResult<AnswerDto>> AskQuestion(AskQuestionDto userQuestion)
     {
-        //if (!Request.Headers.ContainsKey("Authorization") || string.IsNullOrEmpty(Request.Headers["Authorization"])) 
-        //    return BadRequest("The Authorization header is required.");
-        //userQuestion.UserId = TokenData.getUserId(Request.Headers["Authorization"]!);
+        if (!Request.Headers.ContainsKey("Authorization") || string.IsNullOrEmpty(Request.Headers["Authorization"])) 
+            return BadRequest("The Authorization header is required.");
 
-        userQuestion.UserId = 5;
+        var question = _mapper.Map<QuestionDto>(userQuestion);
         
-        _logger.LogInformation($"AskQuestion called. userId: {userQuestion.UserId} Question: {userQuestion.Text}.");
+        question.UserId = TokenData.getUserId(Request.Headers["Authorization"]!);
 
-        if (string.IsNullOrEmpty(userQuestion.Text))
+        
+        _logger.LogInformation($"AskQuestion called. userId: {question.UserId} Question: {question.Text}.");
+
+        if (string.IsNullOrEmpty(question.Text))
         {
             return BadRequest("The text of the user question is required.");
         }
 
-        if (userQuestion.UserId == 0)
+        if (question.UserId == 0)
         {
             return BadRequest("Faulty userId");
         }
         
+        if (userQuestion.ConversationId != 0 && !await _questionRepo.ConversationExists(userQuestion.ConversationId))
+        {
+            return BadRequest($"There is no conversation with Id {question.ConversationId}");
+        }
         
         try
         {
             
-            var question = await _questionRepo.SaveQuestionAsync(userQuestion);
+            var savedQuestion = await _questionRepo.SaveQuestionAsync(question);
             
             var answer = new AnswerDto();
 
-            if (question != null) answer = await _gptService.AskQuestion(question);
+            if (savedQuestion != null) answer = await _gptService.AskQuestion(savedQuestion);
 
             if (answer is null) return StatusCode(500);
             
-            answer.ConversationId = userQuestion.ConversationId;
+            answer.ConversationId = (int)savedQuestion.ConversationId;
 
         
             var result = await _questionRepo.SaveAnswerAsync(answer);
@@ -67,7 +77,7 @@ public class QuestionController : ControllerBase
         }
         catch (Exception e)
         {
-            var error = new ResponseMessageDto { StatusCode = 500, Message = e.Message };
+            var error = new ResponseMessageDto { Error = true, StatusCode = 500, Message = $"{e.Message}" };
             return StatusCode(500, error);
         }
 
@@ -121,6 +131,13 @@ public class QuestionController : ControllerBase
 
         try
         {
+            var question = await _questionRepo.GetQuestionAsync(questionId);
+            if (question == null)
+            {
+                return NotFound(new ResponseMessageDto { Message = $"Question with id {questionId} not found" });
+            }
+
+
             await _questionRepo.DeleteQuestionAsync(questionId);
             return NoContent();
 
@@ -167,7 +184,7 @@ public class QuestionController : ControllerBase
 
         try
         {
-            var conversation = await _questionRepo.GetAnswerAsync(conversationId);
+            var conversation = await _questionRepo.GetConversationAsync(conversationId);
             if (conversation == null)
             {
                 return NotFound(new ResponseMessageDto { Message = $"Conversation with id {conversationId} not found" });

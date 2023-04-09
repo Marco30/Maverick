@@ -106,62 +106,53 @@ public class AuthController : ControllerBase
         }
 
     }
-    
-    [ValidateToken]
-    [HttpPost("resetpassword")]
-    public async Task<IActionResult> resetUserPassword(ResetPasswordDto reset)
-    {
-        // Validate token 
-        if (reset.Token == "resetPasswordTest")
-        {
-            return Ok();
-        }
-        
-        var userId = TokenData.getUserId($"Bearer {reset.Token}");
-        
-        try
-        {
-            var user = await _userRepo.GetUserFromIdAsync(userId);
 
-            if (user == null || reset.Password == null) return BadRequest();
 
-            var updateSuccess = await _userRepo.UpdateUserPassword((int)user.Id!, reset.Password);
-            if (!updateSuccess)
-            {
-                return StatusCode(500, "Error Updating user password");
-            }
 
-            return Ok();
-        }
-        catch (Exception)
-        {
-            return StatusCode(500, "Error updating user password");
-
-        }
-    }
 
     [HttpPost("getUserDataFromSecurityNumber")]
     public Task<IActionResult> GetUserData(GetUserDataDto userData)
     {
-        if (userData.SocialSecurityNumber == null)
+        if(userData.SocialSecurityNumber == null)
         {
             return Task.FromResult<IActionResult>(BadRequest());
         }
 
-        UserDto user = Crawlers.SeleniumGetUserInfoPagesCrawler("https://mrkoll.se/", userData.SocialSecurityNumber);
 
+        try
+        {
+            var user = Crawlers.SeleniumGetUserInfoPagesCrawler("https://mrkoll.se/", userData.SocialSecurityNumber);
 
-        user.SocialSecurityNumber = userData.SocialSecurityNumber;
-        return Task.FromResult<IActionResult>(Ok(user));
+            if (user != null)
+            {
+                user.SocialSecurityNumber = userData.SocialSecurityNumber.ToString();
+                return Task.FromResult<IActionResult>(Ok(user));
+            }
+        }
+        catch (Exception e)
+        {
+            _logger.LogInformation($"Crawl failed: {e.Message}");
+            
+            var responseMessage = new ResponseMessageDto
+            {
+                Error = true,
+                StatusCode = StatusCodes.Status500InternalServerError,
+                Message = "Error retrieving user data: " + e.Message
+            };
+            return Task.FromResult<IActionResult>(StatusCode(StatusCodes.Status500InternalServerError, responseMessage));
+        }
 
+        
+
+        return Task.FromResult<IActionResult>(NotFound());
 
     }
 
     [HttpPost("registeruser")]
     public async Task<ActionResult<User>> RegisterUser(RegisterUserDto register)
     {
-        register.Address = _mapper.Map<AddressDto>(register.Address);
-
+        register.Address = _mapper.Map<RegisterAddressDto>(register.Address);
+        
         if (register.Email is null) 
             return BadRequest(new ResponseMessageDto { Error = true, Message = "Email saknas" });
         
@@ -181,12 +172,11 @@ public class AuthController : ControllerBase
 
         try
         {
-            //var crawlResult = Crawlers.SeleniumGetUserInfoPagesCrawler("https://mrkoll.se/", register.SocialSecurityNumber);
-            //AddressDto? address = crawlResult.Address;
+            var crawlResult = Crawlers.SeleniumGetUserInfoPagesCrawler("https://mrkoll.se/", register.SocialSecurityNumber);
+            AddressDto? address = crawlResult.Address;
 
             try
             {
-                //register.AddressId = await _userRepo.AddAddress(address!);
 
                 register.AddressId = await _userRepo.AddAddress(register.Address);
 
@@ -217,15 +207,6 @@ public class AuthController : ControllerBase
 
         }
         
-            
-
-
-            
-
-
-        
-
-
     }
 
     private static bool VerifySocialSecurityNumber(string number)

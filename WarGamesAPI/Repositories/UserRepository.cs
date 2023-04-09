@@ -6,7 +6,6 @@ using WarGamesAPI.DTO;
 using WarGamesAPI.Interfaces;
 using WarGamesAPI.Model;
 
-
 namespace Courses.Api.Repositories;
 
 public class UserRepository : IUserRepository
@@ -77,7 +76,7 @@ public class UserRepository : IUserRepository
         
     }
 
-    public async Task<int> AddAddress(AddressDto address)
+    public async Task<int> AddAddress(RegisterAddressDto address)
     {
         try
         {

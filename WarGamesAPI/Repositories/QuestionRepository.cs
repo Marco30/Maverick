@@ -20,10 +20,11 @@ public class QuestionRepository : IQuestionRepository
         _mapper = mapper;
     }
 
-    public async Task<QuestionDto?> SaveQuestionAsync(AskQuestionDto userQuestion)
+    public async Task<QuestionDto?> SaveQuestionAsync(QuestionDto userQuestion)
     {
         var userId = (int)userQuestion.UserId!;
 
+        
         if (userQuestion.ConversationId == 0)
         {
 
@@ -35,7 +36,7 @@ public class QuestionRepository : IQuestionRepository
         var question = new Question
         {
             Text = userQuestion.Text, UserId = userId, 
-            ConversationId = userQuestion.ConversationId
+            ConversationId = (int)userQuestion.ConversationId
         };
 
         try
