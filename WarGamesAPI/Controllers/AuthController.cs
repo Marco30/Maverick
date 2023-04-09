@@ -113,26 +113,38 @@ public class AuthController : ControllerBase
     [HttpPost("getUserDataFromSecurityNumber")]
     public Task<IActionResult> GetUserData(GetUserDataDto userData)
     {
-        if (userData.SocialSecurityNumber == null)
+        if(userData.SocialSecurityNumber == null)
         {
             return Task.FromResult<IActionResult>(BadRequest());
         }
 
+
         try
         {
-            
             var user = Crawlers.SeleniumGetUserInfoPagesCrawler("https://mrkoll.se/", userData.SocialSecurityNumber);
-            user.SocialSecurityNumber = userData.SocialSecurityNumber;
-            return Task.FromResult<IActionResult>(Ok(user));
 
+            if (user != null)
+            {
+                user.SocialSecurityNumber = userData.SocialSecurityNumber.ToString();
+                return Task.FromResult<IActionResult>(Ok(user));
+            }
         }
         catch (Exception e)
         {
-            var error = new ResponseMessageDto {Error = true, StatusCode = 500, Message = e.Message};
-
-            return Task.FromResult<IActionResult>(StatusCode(500, error));
+            _logger.LogInformation($"Crawl failed: {e.Message}");
+            
+            var responseMessage = new ResponseMessageDto
+            {
+                Error = true,
+                StatusCode = StatusCodes.Status500InternalServerError,
+                Message = "Error retrieving user data: " + e.Message
+            };
+            return Task.FromResult<IActionResult>(StatusCode(StatusCodes.Status500InternalServerError, responseMessage));
         }
 
+        
+
+        return Task.FromResult<IActionResult>(NotFound());
 
     }
 
@@ -160,8 +172,8 @@ public class AuthController : ControllerBase
 
         try
         {
-            //var crawlResult = Crawlers.SeleniumGetUserInfoPagesCrawler("https://mrkoll.se/", register.SocialSecurityNumber);
-            //AddressDto? address = crawlResult.Address;
+            var crawlResult = Crawlers.SeleniumGetUserInfoPagesCrawler("https://mrkoll.se/", register.SocialSecurityNumber);
+            AddressDto? address = crawlResult.Address;
 
             try
             {

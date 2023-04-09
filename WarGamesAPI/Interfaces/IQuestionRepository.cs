@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using WarGamesAPI.DTO;
 
 namespace WarGamesAPI.Interfaces;
@@ -11,6 +12,8 @@ public interface IQuestionRepository
     Task<AnswerDto?> GetAnswerAsync(int answerId);
     Task<ConversationDto?> GetConversationAsync(int conversationId);
     Task<List<AnswerDto>> GetAnswersAsync(int questionId);
+    Task<bool> ConversationExists(int conversationId);
+    
 
     Task DeleteQuestionAsync(int questionId);
     Task DeleteAnswerAsync(int answerId);

@@ -51,6 +51,10 @@ public class QuestionController : ControllerBase
             return BadRequest("Faulty userId");
         }
         
+        if (userQuestion.ConversationId != 0 && !await _questionRepo.ConversationExists(userQuestion.ConversationId))
+        {
+            return BadRequest($"There is no conversation with Id {question.ConversationId}");
+        }
         
         try
         {
@@ -73,7 +77,7 @@ public class QuestionController : ControllerBase
         }
         catch (Exception e)
         {
-            var error = new ResponseMessageDto { StatusCode = 500, Message = e.Message };
+            var error = new ResponseMessageDto { Error = true, StatusCode = 500, Message = $"{e.Message}" };
             return StatusCode(500, error);
         }
 

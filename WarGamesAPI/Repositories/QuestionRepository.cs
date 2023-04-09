@@ -24,6 +24,7 @@ public class QuestionRepository : IQuestionRepository
     {
         var userId = (int)userQuestion.UserId!;
 
+        
         if (userQuestion.ConversationId == 0)
         {
 
@@ -100,6 +101,12 @@ public class QuestionRepository : IQuestionRepository
         return await _context.Conversation.Where(c => c.Id == conversationId).ProjectTo<ConversationDto>(_mapper.ConfigurationProvider)
             .SingleOrDefaultAsync();
     }
+
+    public async Task<bool> ConversationExists(int conversationId)
+    {
+        return await _context.Conversation.AnyAsync(c => c.Id == conversationId);
+    }
+
 
     public async Task DeleteQuestionAsync(int questionId)
     {
