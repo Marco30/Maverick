@@ -1,3 +1,4 @@
+using crypto;
 using HtmlAgilityPack;
 using System.Text.RegularExpressions;
 using WarGamesAPI.DTO;
@@ -83,12 +84,10 @@ public class Parsers
 
                 }
 
-                var phone = htmlDocument.DocumentNode.SelectNodes("/html/body/div[1]/div[3]/div/div/div[1]/div/div[9]/div/div/a");
+                var phone = htmlDocument.DocumentNode.SelectNodes("/html/body/div[1]/div[3]/div/div/div[1]/div/div[10]/div/div/a");
 
                 try
                 {
-
-                
                     
                     if(phone!= null) { 
 
@@ -117,7 +116,6 @@ public class Parsers
 
                     var Street = htmlDocument.DocumentNode.SelectSingleNode("/html/body/div[1]/div[3]/div/div/div[1]/div/div[7]/div[2]/span[2]");
 
-
                 
                     address.Street = Street.InnerText.Trim();
                 
@@ -129,22 +127,26 @@ public class Parsers
 
                     var zipCodeAndMunicipality = htmlDocument.DocumentNode.SelectSingleNode("/html/body/div[1]/div[3]/div/div/div[1]/div/div[7]/div[2]/span[3]");
 
+                
+                    
                     string[] arrayZipCodeAndMunicipality = zipCodeAndMunicipality.InnerText.Trim().Split(' ');
 
                     address.ZipCode = arrayZipCodeAndMunicipality[0];
 
                     address.Municipality = arrayZipCodeAndMunicipality[1];
 
+                
+
                     userData.Address = address;
 
                     return userData;
-
                 }
                 catch (Exception e)
                 {
                     Console.WriteLine(e);
                     throw;
                 }
+
 
             }
 

@@ -5,10 +5,12 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using Serilog;
 using Serilog.Events;
+using System.Reflection;
 using WarGamesAPI.Data;
 using WarGamesAPI.Helpers;
 using WarGamesAPI.Interfaces;
 using WarGamesAPI.Services;
+using WarGamesAPI.Settings;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -62,6 +64,13 @@ builder.Services.AddSwaggerGen(c =>
         }
     });
 });
+
+
+
+
+builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("MailSettings"));
+
+builder.Services.AddTransient<IEmailService, EmailService>();
 
 builder.Services.AddAutoMapper(typeof(AutoMapperProfiles).Assembly);
 builder.Services.AddControllers();

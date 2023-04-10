@@ -1,4 +1,3 @@
-using Microsoft.EntityFrameworkCore;
 using WarGamesAPI.DTO;
 
 namespace WarGamesAPI.Interfaces;

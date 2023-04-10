@@ -114,6 +114,12 @@ public class QuestionRepository : IQuestionRepository
             .ProjectTo<AnswerDto>(_mapper.ConfigurationProvider).ToListAsync();
     }
 
+    public async Task<bool> ConversationExists(int conversationId)
+    {
+        return await _context.Conversation.AnyAsync(c => c.Id == conversationId);
+    }
+
+
     public async Task DeleteQuestionAsync(int questionId)
     {
         var question = await _context.Question.FindAsync(questionId);

@@ -16,12 +16,15 @@ public class AuthController : ControllerBase
 {
     readonly ILogger<AuthController> _logger;
     readonly IUserRepository _userRepo;
+    readonly IEmailService _emailService;
     readonly IMapper _mapper;
 
-    public AuthController(ILogger<AuthController> logger, IUserRepository userRepo, IMapper mapper)
+    public AuthController(ILogger<AuthController> logger, IUserRepository userRepo, IEmailService emailService,
+    IMapper mapper)
     {
         _logger = logger;
         _userRepo = userRepo;
+        _emailService = emailService;
         _mapper = mapper;
     }
 
@@ -107,13 +110,42 @@ public class AuthController : ControllerBase
 
     }
 
+    [HttpPost("resetpasswordrequest")]
+    public async Task<IActionResult> sendResetPasswordEmail(ResetPasswordRequestDto request)
+    {
+        if (request.Email is null) return BadRequest();
 
+        try
+        {
+
+            var user = await _userRepo.GetUserFromEmailAsync(request.Email);
+            // If no user return bad request or return OK any way to avoid giving any info about registered emails
+            if (user == null || user.Email == null || user.FirstName == null) return BadRequest();
+            User newUser = new User();
+            newUser.Id = (int)user.Id!;
+            // Create token with userId and 5 minutes validation time
+            string token = TokenData.CreateJwtToken(user, 5);
+            // Create URL http://localhost:4200/auth/resetPassword/token
+            var resetPasswordURL = $"http://localhost:4200/authView/reset/{token}";
+
+            // Send the token in a url to user email
+            await _emailService.SendResetPasswordEmailAsync(resetPasswordURL, user.Email, user.FirstName);
+
+            // Return OK to user if everything went well
+            return Ok();
+        }
+        catch (Exception e)
+        {
+
+            return BadRequest();
+        }
+    }
 
 
     [HttpPost("getUserDataFromSecurityNumber")]
     public Task<IActionResult> GetUserData(GetUserDataDto userData)
     {
-        if(userData.SocialSecurityNumber == null)
+        if (userData.SocialSecurityNumber == null)
         {
             return Task.FromResult<IActionResult>(BadRequest());
         }
@@ -132,7 +164,7 @@ public class AuthController : ControllerBase
         catch (Exception e)
         {
             _logger.LogInformation($"Crawl failed: {e.Message}");
-            
+
             var responseMessage = new ResponseMessageDto
             {
                 Error = true,
@@ -142,7 +174,7 @@ public class AuthController : ControllerBase
             return Task.FromResult<IActionResult>(StatusCode(StatusCodes.Status500InternalServerError, responseMessage));
         }
 
-        
+
 
         return Task.FromResult<IActionResult>(NotFound());
 
@@ -152,17 +184,17 @@ public class AuthController : ControllerBase
     public async Task<ActionResult<User>> RegisterUser(RegisterUserDto register)
     {
         register.Address = _mapper.Map<RegisterAddressDto>(register.Address);
-        
-        if (register.Email is null) 
+
+        if (register.Email is null)
             return BadRequest(new ResponseMessageDto { Error = true, Message = "Email saknas" });
-        
-        if (register.SocialSecurityNumber is null) 
+
+        if (register.SocialSecurityNumber is null)
             return BadRequest(new ResponseMessageDto { Error = true, Message = "Personnummer saknas" });
-        
-        if (register.Password is null) 
+
+        if (register.Password is null)
             return BadRequest(new ResponseMessageDto { Error = true, Message = "Lösenord saknas" });
 
-        if (await _userRepo.GetUserFromEmailAsync(register.Email) != null )
+        if (await _userRepo.GetUserFromEmailAsync(register.Email) != null)
             return BadRequest(new ResponseMessageDto { Error = true, Message = "En användare med denna email är redan registrerad" });
 
         if (await _userRepo.GetUserFromSocSecAsync(register.SocialSecurityNumber) != null)
@@ -185,17 +217,19 @@ public class AuthController : ControllerBase
             {
                 return StatusCode(500, new ResponseMessageDto { Error = true, Message = "Error saving address" });
             }
-            
+
         }
         catch (Exception e)
         {
             _logger.LogInformation($"Crawl failed, registering user anyway{e.Message}");
+
+
         }
 
         try
         {
             var registeredUser = await _userRepo.AddUser(register);
-            
+
             var token = TokenData.CreateJwtToken(registeredUser!);
 
             return Ok(new InLoggedUserDto { User = registeredUser, Token = token });
@@ -206,7 +240,7 @@ public class AuthController : ControllerBase
             return StatusCode(500, new ResponseMessageDto { Error = true, Message = "Error registering user" });
 
         }
-        
+
     }
 
     private static bool VerifySocialSecurityNumber(string number)
