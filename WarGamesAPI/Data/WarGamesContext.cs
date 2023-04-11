@@ -16,7 +16,33 @@ public class WarGamesContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<User>().HasData(new User
+        {
+            Id = 5,
+            SocialSecurityNumber = "198507119595",
+            FirstName = "Khaled",
+            LastName = "Abo",
+            FullName = "Khaled Abo",
+            Email = "khaled@khaled.se",
+            Password = "123456",
+            MobilePhoneNumber = null,
+            AgreeMarketing = true,
+            SubscribeToEmailNotification = true,
+            ProfileImage = null,
+            Gender = "Man",
+            AddressId = 1
+        });
         
+        modelBuilder.Entity<Address>().HasData(new Address
+        {
+            Id = 1,
+            City = "Stockholm",
+            Country = "Sweden",
+            Street = "Röntgenvägen 5 lgh 1410",
+            ZipCode = "14152",
+            UserId = 5
+        });
+
         modelBuilder.Entity<Address>()
             .HasOne(a => a.User)
             .WithOne(u => u.Address)
