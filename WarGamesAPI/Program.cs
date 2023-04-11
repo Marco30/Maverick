@@ -3,12 +3,17 @@ using Courses.Api.Repositories;
 using Microsoft.OpenApi.Models;
 using Serilog;
 using Serilog.Events;
+using System.Reflection;
 using WarGamesAPI.Interfaces;
 using WarGamesAPI.Services;
+using WarGamesAPI.Settings;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+
+builder.Configuration.AddEnvironmentVariables().AddUserSecrets(Assembly.GetExecutingAssembly(), true);
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy(name:"AllowAllOrigins",
@@ -54,16 +59,9 @@ builder.Services.AddSwaggerGen(c =>
 
 
 
+builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("MailSettings"));
 
-
-
-
-
-
-
-
-
-
+builder.Services.AddTransient<IEmailService, EmailService>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

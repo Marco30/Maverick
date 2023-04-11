@@ -7,9 +7,9 @@ import { RegisterComponent } from '../components/authentication-view-components/
 import { LoginComponent } from '../components/authentication-view-components/login/login.component';
 import { ResetPasswordComponent } from '../components/authentication-view-components/reset-password/reset-password.component';
 import { ResetPasswordRequestComponent } from '../components/authentication-view-components/reset-password-request/reset-password-request.component';
-import { LoaderModule } from '../components/loader/loader.module';
-import { ModalModule } from '../components/modal/modal.module';
 import { FooterComponent } from '../components/footer/footer.component';
+import { LoaderComponent } from '../components/loader/loader.component';
+import { ModalComponent } from '../components/modal/modal.component';
 
 @NgModule({
   declarations: [
@@ -20,11 +20,11 @@ import { FooterComponent } from '../components/footer/footer.component';
     ResetPasswordRequestComponent,
   ],
   imports: [
+    ModalComponent,
+    LoaderComponent,
     CommonModule,
     FormsModule,
     AuthenticationViewRoutingModule,
-    LoaderModule,
-    ModalModule,
     FooterComponent,
   ],
 })

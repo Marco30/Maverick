@@ -1,7 +1,8 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, ViewChild, Output, EventEmitter } from '@angular/core';
 import { NgForm } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Observable, Subject, takeUntil } from 'rxjs';
 import { Address } from 'src/app/model/address/address';
+import { Login } from 'src/app/model/login/login';
 import { GENDERS, Register } from 'src/app/model/register/register';
 import { AuthenticationService } from 'src/app/service/authentication/authentication.service';
 
@@ -15,8 +16,9 @@ enum ERRORS_TYPES {
   zipCode = 'zipCode',
   matchedPasswords = 'passwordDontMatch',
   serverError = 'serverError',
-  birthDate = 'birthDate',
+  dateOfBirth = 'dateOfBirth',
   gender = 'gender',
+  mobile = 'mobile',
 }
 enum ERRORS_MSGS {
   fullName = 'Full name is required',
@@ -28,8 +30,9 @@ enum ERRORS_MSGS {
   zipCode = 'Zip code name is required',
   passowrdDontMatch = "Passwords don't match",
   serverError = 'Sorry, something went wrong',
-  birthDate = 'Birth Date is required',
+  dateOfBirth = 'Birth Date is required',
   gender = 'Gender is required',
+  mobile = 'Mobile number is required',
 }
 @Component({
   selector: 'app-register',
@@ -38,10 +41,8 @@ enum ERRORS_MSGS {
 })
 export class RegisterComponent {
   @ViewChild('registerform', { static: false }) registerform!: NgForm;
-  constructor(
-    private authenticationService: AuthenticationService,
-    private router: Router
-  ) {}
+  @Output() success: EventEmitter<Login> = new EventEmitter();
+  constructor(private authenticationService: AuthenticationService) {}
 
   address: Address = {
     city: '',
@@ -62,14 +63,20 @@ export class RegisterComponent {
     email: '',
     password: '',
     gender: GENDERS.other,
-    birthDate: new Date(),
-    phoneNumber: 0,
-    mobilePhoneNumber: 0,
-    birthDay: 0,
-    birthMonth: 0,
-    birthYear: 0,
+    dateOfBirth: new Date('2010-01-16'),
+    phoneNumber: undefined,
+    mobilePhoneNumber: undefined,
     address: this.address,
   };
+
+  // name regex No numbers, minimum two letter, no leading or trailing white spaces
+  nameRegex = /^[A-Za-zÀ-ÖØ-öø-ÿ]{2,}(?:\s+[A-Za-zÀ-ÖØ-öø-ÿ]+)*$/;
+  // email regex
+  emailRegex = /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$/;
+  // personal security number
+  securityNumberRegex = /^(19|20)?(\d{6}([-+]|\s)\d{4}|(?!19|20)\d{10})$/;
+  // phone number regex, allows internationals phone numbers, wrong phone number might pass
+  phoneRegex = /^\+?\d{1,3}[-.\s]?\d{3,4}[-.\s]?\d{4,6}$/;
   GENDERS = GENDERS;
   showLoading: boolean = false;
   showTermsOfUse: boolean = false;
@@ -78,9 +85,11 @@ export class RegisterComponent {
   errorsMap: Map<ERRORS_TYPES, ERRORS_MSGS> = new Map();
   info: string = '';
   passwordConfirmation: string = '';
-  cancelDataFetching: boolean = false;
+  dataFetchingCancelled$: Subject<void> = new Subject();
   submitted: boolean = false;
-
+  serverError: string = '';
+  successRegistration: boolean = false;
+  isFetchingUserData: boolean = false;
   checkSame() {
     const secondPassword = this.passwordConfirmation;
     const firstPassword = this.registerData.password;
@@ -116,9 +125,12 @@ export class RegisterComponent {
 
   removeError(type: ERRORS_TYPES) {
     this.errorsMap.delete(type);
+    this.serverError = '';
   }
 
   register() {
+    console.log('register date: ', this.registerData.dateOfBirth);
+
     this.submitted = true;
 
     console.log('Registering with data:', this.registerData);
@@ -128,11 +140,19 @@ export class RegisterComponent {
         ERRORS_MSGS.passowrdDontMatch
       );
     }
-    if (!this.registerData.firstName) {
+    const firstNameValide = this.nameRegex.test(this.registerData.firstName);
+    const lastNameValide = this.nameRegex.test(this.registerData.lastName);
+    if (!this.registerData.firstName || !firstNameValide) {
       this.errorsMap.set(ERRORS_TYPES.firstName, ERRORS_MSGS.firstName);
     }
-    if (!this.registerData.lastName) {
+    if (!this.registerData.lastName || !lastNameValide) {
       this.errorsMap.set(ERRORS_TYPES.lastName, ERRORS_MSGS.lastName);
+    }
+    if (!this.registerData.dateOfBirth) {
+      this.errorsMap.set(ERRORS_TYPES.dateOfBirth, ERRORS_MSGS.dateOfBirth);
+    }
+    if (!this.registerData.gender) {
+      this.errorsMap.set(ERRORS_TYPES.gender, ERRORS_MSGS.gender);
     }
     if (!this.registerData.email) {
       this.errorsMap.set(ERRORS_TYPES.email, ERRORS_MSGS.email);
@@ -147,41 +167,40 @@ export class RegisterComponent {
       this.errorsMap.set(ERRORS_TYPES.zipCode, ERRORS_MSGS.zipCode);
     }
     if (this.errorsMap.size > 0) return;
-    this.showLoading = true;
-    // this.authenticationService.register(this.registerData).subscribe({
-    //   next: (res) => {
-    //     console.info('--------register------------');
-    //     console.info(res);
-    //     this.info = 'Congratulations! Your account has been registered';
-    //     this.showLoading = false;
+    console.log('register data: ', this.registerData);
 
-    //     // Routing to login view won't work beacuse  the user is already at /login
-    //   },
-    //   error: (err) => {
-    //     this.errorsMap.clear();
-    //     this.errorsMap.set(ERRORS_TYPES.serverError, ERRORS_MSGS.serverError);
-    //     this.showLoading = false;
-    //   },
-    // });
+    this.showLoading = true;
+    this.isFetchingUserData = false;
+    this.authenticationService.register(this.registerData).subscribe({
+      next: (res) => {
+        console.info('--------register------------');
+        console.info(res);
+        this.successRegistration = true;
+        this.showLoading = false;
+      },
+      error: (err) => {
+        this.errorsMap.clear();
+        this.serverError = 'Sorry, something went wrog!';
+        this.showLoading = false;
+      },
+    });
   }
+
   getUserData(): void {
     let num = this.registerData.socialSecurityNumber;
     if (this.registerData.socialSecurityNumber.includes('-')) {
       num = this.registerData.socialSecurityNumber.replace('-', '');
     }
     if (num.length == 12) {
-      this.cancelDataFetching = false;
+      this.isFetchingUserData = true;
       this.showLoading = true;
       this.registerData.socialSecurityNumber = num;
       this.authenticationService
         .getUserDataFromSecurityNumber(this.registerData)
+        .pipe(takeUntil(this.dataFetchingCancelled$))
         .subscribe({
           next: (userData) => {
-            if (this.cancelDataFetching) return;
             console.log('uploaded image to server, event: ', userData);
-            const { year, month, day } = this.getBirthDay(
-              this.registerData.socialSecurityNumber
-            );
             this.registerData.fullName =
               userData.fullName || this.registerData.fullName;
             this.registerData.firstName =
@@ -196,36 +215,32 @@ export class RegisterComponent {
               userData?.address?.zipCode || this.registerData.address.zipCode;
             this.registerData.gender =
               userData?.gender || this.registerData.gender;
-            this.registerData.birthYear = Number(year);
-            this.registerData.birthMonth = Number(month);
-            this.registerData.birthDay = Number(day);
+            this.registerData.dateOfBirth = this.getDateOfBirth(
+              this.registerData.socialSecurityNumber
+            );
             this.showLoading = false;
-            // Add Action after register
           },
           error: (err) => {
             console.log(err);
             // Show erros from backend, Avoid revealign existing emails
-            this.errorsMap.set(
-              ERRORS_TYPES.serverError,
-              ERRORS_MSGS.serverError
-            );
+            this.serverError = 'Sorry, something went wrong!';
             this.showLoading = false;
           },
         });
     }
   }
 
-  getBirthDay(socialSecurityNumber: string) {
+  getDateOfBirth(socialSecurityNumber: string) {
     console.log('socialSecurityNumber: ', socialSecurityNumber);
     const bd = socialSecurityNumber.slice(0, 8);
     const year = bd.slice(0, 4);
     const month = bd.slice(4, 6);
     const day = bd.slice(6, 8);
-    return { year, month, day };
+    return new Date(year + '-' + month + '-' + day);
   }
 
-  cancelLoader() {
-    this.cancelDataFetching = true;
+  abortUserDataFetching() {
+    this.dataFetchingCancelled$.next();
     this.showLoading = false;
   }
   public onAgreeMarketingChanged(value: boolean) {
@@ -237,5 +252,14 @@ export class RegisterComponent {
 
   closeModal() {
     this.showTermsOfUse = false;
+  }
+
+  toLogin() {
+    console.log('To login');
+    this.success.emit({
+      socialSecurityNumber: '',
+      email: this.registerData.email,
+      password: this.registerData.password,
+    });
   }
 }

@@ -16,7 +16,6 @@ export class ResetPasswordComponent {
     confirmPassword: '',
   };
   noMatchPasswords: boolean = false;
-  info: string = '';
   success: boolean = false;
   error: string = '';
   constructor(
@@ -28,10 +27,9 @@ export class ResetPasswordComponent {
   submitted: boolean = false;
   showLoading: boolean = false;
   toLogin() {
-    this.router.navigate(['auth']);
+    this.router.navigate(['authView']);
   }
   checkSame(input: string) {
-    this.info = '';
     const secondPassword = input;
     const firstPassword = this.data.password;
     if (secondPassword !== firstPassword) {
@@ -56,21 +54,17 @@ export class ResetPasswordComponent {
       return;
     }
     this.showLoading = true;
-
+    this.error = '';
+    this.success = false;
     const token = this.route.snapshot.params['token'];
-    console.log('resetting password: ', this);
-    console.log('params: ', token);
     this.authenticationService
       .sendResetPassword(token, this.data.password)
       .subscribe({
         next: (res) => {
-          console.log('success resetting password:', res);
-          this.info = 'Success your password has been reset, Now you can login';
-          this.showLoading = false;
           this.success = true;
+          this.showLoading = false;
         },
         error: (err) => {
-          console.log('error resetting password: ', err);
           this.error = 'Sorry, Something went wrong!';
           this.showLoading = false;
         },

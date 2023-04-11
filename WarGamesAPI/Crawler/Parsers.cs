@@ -1,7 +1,6 @@
 using HtmlAgilityPack;
 using System.Text.RegularExpressions;
 using WarGamesAPI.DTO;
-using WarGamesAPI.Model;
 
 namespace WarGamesAPI.Crawler;
 
@@ -29,7 +28,7 @@ public class Parsers
 
         if (htmlDocument.DocumentNode != null)
         {
-            Console.WriteLine("text från sidan");
+            Console.WriteLine("text frï¿½n sidan");
             //xpath to body tag to verify page
             HtmlAgilityPack.HtmlNode bodyNode = htmlDocument.DocumentNode.SelectSingleNode("/html/body");
 
@@ -38,11 +37,11 @@ public class Parsers
             {
 
 
-                var givenName = htmlDocument.DocumentNode.SelectSingleNode("//span[@title='Detta är personens tilltalsnamn']");
+                var givenName = htmlDocument.DocumentNode.SelectSingleNode("//span[@title='Detta ï¿½r personens tilltalsnamn']");
 
                 userData.FirstName = givenName.InnerText.Trim();
 
-                var surname = htmlDocument.DocumentNode.SelectSingleNode("//span[@title='Detta är ett efternamn']");
+                var surname = htmlDocument.DocumentNode.SelectSingleNode("//span[@title='Detta ï¿½r ett efternamn']");
 
                 userData.LastName = surname.InnerText.Trim();
 
@@ -66,7 +65,7 @@ public class Parsers
                         /* Console.WriteLine(lines[0]);
                      Console.WriteLine(lines[1]);*/
 
-                        if (lines[0] == "Län")
+                        if (lines[0] == "Lï¿½n")
                         {
                             string[] cityArray = lines[1].Split(' ');
                             cityArray[0] = cityArray[0].Remove(cityArray[0].Length - 1);
@@ -74,7 +73,7 @@ public class Parsers
                         }
 
 
-                        if (lines[0] == "Kön")
+                        if (lines[0] == "Kï¿½n")
                         {
                             userData.Gender = CapitalizeFirstLetter(lines[1]);
                             break;
@@ -86,50 +85,64 @@ public class Parsers
 
                 var phone = htmlDocument.DocumentNode.SelectNodes("/html/body/div[1]/div[3]/div/div/div[1]/div/div[9]/div/div/a");
                     
-                if(phone!= null) { 
+                    if(phone!= null) { 
 
-                    if(phone != null) {
-                        for (int i = 0; i < phone.Count; i++)
-                        {
-
-                            var phonenumber = PhonenumberTrim(phone[i].InnerText.Trim());
-
-                            phonenumber = PhonenumberTrim(phonenumber);
-
-                            if (CheckIfPhonenumberIsMobilePhone(phonenumber))
+                        if(phone != null) {
+                            for (int i = 0; i < phone.Count; i++)
                             {
-                                userData.MobilePhoneNumber = phonenumber;
-                            }
-                            else
-                            {
-                                userData.PhoneNumber = phonenumber;
-                            }
 
+                                var phonenumber = PhonenumberTrim(phone[i].InnerText.Trim());
+
+                                phonenumber = PhonenumberTrim(phonenumber);
+
+                                if (CheckIfPhonenumberIsMobilePhone(phonenumber))
+                                {
+                                    userData.MobilePhoneNumber = phonenumber;
+                                }
+                                else
+                                {
+                                    userData.PhoneNumber = phonenumber;
+                                }
+
+                            }
                         }
-                    }
                     
 
+                    }
+
+                    var Street = htmlDocument.DocumentNode.SelectSingleNode("/html/body/div[1]/div[3]/div/div/div[1]/div/div[7]/div[2]/span[2]");
+
+                
+                    address.Street = Street.InnerText.Trim();
+                
+
+
+                    /* var city = htmlDocument.DocumentNode.SelectSingleNode("/html/body/div[1]/div[3]/div/div/div[1]/div/div[7]/div[1]/div[4]/span[2]");
+    
+                    address.City = CityTrim(city.InnerText.Trim()); */
+
+                    var zipCodeAndMunicipality = htmlDocument.DocumentNode.SelectSingleNode("/html/body/div[1]/div[3]/div/div/div[1]/div/div[7]/div[2]/span[3]");
+
+                
+                    
+                    string[] arrayZipCodeAndMunicipality = zipCodeAndMunicipality.InnerText.Trim().Split(' ');
+
+                    address.ZipCode = arrayZipCodeAndMunicipality[0];
+
+                    address.Municipality = arrayZipCodeAndMunicipality[1];
+
+                
+
+                    userData.Address = address;
+
+                    return userData;
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                    throw;
                 }
 
-                var Street = htmlDocument.DocumentNode.SelectSingleNode("/html/body/div[1]/div[3]/div/div/div[1]/div/div[7]/div[2]/span[2]");
-
-                address.Street = Street.InnerText.Trim();
-
-                /* var city = htmlDocument.DocumentNode.SelectSingleNode("/html/body/div[1]/div[3]/div/div/div[1]/div/div[7]/div[1]/div[4]/span[2]");
-
-                address.City = CityTrim(city.InnerText.Trim()); */
-
-                var zipCodeAndMunicipality = htmlDocument.DocumentNode.SelectSingleNode("/html/body/div[1]/div[3]/div/div/div[1]/div/div[7]/div[2]/span[3]");
-
-                string[] arrayZipCodeAndMunicipality = zipCodeAndMunicipality.InnerText.Trim().Split(' ');
-
-                address.ZipCode = arrayZipCodeAndMunicipality[0];
-
-                address.Municipality = arrayZipCodeAndMunicipality[1];
-
-                userData.Address = address;
-
-                return userData;
 
             }
 

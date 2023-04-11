@@ -18,13 +18,10 @@ export class Register {
   agreeMarketing: boolean;
   subscribeToEmailNotification: boolean;
   gender: Genders;
-  birthYear: number;
-  birthMonth: number;
-  birthDay: number;
   address: Address;
-  phoneNumber: number;
-  mobilePhoneNumber: number;
-  birthDate: Date;
+  phoneNumber: number | undefined;
+  mobilePhoneNumber: number | undefined;
+  dateOfBirth: Date;
   constructor(
     socialSecurityNumber: string,
     email: string,
@@ -35,13 +32,11 @@ export class Register {
     gender: Genders,
     fullName: string,
     subscribeToEmailNotification: boolean,
-    birthDay: number,
-    birthYear: number,
-    birthMonth: number,
+
     address: Address,
     phoneNumber: number,
     mobilePhoneNumber: number,
-    birthDate: Date
+    dateOfBirth: Date
   ) {
     this.socialSecurityNumber = socialSecurityNumber;
     this.email = email;
@@ -52,12 +47,10 @@ export class Register {
     this.subscribeToEmailNotification = subscribeToEmailNotification;
     this.gender = gender;
     this.fullName = fullName;
-    this.birthDay = birthDay;
-    this.birthMonth = birthMonth;
-    this.birthYear = birthYear;
+
     this.address = address;
     this.phoneNumber = phoneNumber;
     this.mobilePhoneNumber = mobilePhoneNumber;
-    this.birthDate = birthDate;
+    this.dateOfBirth = dateOfBirth;
   }
 }

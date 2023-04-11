@@ -2,14 +2,14 @@
   <form (ngSubmit)="register()" #registerForm="ngForm" class="needs-validation">
     <app-loader
       *ngIf="showLoading"
-      [showCancel]="showLoading"
-      (cancelLoader)="cancelLoader()"
+      [showCancel]="isFetchingUserData && showLoading"
+      (cancelLoader)="abortUserDataFetching()"
     ></app-loader>
     <h3 class="h2-size text-center">Register</h3>
     <div class="form-group pb-2">
       <label for="socialSecurityNumber" class="py-1">Personnummer*</label>
       <input
-        pattern="^(19|20)?(\d{6}([-+]|\s)\d{4}|(?!19|20)\d{10})$"
+        [pattern]="securityNumberRegex"
         type="text"
         class="form-control"
         id="socialSecurityNumber"
@@ -25,7 +25,7 @@
         class="text-danger help-block d-block mt-1"
         *ngIf=" socialSecurityNumberControl.touched && socialSecurityNumberControl.errors?.['pattern'] "
       >
-        SocialSecurityNumber is not complete
+        Social security number is not complete
       </span>
     </div>
     <div class="row">
@@ -33,6 +33,7 @@
         <div class="form-group pb-2">
           <label for="firstName" class="py-1">First Name*</label>
           <input
+            [pattern]="nameRegex"
             type="text"
             class="form-control"
             id="firstName"
@@ -54,12 +55,19 @@
           >
             This field is required
           </span>
+          <span
+            class="text-danger help-block d-block mt-1"
+            *ngIf="firstNameControl.errors?.['pattern'] && firstNameControl.touched"
+          >
+            First name is not valid
+          </span>
         </div>
       </div>
       <div class="col-6">
         <div class="form-group pb-2">
           <label for="lastName" class="py-1">Last Name*</label>
           <input
+            [pattern]="nameRegex"
             type="text"
             class="form-control"
             id="lastName"
@@ -81,6 +89,12 @@
           >
             This field is required
           </span>
+          <span
+            class="text-danger help-block d-block mt-1"
+            *ngIf="lastNameControl.errors?.['pattern'] && lastNameControl.touched"
+          >
+            Last name is not valid
+          </span>
         </div>
       </div>
     </div>
@@ -92,17 +106,18 @@
           <input
             type="date"
             class="form-control"
-            id="birthDate"
-            name="birthDate"
+            id="dateOfBirth"
+            name="dateOfBirth"
             placeholder="Your birth date"
+            max="2010-04-20"
             required
-            [(ngModel)]="registerData.birthDate"
-            (ngModelChange)="removeError(ERRORS_TYPES.birthDate)"
-            #birthDateControl="ngModel"
+            [(ngModel)]="registerData.dateOfBirth"
+            (ngModelChange)="removeError(ERRORS_TYPES.dateOfBirth)"
+            #dateOfBirthControl="ngModel"
             [ngClass]="{
               'is-invalid':
-                (submitted && birthDateControl.errors) ||
-                (birthDateControl.touched && birthDateControl.errors)
+                (submitted && dateOfBirthControl.errors) ||
+                (dateOfBirthControl.touched && dateOfBirthControl.errors)
             }"
           />
         </div>
@@ -111,10 +126,13 @@
         <div class="form-group pb-2">
           <label for="gender" class="py-1 d-block">Gender*</label>
           <select
-            class="form-select form-select-md mb-3"
+            name="gender"
+            id="gender"
+            class="form-select form-select-md"
             [(ngModel)]="registerData.gender"
             (ngModelChange)="removeError(ERRORS_TYPES.gender)"
             #genderControl="ngModel"
+            required
             [ngClass]="{
               'is-invalid':
                 (submitted && genderControl.errors) ||
@@ -124,7 +142,7 @@
             <option
               class="mb-1"
               *ngFor="let gender of GENDERS | keyvalue"
-              [value]="gender"
+              [value]="gender.value"
             >
               {{ gender.value }}
             </option>
@@ -136,7 +154,7 @@
     <div class="form-group pb-2">
       <label for="email" class="py-1">Email*</label>
       <input
-        pattern="^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$"
+        [pattern]="emailRegex"
         type="email"
         class="form-control"
         id="email"
@@ -163,6 +181,64 @@
         *ngIf=" emailControl.touched && emailControl.errors?.['pattern'] "
       >
         Email is not valid
+      </span>
+    </div>
+    <div class="form-group pb-2">
+      <label for="mobilePhoneNumber" class="py-1">Mobile phone number*</label>
+      <input
+        [pattern]="phoneRegex"
+        type="text"
+        class="form-control"
+        id="mobilePhoneNumber"
+        name="mobilePhoneNumber"
+        placeholder="Enter your phone number"
+        [(ngModel)]="registerData.mobilePhoneNumber"
+        (ngModelChange)="removeError(ERRORS_TYPES.mobile)"
+        required
+        #mobilePhoneNumberControl="ngModel"
+        [ngClass]="{
+          'is-invalid':
+            (submitted && mobilePhoneNumberControl.errors) ||
+            (mobilePhoneNumberControl.touched &&
+              mobilePhoneNumberControl.errors)
+        }"
+      />
+      <span
+        class="text-danger help-block d-block mt-1"
+        *ngIf=" mobilePhoneNumberControl.touched && mobilePhoneNumberControl.errors?.['required']   "
+      >
+        This field is required
+      </span>
+      <span
+        class="text-danger help-block d-block mt-1"
+        *ngIf=" mobilePhoneNumberControl.errors?.['pattern'] && mobilePhoneNumberControl.errors?.['required']   "
+      >
+        Please enter a correct phone number
+      </span>
+    </div>
+    <div class="form-group pb-2">
+      <label for="phoneNumber" class="py-1">Phone number</label>
+      <input
+        [pattern]="phoneRegex"
+        type="text"
+        class="form-control"
+        id="phoneNumber"
+        name="phoneNumber"
+        placeholder="Enter your phone number"
+        [(ngModel)]="registerData.phoneNumber"
+        #phoneNumberControl="ngModel"
+        [ngClass]="{
+          'is-invalid':
+            (submitted && phoneNumberControl.errors) ||
+            (phoneNumberControl.touched && phoneNumberControl.errors)
+        }"
+      />
+
+      <span
+        class="text-danger help-block d-block mt-1"
+        *ngIf=" phoneNumberControl.errors?.['pattern']"
+      >
+        Please enter a correct phone number
       </span>
     </div>
 
@@ -351,20 +427,40 @@
     </p>
 
     <div *ngIf="errorsMap.size > 0">
-      <span
+      <!-- <span
         class="text-danger help-block d-block mt-1"
         *ngFor="let error of errorsMap | keyvalue"
       >
         {{ error.value }}
+      </span> -->
+      <span class="text-danger help-block d-block mt-1">
+        Please fill the required fields!
       </span>
     </div>
+    <span *ngIf="serverError" class="text-danger help-block d-block mt-1">
+      {{ serverError }}
+    </span>
 
-    <div *ngIf="info">
+    <div *ngIf="successRegistration">
       <p class="info-bg-color rounded mt-3 p-3 text-center">
-        {{ info }}
+        Congratulations! Your account has been registered , you can login in
+        with your credentials now
+        <button
+          type="button"
+          (click)="toLogin()"
+          class="btn btn-link custom-link-color"
+        >
+          to login
+        </button>
       </p>
     </div>
-    <button type="submit" class="custom-btn w-100 mt-3">Register</button>
+    <button
+      type="submit"
+      class="custom-btn w-100 mt-3"
+      [disabled]="successRegistration"
+    >
+      Register
+    </button>
   </form>
   <app-modal *ngIf="showTermsOfUse" (closeModal)="closeModal()">
     <div>

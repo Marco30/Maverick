@@ -16,11 +16,13 @@ public class AuthController : ControllerBase
 {
     readonly ILogger<AuthController> _logger;
     readonly IUserRepository _userRepo;
+    readonly IEmailService _emailService;
 
-    public AuthController(ILogger<AuthController> logger, IUserRepository userRepo)
+    public AuthController(ILogger<AuthController> logger, IUserRepository userRepo, IEmailService emailService)
     {
         _logger = logger;
         _userRepo = userRepo;
+        _emailService = emailService;
     }
 
     [HttpPost("authenticate")]
@@ -105,7 +107,6 @@ public class AuthController : ControllerBase
 
     }
 
-    //[ValidateToken]
     [HttpPost("resetpasswordrequest")]
     public async Task<IActionResult> sendResetPasswordEmail(ResetPasswordRequestDto request)
     {
@@ -116,22 +117,23 @@ public class AuthController : ControllerBase
 
             var user = await _userRepo.GetUserFromEmailAsync(request.Email);
             // If no user return bad request or return OK any way to avoid giving any info about registered emails
-            if (user == null) return BadRequest();
+            if (user == null || user.Email == null || user.FirstName == null) return BadRequest();
             User newUser = new User();
             newUser.Id = user.Id;
             // Create token with userId and 5 minutes validation time
             string token = TokenData.CreateJwtToken(user, 5);
-            // Create URL http://localhost:4200/resetPassword/token
-            var resetPasswordURL = $"http://localhost:4200/resetPassword/{token}";
+            // Create URL http://localhost:4200/auth/resetPassword/token
+            var resetPasswordURL = $"http://localhost:4200/authView/reset/{token}";
 
             // Send the token in a url to user email
-            //await _mailRepo.SendResetPasswordEmailAsync(resetPasswordURL, user.Email, user.FirstName);
+              await _emailService.SendResetPasswordEmailAsync(resetPasswordURL, user.Email, user.FirstName);
 
             // Return OK to user if everything went well
             return Ok();
         }
-        catch (Exception)
+        catch (Exception e )
         {
+
             return BadRequest();
         }
     }
@@ -174,13 +176,31 @@ public class AuthController : ControllerBase
             return Task.FromResult<IActionResult>(BadRequest());
         }
 
-        var user = Crawlers.SeleniumGetUserInfoPagesCrawler("https://mrkoll.se/", userData.SocialSecurityNumber);
 
-        if (user != null)
+        try
         {
-            user.SocialSecurityNumber = userData.SocialSecurityNumber.ToString();
-            return Task.FromResult<IActionResult>(Ok(user));
+            var user = Crawlers.SeleniumGetUserInfoPagesCrawler("https://mrkoll.se/", userData.SocialSecurityNumber);
+
+            if (user != null)
+            {
+                user.SocialSecurityNumber = userData.SocialSecurityNumber.ToString();
+                return Task.FromResult<IActionResult>(Ok(user));
+            }
         }
+        catch (Exception e)
+        {
+            _logger.LogInformation($"Crawl failed: {e.Message}");
+            
+            var responseMessage = new ResponseMessageDto
+            {
+                Error = true,
+                StatusCode = StatusCodes.Status500InternalServerError,
+                Message = "Error retrieving user data: " + e.Message
+            };
+            return Task.FromResult<IActionResult>(StatusCode(StatusCodes.Status500InternalServerError, responseMessage));
+        }
+
+        
 
         return Task.FromResult<IActionResult>(NotFound());
 
@@ -224,6 +244,12 @@ public class AuthController : ControllerBase
             catch (Exception e)
             {
                 _logger.LogInformation($"Crawl failed, registering user anyway{e.Message}");
+                if (register.Address != null)
+                {
+                    var address = await _userRepo.AddAddress(register.Address);
+                    if (address != null) register.AddressId = address.Id;
+                }
+
             }
 
             var registeredUser = await _userRepo.AddUser(register);
