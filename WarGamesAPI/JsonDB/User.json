@@ -1,11 +1,1 @@
-[
-  {
-    "SocialSecurityNumber": "198507119595",
-    "FirstName": "Khaled",
-    "LastName": "Abo",
-    "Email": "khaled@khaled.se",
-    "Password": "123456",
-    "Gender": "Man"
-  }
-
-]
+[{"Id":824704124,"SocialSecurityNumber":"198201045971","FirstName":"Peter","LastName":"Lindholm","FullName":"Peter Lindholm","Email":"peteralexander112@protonmail.com","Password":"123456","PhoneNumber":null,"MobilePhoneNumber":null,"AgreeMarketing":true,"SubscribeToEmailNotification":true,"ProfileImage":null,"AddressId":1657700666,"Gender":"male"}]

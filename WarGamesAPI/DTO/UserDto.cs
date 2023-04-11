@@ -14,6 +14,8 @@ public class UserDto
     public bool AgreeMarketing { get; set; }
     public bool SubscribeToEmailNotification { get; set; }
     public string? ProfileImage { get; set; }
+
+    public int AddressId { get; set; }
     public AddressDto? Address { get; set; }
     public string? Gender { get; set; }
 }

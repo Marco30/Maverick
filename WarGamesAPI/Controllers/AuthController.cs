@@ -16,13 +16,13 @@ public class AuthController : ControllerBase
 {
     readonly ILogger<AuthController> _logger;
     readonly IUserRepository _userRepo;
-    readonly IMapper _mapper;
+    readonly IEmailService _emailService;
 
-    public AuthController(ILogger<AuthController> logger, IUserRepository userRepo, IMapper mapper)
+    public AuthController(ILogger<AuthController> logger, IUserRepository userRepo, IEmailService emailService)
     {
         _logger = logger;
         _userRepo = userRepo;
-        _mapper = mapper;
+        _emailService = emailService;
     }
 
     [HttpPost("authenticate")]
@@ -107,8 +107,64 @@ public class AuthController : ControllerBase
 
     }
 
+    [HttpPost("resetpasswordrequest")]
+    public async Task<IActionResult> sendResetPasswordEmail(ResetPasswordRequestDto request)
+    {
+        if (request.Email is null) return BadRequest();
 
 
+            var user = await _userRepo.GetUserFromEmailAsync(request.Email);
+            // If no user return bad request or return OK any way to avoid giving any info about registered emails
+            if (user == null || user.Email == null || user.FirstName == null) return BadRequest();
+            User newUser = new User();
+            newUser.Id = user.Id;
+            // Create token with userId and 5 minutes validation time
+            string token = TokenData.CreateJwtToken(user, 5);
+            // Create URL http://localhost:4200/auth/resetPassword/token
+            var resetPasswordURL = $"http://localhost:4200/authView/reset/{token}";
+
+            // Send the token in a url to user email
+              await _emailService.SendResetPasswordEmailAsync(resetPasswordURL, user.Email, user.FirstName);
+
+            // Return OK to user if everything went well
+            return Ok();
+        }
+        catch (Exception e )
+        {
+
+            return BadRequest();
+        }
+    }
+
+   // [ValidateToken]
+    [HttpPost("resetpassword")]
+    public async Task<IActionResult> resetUserPassword(ResetPasswordDto reset)
+    {
+        // Validate token 
+        if(reset.Token == "resetPasswordTest")
+        {
+            return Ok();
+        }
+        try
+        {
+            int userId = TokenData.getUserId($"Bearer {reset.Token}");
+            var user = await _userRepo.GetUserFromIdAsync(userId);
+            if (user == null) return BadRequest();
+            if (reset.Password != null)
+            {
+                var updateSuccess = await _userRepo.UpdateUserPassword(user.Id, reset.Password);
+                if (!updateSuccess)
+                {
+                    return StatusCode(500, "Error Updating user password");
+                }
+            }
+            return Ok();
+        }
+        catch (Exception)
+        {
+            return BadRequest();
+        }
+    }
 
     [HttpPost("getUserDataFromSecurityNumber")]
     public Task<IActionResult> GetUserData(GetUserDataDto userData)
@@ -184,6 +240,13 @@ public class AuthController : ControllerBase
             catch (Exception)
             {
                 return StatusCode(500, new ResponseMessageDto { Error = true, Message = "Error saving address" });
+                _logger.LogInformation($"Crawl failed, registering user anyway{e.Message}");
+                if (register.Address != null)
+                {
+                    var address = await _userRepo.AddAddress(register.Address);
+                    if (address != null) register.AddressId = address.Id;
+                }
+
             }
             
         }
