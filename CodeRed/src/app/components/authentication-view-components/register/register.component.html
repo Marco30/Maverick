@@ -111,7 +111,9 @@
             placeholder="Your birth date"
             max="2010-04-20"
             required
-            [ngModel]="registerData.dateOfBirth | date:'yyyy-MM-dd'"  
+            [(ngModel)]="registerData.dateOfBirth"
+            [ngModel]="registerData.dateOfBirth | date: 'yyyy-MM-dd'"
+            [disabled]="false"
             (ngModelChange)="removeError(ERRORS_TYPES.dateOfBirth)"
             #dateOfBirthControl="ngModel"
             [ngClass]="{
