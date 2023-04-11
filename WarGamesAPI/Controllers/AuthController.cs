@@ -1,4 +1,5 @@
 ﻿using System.Text.RegularExpressions;
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using MiracleMileAPI.Sessions;
 using WarGamesAPI.Crawler;
@@ -6,7 +7,6 @@ using WarGamesAPI.DTO;
 using WarGamesAPI.Filters;
 using WarGamesAPI.Interfaces;
 using WarGamesAPI.Model;
-#pragma warning disable CS1998
 
 namespace WarGamesAPI.Controllers;
 
@@ -62,7 +62,7 @@ public class AuthController : ControllerBase
 
     [ValidateToken]
     [HttpPost("newtoken")]
-    public async Task<IActionResult> NewToken()
+    public Task<IActionResult> NewToken()
     {
         try
         {
@@ -75,7 +75,7 @@ public class AuthController : ControllerBase
             var id = Convert.ToInt32(TokenData.GetClaimByKey(authHeaderToken, "id"));
             var fullName = firstName + " " + lastName;
 
-            var user = new User()
+            var user = new UserDto
             {
                 Id = id,
                 FullName = fullName,
@@ -88,11 +88,11 @@ public class AuthController : ControllerBase
             {
                 string token = TokenData.CreateJwtToken(user);
 
-                return Ok(new InLoggedUserDto { Token = token });
+                return Task.FromResult<IActionResult>(Ok(new InLoggedUserDto { Token = token }));
             }
             else
             {
-                return Ok(new InLoggedUserDto() { Token = "", });
+                return Task.FromResult<IActionResult>(Ok(new InLoggedUserDto() { Token = "", }));
             }
 
 
@@ -102,7 +102,7 @@ public class AuthController : ControllerBase
         {
 
             Console.WriteLine(e);
-            return NotFound();
+            return Task.FromResult<IActionResult>(NotFound());
         }
 
     }
@@ -112,8 +112,6 @@ public class AuthController : ControllerBase
     {
         if (request.Email is null) return BadRequest();
 
-        try
-        {
 
             var user = await _userRepo.GetUserFromEmailAsync(request.Email);
             // If no user return bad request or return OK any way to avoid giving any info about registered emails
@@ -209,40 +207,39 @@ public class AuthController : ControllerBase
     [HttpPost("registeruser")]
     public async Task<ActionResult<User>> RegisterUser(RegisterUserDto register)
     {
-        if (register.Email is null) return BadRequest(new ResponseMessageDto { Error = true, Message = "Email saknas" });
-
-        var emailUser = await _userRepo.GetUserFromEmailAsync(register.Email);
-        var socialSecurityUser = await _userRepo.GetUserFromSocSecAsync(register.SocialSecurityNumber);
-
-        if (emailUser != null )
-            return BadRequest(new ResponseMessageDto { Error = true, Message = "En användare med denna email är redan registrerad" });
-
-        if (socialSecurityUser != null)
-            return BadRequest(new ResponseMessageDto { Error = true, Message = "En användare med detta peronnummer är redan registrerad" });
-
-        if (register.Password is null)
+        register.Address = _mapper.Map<RegisterAddressDto>(register.Address);
+        
+        if (register.Email is null) 
+            return BadRequest(new ResponseMessageDto { Error = true, Message = "Email saknas" });
+        
+        if (register.SocialSecurityNumber is null) 
+            return BadRequest(new ResponseMessageDto { Error = true, Message = "Personnummer saknas" });
+        
+        if (register.Password is null) 
             return BadRequest(new ResponseMessageDto { Error = true, Message = "Lösenord saknas" });
 
-        if (register.SocialSecurityNumber != null && VerifySocialSecurityNumber(register.SocialSecurityNumber))
+        if (await _userRepo.GetUserFromEmailAsync(register.Email) != null )
+            return BadRequest(new ResponseMessageDto { Error = true, Message = "En användare med denna email är redan registrerad" });
+
+        if (await _userRepo.GetUserFromSocSecAsync(register.SocialSecurityNumber) != null)
+            return BadRequest(new ResponseMessageDto { Error = true, Message = "En användare med detta peronnummer är redan registrerad" });
+
+        if (!VerifySocialSecurityNumber(register.SocialSecurityNumber)) return BadRequest(new ResponseMessageDto { Error = true, Message = "Fel på personnummer" });
+
+        try
         {
+            var crawlResult = Crawlers.SeleniumGetUserInfoPagesCrawler("https://mrkoll.se/", register.SocialSecurityNumber);
+            AddressDto? address = crawlResult.Address;
 
             try
             {
-                UserDto crawlResult = Crawlers.SeleniumGetUserInfoPagesCrawler("https://mrkoll.se/", register.SocialSecurityNumber);
-                AddressDto? address = crawlResult.Address;
 
-                var registeredAddress = await _userRepo.AddAddress(address!);
-
-                if (registeredAddress is null)
-                {
-                    return StatusCode(500, new ResponseMessageDto { Error = true, Message = "Error saving address" });
-                }
-
-                register.AddressId = registeredAddress.Id;
+                register.AddressId = await _userRepo.AddAddress(register.Address);
 
             }
-            catch (Exception e)
+            catch (Exception)
             {
+                return StatusCode(500, new ResponseMessageDto { Error = true, Message = "Error saving address" });
                 _logger.LogInformation($"Crawl failed, registering user anyway{e.Message}");
                 if (register.Address != null)
                 {
@@ -251,32 +248,28 @@ public class AuthController : ControllerBase
                 }
 
             }
-
-            var registeredUser = await _userRepo.AddUser(register);
-
-            if (registeredUser != null)
-            {
-                var token = TokenData.CreateJwtToken(registeredUser);
-                var inloggedUser = new InLoggedUserDto
-                {
-                    User = registeredUser,
-                    Token = token
-                };
-                return Ok(inloggedUser);
-
-            }
-
-
+            
+        }
+        catch (Exception e)
+        {
+            _logger.LogInformation($"Crawl failed, registering user anyway{e.Message}");
         }
 
-        return BadRequest(new ResponseMessageDto { Error = true, Message = "Fel på personnummer" });
+        try
+        {
+            var registeredUser = await _userRepo.AddUser(register);
+            
+            var token = TokenData.CreateJwtToken(registeredUser!);
 
-    }
+            return Ok(new InLoggedUserDto { User = registeredUser, Token = token });
 
-    [HttpPost("test")]
-    public async Task<IActionResult> test()
-    {
-        return Ok();
+        }
+        catch (Exception)
+        {
+            return StatusCode(500, new ResponseMessageDto { Error = true, Message = "Error registering user" });
+
+        }
+        
     }
 
     private static bool VerifySocialSecurityNumber(string number)

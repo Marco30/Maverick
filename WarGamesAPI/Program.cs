@@ -1,8 +1,11 @@
 
 using Courses.Api.Repositories;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using Serilog;
 using Serilog.Events;
+using WarGamesAPI.Data;
+using WarGamesAPI.Helpers;
 using System.Reflection;
 using WarGamesAPI.Interfaces;
 using WarGamesAPI.Services;
@@ -11,6 +14,10 @@ using WarGamesAPI.Settings;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Services.AddDbContext<WarGamesContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
+);
+
 
 builder.Configuration.AddEnvironmentVariables().AddUserSecrets(Assembly.GetExecutingAssembly(), true);
 
@@ -56,6 +63,7 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
+builder.Services.AddAutoMapper(typeof(AutoMapperProfiles).Assembly);
 
 
 
@@ -68,9 +76,10 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddScoped<IMessageRepository, MessageRepository>();
-builder.Services.AddScoped<IQuestionService, QuestionService>();
+builder.Services.AddScoped<IQuestionRepository, QuestionRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+
+builder.Services.AddScoped<IGptService, GptService>();
 
 
 Log.Logger = new LoggerConfiguration()

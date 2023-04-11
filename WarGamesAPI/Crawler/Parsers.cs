@@ -84,6 +84,11 @@ public class Parsers
                 }
 
                 var phone = htmlDocument.DocumentNode.SelectNodes("/html/body/div[1]/div[3]/div/div/div[1]/div/div[9]/div/div/a");
+
+                try
+                {
+
+                
                     
                     if(phone!= null) { 
 
