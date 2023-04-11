@@ -5,9 +5,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using Serilog;
 using Serilog.Events;
-using System.Reflection;
 using WarGamesAPI.Data;
 using WarGamesAPI.Helpers;
+using System.Reflection;
 using WarGamesAPI.Interfaces;
 using WarGamesAPI.Services;
 using WarGamesAPI.Settings;
@@ -15,13 +15,12 @@ using WarGamesAPI.Settings;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
-builder.Configuration.AddEnvironmentVariables().AddUserSecrets(Assembly.GetExecutingAssembly(), true);
-
 builder.Services.AddDbContext<WarGamesContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
 );
 
+
+builder.Configuration.AddEnvironmentVariables().AddUserSecrets(Assembly.GetExecutingAssembly(), true);
 
 builder.Services.AddCors(options =>
 {
@@ -65,6 +64,7 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
+builder.Services.AddAutoMapper(typeof(AutoMapperProfiles).Assembly);
 
 
 
@@ -72,7 +72,6 @@ builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("Mail
 
 builder.Services.AddTransient<IEmailService, EmailService>();
 
-builder.Services.AddAutoMapper(typeof(AutoMapperProfiles).Assembly);
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

@@ -141,6 +141,36 @@ public class AuthController : ControllerBase
         }
     }
 
+    // [ValidateToken]
+    [HttpPost("resetpassword")]
+    public async Task<IActionResult> resetUserPassword(ResetPasswordDto reset)
+    {
+        // Validate token 
+        if(reset.Token == "resetPasswordTest")
+        {
+            return Ok();
+        }
+        try
+        {
+            int userId = TokenData.getUserId($"Bearer {reset.Token}");
+            var user = await _userRepo.GetUserFromIdAsync(userId);
+            if (user == null) return BadRequest();
+            if (reset.Password != null)
+            {
+                var updateSuccess = await _userRepo.UpdateUserPassword((int)user.Id!, reset.Password);
+                if (!updateSuccess)
+                {
+                    return StatusCode(500, "Error Updating user password");
+                }
+            }
+            return Ok();
+        }
+        catch (Exception)
+        {
+            return BadRequest();
+        }
+    }
+
 
     [HttpPost("getUserDataFromSecurityNumber")]
     public Task<IActionResult> GetUserData(GetUserDataDto userData)

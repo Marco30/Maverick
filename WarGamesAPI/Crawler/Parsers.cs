@@ -29,7 +29,7 @@ public class Parsers
 
         if (htmlDocument.DocumentNode != null)
         {
-            Console.WriteLine("text från sidan");
+            Console.WriteLine("text frï¿½n sidan");
             //xpath to body tag to verify page
             HtmlAgilityPack.HtmlNode bodyNode = htmlDocument.DocumentNode.SelectSingleNode("/html/body");
 
@@ -38,11 +38,11 @@ public class Parsers
             {
 
 
-                var givenName = htmlDocument.DocumentNode.SelectSingleNode("//span[@title='Detta är personens tilltalsnamn']");
+                var givenName = htmlDocument.DocumentNode.SelectSingleNode("//span[@title='Detta ï¿½r personens tilltalsnamn']");
 
                 userData.FirstName = givenName.InnerText.Trim();
 
-                var surname = htmlDocument.DocumentNode.SelectSingleNode("//span[@title='Detta är ett efternamn']");
+                var surname = htmlDocument.DocumentNode.SelectSingleNode("//span[@title='Detta ï¿½r ett efternamn']");
 
                 userData.LastName = surname.InnerText.Trim();
 
@@ -66,7 +66,7 @@ public class Parsers
                         /* Console.WriteLine(lines[0]);
                      Console.WriteLine(lines[1]);*/
 
-                        if (lines[0] == "Län")
+                        if (lines[0] == "Lï¿½n")
                         {
                             string[] cityArray = lines[1].Split(' ');
                             cityArray[0] = cityArray[0].Remove(cityArray[0].Length - 1);
@@ -74,7 +74,7 @@ public class Parsers
                         }
 
 
-                        if (lines[0] == "Kön")
+                        if (lines[0] == "Kï¿½n")
                         {
                             userData.Gender = CapitalizeFirstLetter(lines[1]);
                             break;
@@ -84,10 +84,12 @@ public class Parsers
 
                 }
 
-                var phone = htmlDocument.DocumentNode.SelectNodes("/html/body/div[1]/div[3]/div/div/div[1]/div/div[10]/div/div/a");
+                var phone = htmlDocument.DocumentNode.SelectNodes("/html/body/div[1]/div[3]/div/div/div[1]/div/div[9]/div/div/a");
 
                 try
                 {
+
+                
                     
                     if(phone!= null) { 
 
