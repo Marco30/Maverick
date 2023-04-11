@@ -19,14 +19,17 @@
                       class="navbar-toggler"
                       type="button"
                       data-bs-toggle="collapse"
-                      data-bs-target="#navbarColor01"
-                      aria-controls="navbarColor01"
+                      [attr.data-bs-target]="'#navbarColor01' + i"
+                      [attr.aria-controls]="'navbarColor01' + i"
                       aria-expanded="false"
                       aria-label="Toggle navigation"
                     >
                       <span class="navbar-toggler-icon"></span>
                     </button>
-                    <div class="collapse navbar-collapse" id="navbarColor01">
+                    <div
+                      class="collapse navbar-collapse"
+                      [id]="'navbarColor01' + i"
+                    >
                       <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                         <li class="nav-item">
                           <a

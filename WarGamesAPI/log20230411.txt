@@ -1,0 +1,4 @@
+2023-04-11 15:38:06.290 +02:00 [INF] Crawl failed: The remote server returned an error: (404) Not Found.
+2023-04-11 15:38:40.528 +02:00 [INF] Crawl failed: The remote server returned an error: (404) Not Found.
+2023-04-11 15:39:30.756 +02:00 [INF] Crawl failed: The remote server returned an error: (404) Not Found.
+2023-04-11 15:47:19.017 +02:00 [INF] Crawl failed: Object reference not set to an instance of an object.

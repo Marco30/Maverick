@@ -62,12 +62,14 @@ export class RegisterComponent {
     subscribeToEmailNotification: true,
     email: '',
     password: '',
-    gender: GENDERS.other,
+    gender: GENDERS.Other,
     dateOfBirth: new Date('2010-01-16'),
     phoneNumber: undefined,
     mobilePhoneNumber: undefined,
     address: this.address,
   };
+
+  dateOfBirthInput: string = '2010-01-16';
 
   // name regex No numbers, minimum two letter, no leading or trailing white spaces
   nameRegex = /^[A-Za-zÀ-ÖØ-öø-ÿ]{2,}(?:\s+[A-Za-zÀ-ÖØ-öø-ÿ]+)*$/;
@@ -78,6 +80,7 @@ export class RegisterComponent {
   // phone number regex, allows internationals phone numbers, wrong phone number might pass
   phoneRegex = /^\+?\d{1,3}[-.\s]?\d{3,4}[-.\s]?\d{4,6}$/;
   GENDERS = GENDERS;
+
   showLoading: boolean = false;
   showTermsOfUse: boolean = false;
   noMatchPasswords: boolean = false;
@@ -166,9 +169,12 @@ export class RegisterComponent {
     if (!this.registerData.address.zipCode) {
       this.errorsMap.set(ERRORS_TYPES.zipCode, ERRORS_MSGS.zipCode);
     }
+    if (!this.registerData.phoneNumber) {
+      this.errorsMap.set(ERRORS_TYPES.mobile, ERRORS_MSGS.mobile);
+    }
     if (this.errorsMap.size > 0) return;
+    this.registerData.dateOfBirth = new Date(this.dateOfBirthInput);
     console.log('register data: ', this.registerData);
-
     this.showLoading = true;
     this.isFetchingUserData = false;
     this.authenticationService.register(this.registerData).subscribe({
@@ -200,7 +206,10 @@ export class RegisterComponent {
         .pipe(takeUntil(this.dataFetchingCancelled$))
         .subscribe({
           next: (userData) => {
-            console.log('uploaded image to server, event: ', userData);
+            console.log(
+              'getting user data from personal security number: ',
+              userData
+            );
             this.registerData.fullName =
               userData.fullName || this.registerData.fullName;
             this.registerData.firstName =
@@ -215,7 +224,12 @@ export class RegisterComponent {
               userData?.address?.zipCode || this.registerData.address.zipCode;
             this.registerData.gender =
               userData?.gender || this.registerData.gender;
-            this.registerData.dateOfBirth = this.getDateOfBirth(
+            this.registerData.phoneNumber =
+              userData?.phoneNumber || this.registerData.phoneNumber;
+            this.registerData.mobilePhoneNumber =
+              userData?.mobilePhoneNumber ||
+              this.registerData.mobilePhoneNumber;
+            this.dateOfBirthInput = this.getDateOfBirth(
               this.registerData.socialSecurityNumber
             );
             this.showLoading = false;
@@ -236,7 +250,7 @@ export class RegisterComponent {
     const year = bd.slice(0, 4);
     const month = bd.slice(4, 6);
     const day = bd.slice(6, 8);
-    return new Date(year + '-' + month + '-' + day);
+    return year + '-' + month + '-' + day;
   }
 
   abortUserDataFetching() {
