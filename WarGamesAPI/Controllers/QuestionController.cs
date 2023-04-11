@@ -4,8 +4,6 @@ using MiracleMileAPI.Sessions;
 using WarGamesAPI.DTO;
 using WarGamesAPI.Filters;
 using WarGamesAPI.Interfaces;
-using WarGamesAPI.Model;
-
 
 namespace WarGamesAPI.Controllers;
 
@@ -50,26 +48,36 @@ public class QuestionController : ControllerBase
         {
             return BadRequest("Faulty userId");
         }
-        
-        if (userQuestion.ConversationId != 0 && !await _questionRepo.ConversationExists(userQuestion.ConversationId))
+
+        if (question.ConversationId != 0)
         {
-            return BadRequest($"There is no conversation with Id {question.ConversationId}");
+            
+            if (!await _questionRepo.ConversationExists(question.ConversationId))
+            {
+                return BadRequest($"There is no conversation with Id {question.ConversationId}");
+            }
+
+            if (await _questionRepo.GetConversationUserId(question.ConversationId) != question.UserId)
+            {
+                return BadRequest("No such conversationId for this user");
+            }
+
         }
+
         
         try
         {
             
             var savedQuestion = await _questionRepo.SaveQuestionAsync(question);
-            
-            var answer = new AnswerDto();
 
-            if (savedQuestion != null) answer = await _gptService.AskQuestion(savedQuestion);
+            if (savedQuestion is null) return StatusCode(500);
+
+            var answer = await _gptService.AskQuestion(savedQuestion);
 
             if (answer is null) return StatusCode(500);
             
-            answer.ConversationId = (int)savedQuestion.ConversationId;
-
-        
+            answer.ConversationId = savedQuestion.ConversationId;
+            
             var result = await _questionRepo.SaveAnswerAsync(answer);
         
             return StatusCode(201, result);

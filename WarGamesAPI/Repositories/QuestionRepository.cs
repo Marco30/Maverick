@@ -119,6 +119,15 @@ public class QuestionRepository : IQuestionRepository
         return await _context.Conversation.AnyAsync(c => c.Id == conversationId);
     }
 
+    public async Task<int> GetConversationUserId(int conversationId)
+    {
+        var conversation = await _context.Conversation.SingleOrDefaultAsync(c => c.Id == conversationId);
+        if (conversation is null)
+        {
+            throw new NullReferenceException($"There is no conversation with id {conversationId}");
+        }
+        return conversation.UserId;
+    }
 
     public async Task DeleteQuestionAsync(int questionId)
     {
