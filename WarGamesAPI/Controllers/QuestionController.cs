@@ -4,8 +4,6 @@ using MiracleMileAPI.Sessions;
 using WarGamesAPI.DTO;
 using WarGamesAPI.Filters;
 using WarGamesAPI.Interfaces;
-using WarGamesAPI.Model;
-
 
 namespace WarGamesAPI.Controllers;
 
