@@ -8,6 +8,7 @@ import { User } from 'src/app/model/user/user';
 import { environment } from 'src/environments/environment';
 import { GenericHttpService } from '../genericHttp/generic-http.service';
 import { HttpRequestService } from '../httpRequest/http-request.service';
+import { UserData } from 'src/app/model/userdata/user-data';
 
 @Injectable({
   providedIn: 'root',
@@ -53,7 +54,8 @@ export class AuthenticationService {
     return this.httpRequestService.postData<Register>(url, queryParams);
   }
 
-  getUserDataFromSecurityNumber(userInfo: Register): Observable<Register> {
+  // change any to userdata
+  getUserDataFromSecurityNumber(userInfo: Register): Observable<UserData> {
     const url = environment.get_user_data_from_security_number;
     const queryParams = { model: userInfo };
     return this.httpRequestService.postData<any>(url, queryParams);

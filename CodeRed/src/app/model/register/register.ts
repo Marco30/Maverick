@@ -1,9 +1,9 @@
 import { Address } from '../address/address';
 
 export const GENDERS = {
-  male: 'Male',
-  female: 'Female',
-  other: 'Other',
+  Man: 'Man',
+  Woman: 'Woman',
+  Other: 'Other',
 } as const;
 
 type Object<T> = T[keyof T];

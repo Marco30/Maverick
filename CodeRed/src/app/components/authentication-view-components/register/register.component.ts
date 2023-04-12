@@ -62,7 +62,7 @@ export class RegisterComponent {
     subscribeToEmailNotification: true,
     email: '',
     password: '',
-    gender: GENDERS.other,
+    gender: GENDERS.Other,
     dateOfBirth: new Date('2010-01-16'),
     phoneNumber: undefined,
     mobilePhoneNumber: undefined,
@@ -208,13 +208,18 @@ export class RegisterComponent {
             this.registerData.lastName =
               userData?.lastName || this.registerData.lastName;
             this.registerData.address.city =
-              userData?.address?.city || this.registerData.address.city;
+              userData?.city || this.registerData.address.city;
             this.registerData.address.street =
-              userData?.address?.street || this.registerData.address.street;
+              userData?.street || this.registerData.address.street;
             this.registerData.address.zipCode =
-              userData?.address?.zipCode || this.registerData.address.zipCode;
+              userData?.zipCode || this.registerData.address.zipCode;
             this.registerData.gender =
               userData?.gender || this.registerData.gender;
+              this.registerData.phoneNumber =
+              userData?.phoneNumber || this.registerData.phoneNumber;
+            this.registerData.mobilePhoneNumber =
+              userData?.mobilePhoneNumber ||
+              this.registerData.mobilePhoneNumber;
             this.registerData.dateOfBirth = this.getDateOfBirth(
               this.registerData.socialSecurityNumber
             );
