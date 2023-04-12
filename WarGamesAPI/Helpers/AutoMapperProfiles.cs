@@ -20,10 +20,9 @@ public class AutoMapperProfiles : Profile
         CreateMap<Conversation, ConversationDto>();
         CreateMap<UserDto, UserDataDto>();
         CreateMap<UserDto, UserDataDto>()
-            .ForMember(dest => dest.City, opt => opt.MapFrom(src => src.Address.City))
+            .ForMember(dest => dest.City, opt => opt.MapFrom(src => src.Address.Municipality))
             .ForMember(dest => dest.Street, opt => opt.MapFrom(src => src.Address.Street))
-            .ForMember(dest => dest.ZipCode, opt => opt.MapFrom(src => src.Address.ZipCode))
-            .ForMember(dest => dest.Municipality, opt => opt.MapFrom(src => src.Address.Municipality));
+            .ForMember(dest => dest.ZipCode, opt => opt.MapFrom(src => src.Address.ZipCode));
     }
 }
 

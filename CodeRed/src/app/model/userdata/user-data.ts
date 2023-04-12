@@ -9,7 +9,6 @@ export class UserData {
     public city?: string;
     public street?: string;
     public zipCode?: string;
-    public municipality?: string;
     public phoneNumber?: number;
     public mobilePhoneNumber?: number;
   
@@ -22,7 +21,6 @@ export class UserData {
       city?: string,
       street?: string,
       zipCode?: string,
-      municipality?: string,
       phoneNumber?: number,
       mobilePhoneNumber?: number
     ) {
@@ -34,7 +32,6 @@ export class UserData {
       this.city = city;
       this.street = street;
       this.zipCode = zipCode;
-      this.municipality = municipality;
       this.phoneNumber = phoneNumber;
       this.mobilePhoneNumber = mobilePhoneNumber;
     }
