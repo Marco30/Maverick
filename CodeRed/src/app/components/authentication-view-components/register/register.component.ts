@@ -213,8 +213,12 @@ export class RegisterComponent {
               userData?.address?.street || this.registerData.address.street;
             this.registerData.address.zipCode =
               userData?.address?.zipCode || this.registerData.address.zipCode;
-            this.registerData.gender =
-              userData?.gender || this.registerData.gender;
+            if (
+              userData?.gender == GENDERS.Man ||
+              userData?.gender == GENDERS.Woman
+            ) {
+              this.registerData.gender = userData?.gender;
+            }
             this.registerData.phoneNumber =
               userData?.phoneNumber || this.registerData.phoneNumber;
             this.registerData.mobilePhoneNumber =
