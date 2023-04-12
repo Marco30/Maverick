@@ -46,6 +46,7 @@ export class RegisterComponent {
 
   address: Address = {
     city: '',
+    municipality: '',
     country: '',
     street: '',
     zipCode: '',
@@ -209,13 +210,19 @@ export class RegisterComponent {
               userData?.lastName || this.registerData.lastName;
             this.registerData.address.city =
               userData?.city || this.registerData.address.city;
+            this.registerData.address.municipality =
+              userData?.municipality || this.registerData.address.municipality;
             this.registerData.address.street =
               userData?.street || this.registerData.address.street;
             this.registerData.address.zipCode =
               userData?.zipCode || this.registerData.address.zipCode;
-            this.registerData.gender =
-              userData?.gender || this.registerData.gender;
-              this.registerData.phoneNumber =
+            if (
+              userData?.gender == GENDERS.Man ||
+              userData?.gender == GENDERS.Woman
+            ) {
+              this.registerData.gender = userData?.gender;
+            }
+            this.registerData.phoneNumber =
               userData?.phoneNumber || this.registerData.phoneNumber;
             this.registerData.mobilePhoneNumber =
               userData?.mobilePhoneNumber ||
