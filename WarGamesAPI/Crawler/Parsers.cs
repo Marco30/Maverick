@@ -38,11 +38,11 @@ public class Parsers
             {
 
 
-                var givenName = htmlDocument.DocumentNode.SelectSingleNode("//span[@title='Detta �r personens tilltalsnamn']");
+                var givenName = htmlDocument.DocumentNode.SelectSingleNode("/html/body/div[1]/div[3]/div/div/div[1]/div/div[6]/div[2]/div[1]/span/span[1]/strong");
 
                 userData.FirstName = givenName.InnerText.Trim();
 
-                var surname = htmlDocument.DocumentNode.SelectSingleNode("//span[@title='Detta �r ett efternamn']");
+                var surname = htmlDocument.DocumentNode.SelectSingleNode("/html/body/div[1]/div[3]/div/div/div[1]/div/div[6]/div[2]/div[1]/span/span[4]/strong");
 
                 userData.LastName = surname.InnerText.Trim();
 
@@ -66,7 +66,7 @@ public class Parsers
                         /* Console.WriteLine(lines[0]);
                      Console.WriteLine(lines[1]);*/
 
-                        if (lines[0] == "L�n")
+                        if (lines[0] == "Län")
                         {
                             string[] cityArray = lines[1].Split(' ');
                             cityArray[0] = cityArray[0].Remove(cityArray[0].Length - 1);
@@ -74,7 +74,7 @@ public class Parsers
                         }
 
 
-                        if (lines[0] == "K�n")
+                        if (lines[0] == "Kön")
                         {
                             userData.Gender = CapitalizeFirstLetter(lines[1]);
                             break;
@@ -116,7 +116,7 @@ public class Parsers
 
                     }
 
-                    var Street = htmlDocument.DocumentNode.SelectSingleNode("/html/body/div[1]/div[3]/div/div/div[1]/div/div[7]/div[2]/span[2]");
+                    var Street = htmlDocument.DocumentNode.SelectSingleNode("/html/body/div[1]/div[3]/div/div/div[1]/div/div[6]/div[2]/span[2]");
 
                 
                     address.Street = Street.InnerText.Trim();
@@ -127,10 +127,9 @@ public class Parsers
     
                     address.City = CityTrim(city.InnerText.Trim()); */
 
-                    var zipCodeAndMunicipality = htmlDocument.DocumentNode.SelectSingleNode("/html/body/div[1]/div[3]/div/div/div[1]/div/div[7]/div[2]/span[3]");
+                    var zipCodeAndMunicipality = htmlDocument.DocumentNode.SelectSingleNode("/html/body/div[1]/div[3]/div/div/div[1]/div/div[6]/div[2]/span[3]");
 
-                
-                    
+
                     string[] arrayZipCodeAndMunicipality = zipCodeAndMunicipality.InnerText.Trim().Split(' ');
 
                     address.ZipCode = arrayZipCodeAndMunicipality[0];

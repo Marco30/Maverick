@@ -3,6 +3,7 @@ using OpenQA.Selenium.Chrome;
 using WebDriverManager.DriverConfigs.Impl;
 using System.Net;
 using HtmlAgilityPack;
+using WebDriverManager.Helpers;
 
 namespace WarGamesAPI.Crawler;
 
@@ -25,16 +26,15 @@ public class Crawlers
         options.AddArguments("window-size=1920,1080");
         options.AddArguments("start-maximized");
 
-
-
         IWebDriver browser = null;
         try
         {
-            new WebDriverManager.DriverManager().SetUpDriver(new ChromeConfig());
+            new WebDriverManager.DriverManager().SetUpDriver(new ChromeConfig(), VersionResolveStrategy.MatchingBrowser);
             browser = new ChromeDriver(options);
         }
         catch (Exception e)
         {
+            Console.WriteLine("google version error text = {0}", e.Message);
             var chromeVersion = Parsers.GetStringBetween(e.Message, " is ", " with");
             new WebDriverManager.DriverManager().SetUpDriver(new ChromeConfig(), chromeVersion);
             browser = new ChromeDriver(options);
