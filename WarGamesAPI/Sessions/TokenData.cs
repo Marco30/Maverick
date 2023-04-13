@@ -159,40 +159,35 @@ public class TokenData
 
     }
 
-    public static string CreateJwtToken(UserDto user, int timeValidity = 0 )
+    public static string CreateJwtToken(UserDto user, int timeValidity = 0)
     {
-      
-
         var appSettings = GetAppSettings();
-
-
         var now = DateTime.Now;
 
-
+        string defaultSsn = "N/A";
+        string ssn = user.SocialSecurityNumber ?? defaultSsn;
 
         var claims = new List<Claim> {
-            new Claim (JwtRegisteredClaimNames.Sub, user.SocialSecurityNumber ),
-            new Claim (JwtRegisteredClaimNames.Jti, Guid.NewGuid ().ToString ()),
-            new Claim (JwtRegisteredClaimNames.Iat, ToUnixEpochDate (now).ToString (), ClaimValueTypes.Integer64),
-            new Claim (ClaimTypes.Name, user.SocialSecurityNumber ),
-            new Claim (ClaimTypes.NameIdentifier, user.SocialSecurityNumber ),
-            
-            new Claim ("issuer", appSettings.JwtIssuer),
-            new Claim ("audience", appSettings.JwtAudience),
-            new Claim ("fullname", user.FullName),
-            new Claim ("lastname", user.LastName),
-            new Claim ("firstname", user.FirstName),
-            new Claim ("id", user.Id.ToString())
-        };
+            new Claim(JwtRegisteredClaimNames.Sub, ssn),
+            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+            new Claim(JwtRegisteredClaimNames.Iat, ToUnixEpochDate(now).ToString(), ClaimValueTypes.Integer64),
+            new Claim(ClaimTypes.Name, ssn),
+            new Claim(ClaimTypes.NameIdentifier, ssn),
 
+            new Claim("issuer", appSettings.JwtIssuer),
+            new Claim("audience", appSettings.JwtAudience),
+            new Claim("fullname", user.FullName),
+            new Claim("lastname", user.LastName),
+            new Claim("firstname", user.FirstName),
+            new Claim("id", user.Id.ToString())
+        };
 
         // Add act on behalf of self claim.
         claims.Add(new Claim(ClaimTypes.Role, "privatperson"));
-        claims.Add(new Claim("http://schemas.danica.se/identity/claims/actonbehalfof", user.SocialSecurityNumber));
+        claims.Add(new Claim("http://schemas.danica.se/identity/claims/actonbehalfof", ssn));
 
         int tokenTimeValidity = appSettings.JWtTokenValidMinutes;
         if (timeValidity > 0) tokenTimeValidity = timeValidity;
-
 
         var jwt = new JwtSecurityToken(
             issuer: appSettings.JwtIssuer,
@@ -207,6 +202,7 @@ public class TokenData
         var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
         return encodedJwt;
     }
+
 
     private static long ToUnixEpochDate(DateTime date)
     {

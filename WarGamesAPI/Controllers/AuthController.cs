@@ -141,7 +141,6 @@ public class AuthController : ControllerBase
         }
     }
 
-    // [ValidateToken]
     [HttpPost("resetpassword")]
     public async Task<IActionResult> resetUserPassword(ResetPasswordDto reset)
     {
@@ -184,12 +183,10 @@ public class AuthController : ControllerBase
         try
         {
             var user = Crawlers.SeleniumGetUserInfoPagesCrawler("https://mrkoll.se/", userData.SocialSecurityNumber);
-
-            if (user != null)
-            {
-                user.SocialSecurityNumber = userData.SocialSecurityNumber.ToString();
-                return Task.FromResult<IActionResult>(Ok(user));
-            }
+            user.SocialSecurityNumber = userData.SocialSecurityNumber;
+            var result = _mapper.Map<UserDataDto>(user);
+            return Task.FromResult<IActionResult>(Ok(result));
+            
         }
         catch (Exception e)
         {
@@ -204,22 +201,14 @@ public class AuthController : ControllerBase
             return Task.FromResult<IActionResult>(StatusCode(StatusCodes.Status500InternalServerError, responseMessage));
         }
 
-
-
-        return Task.FromResult<IActionResult>(NotFound());
-
     }
 
     [HttpPost("registeruser")]
-    public async Task<ActionResult<User>> RegisterUser(RegisterUserDto register)
+    public async Task<ActionResult<InLoggedUserDto>> RegisterUser(RegisterUserDto register)
     {
-        register.Address = _mapper.Map<RegisterAddressDto>(register.Address);
 
         if (register.Email is null)
             return BadRequest(new ResponseMessageDto { Error = true, Message = "Email saknas" });
-
-        if (register.SocialSecurityNumber is null)
-            return BadRequest(new ResponseMessageDto { Error = true, Message = "Personnummer saknas" });
 
         if (register.Password is null)
             return BadRequest(new ResponseMessageDto { Error = true, Message = "Lösenord saknas" });
@@ -227,39 +216,16 @@ public class AuthController : ControllerBase
         if (await _userRepo.GetUserFromEmailAsync(register.Email) != null)
             return BadRequest(new ResponseMessageDto { Error = true, Message = "En användare med denna email är redan registrerad" });
 
-        if (await _userRepo.GetUserFromSocSecAsync(register.SocialSecurityNumber) != null)
-            return BadRequest(new ResponseMessageDto { Error = true, Message = "En användare med detta peronnummer är redan registrerad" });
-
-        if (!VerifySocialSecurityNumber(register.SocialSecurityNumber)) return BadRequest(new ResponseMessageDto { Error = true, Message = "Fel på personnummer" });
-
         try
         {
-            var crawlResult = Crawlers.SeleniumGetUserInfoPagesCrawler("https://mrkoll.se/", register.SocialSecurityNumber);
-            AddressDto? address = crawlResult.Address;
-
-            try
+            if (register.Address != null)
             {
-
-                register.AddressId = await _userRepo.AddAddress(register.Address);
-
-            }
-            catch (Exception)
-            {
-                return StatusCode(500, new ResponseMessageDto { Error = true, Message = "Error saving address" });
+                var addressId = await _userRepo.AddAddress(register.Address);
+                register.AddressId = addressId;
             }
 
-        }
-        catch (Exception e)
-        {
-            _logger.LogInformation($"Crawl failed, registering user anyway{e.Message}");
-
-
-        }
-
-        try
-        {
             var registeredUser = await _userRepo.AddUser(register);
-
+            
             var token = TokenData.CreateJwtToken(registeredUser!);
 
             return Ok(new InLoggedUserDto { User = registeredUser, Token = token });
