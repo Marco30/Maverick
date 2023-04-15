@@ -6,5 +6,6 @@ export const environment = {
   reset_password: `${BaseUrl}/resetPassword`,
   refreshToken_url: `${BaseUrl}/newToken`,
   register_url: `${BaseUrl}/registerUser`,
+  ask_question: `${BaseUrl}/askquestion`,
   get_user_data_from_security_number: `${BaseUrl}/getUserDataFromSecurityNumber`,
 };

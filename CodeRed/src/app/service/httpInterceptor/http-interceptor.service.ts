@@ -27,6 +27,8 @@ export class HttpInterceptorService {
       newHeaders = newHeaders.append("bearer", token);
       newHeaders = newHeaders.append("authorization", `Bearer ${token}`);
     }
+    console.info('Token test nu');
+    console.info(token);
     // Finally we have to clone our request with our new headers
     // This is required because HttpRequests are immutable
     const authReq = req.clone({ headers: newHeaders }); // Then we return an Observable that will run the request

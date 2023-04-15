@@ -33,7 +33,7 @@ public class GptService : IGptService
         return new AnswerDto
         {
             QuestionId = question.Id, 
-            AnswerText = answer, Time = DateTime.Now
+            Text = answer, Date = DateTime.Now
         };
 
     }

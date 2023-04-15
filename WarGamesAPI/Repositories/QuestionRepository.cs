@@ -57,8 +57,8 @@ public class QuestionRepository : IQuestionRepository
     {
         var answerToSave = new Answer
         {
-            Text = answer.AnswerText,
-            Time = answer.Time,
+            Text = answer.Text,
+            Date = answer.Date,
             QuestionId = answer.QuestionId,
             ConversationId = answer.ConversationId
         };

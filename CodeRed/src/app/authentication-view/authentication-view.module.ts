@@ -7,9 +7,9 @@ import { RegisterComponent } from '../components/authentication-view-components/
 import { LoginComponent } from '../components/authentication-view-components/login/login.component';
 import { ResetPasswordComponent } from '../components/authentication-view-components/reset-password/reset-password.component';
 import { ResetPasswordRequestComponent } from '../components/authentication-view-components/reset-password-request/reset-password-request.component';
-import { FooterComponent } from '../components/footer/footer.component';
+import { FooterComponent } from '../components/authentication-view-components/footer/footer.component';
 import { LoaderComponent } from '../components/loader/loader.component';
-import { ModalComponent } from '../components/modal/modal.component';
+import { ModalComponent } from '../components/authentication-view-components/modal/modal.component';
 
 @NgModule({
   declarations: [
