@@ -54,11 +54,11 @@
   border-color: var(--primary-color);
 }
 
-.card {
-  /* background-color: var(--background-color); */
-  /* color: var(--text-color); */
-  /* border-color: var(--border-color); */
-}
+/*.card {
+  background-color: var(--background-color);
+  color: var(--text-color); 
+  border-color: var(--border-color); 
+}*/
 
 .card-header {
   /* background-color: var(--border-color); */
