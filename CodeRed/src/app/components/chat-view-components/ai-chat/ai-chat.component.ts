@@ -53,29 +53,32 @@ export class AiChatComponent {
 
   scrollToLastMessage(): void {
     
-    setTimeout(() => {
-
     const element = document.getElementById("advanced-tools"); // Your target element
     const headerOffset = 45;
-
-    if (element) {
-      const elementPosition = element.getBoundingClientRect().top;
-      const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
-
-
-      window.scrollTo({
-        top: offsetPosition,
-        behavior: "smooth",
-      });
-    }
-    /* const lastMessageIndex = this.messages.length - 1;
+    const isScrolledToTarget = element && element.getBoundingClientRect().top <= headerOffset;
+  
+    if (!isScrolledToTarget) {
+      setTimeout(() => {
+        if (element) {
+          const elementPosition = element.getBoundingClientRect().top;
+          const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+  
+          window.scrollTo({
+            top: offsetPosition,
+            behavior: "smooth",
+          });
+          /*    const lastMessageIndex = this.messages.length - 1;
     const lastMessageId = 'message-' + lastMessageIndex;
     const lastMessageElement = document.getElementById('advanced-tools');
     if (lastMessageElement) {
       lastMessageElement.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    } */
-  },300);
+    }  */
 
+        }
+      }, 300);
+    }
+
+   
   }
 
 
@@ -111,7 +114,7 @@ export class AiChatComponent {
 
   onSubmit() {
 
-    if (this.questionData.text != '') {
+    /*if (this.questionData.text != '') {
 
      
 
@@ -134,12 +137,17 @@ export class AiChatComponent {
         // complete: () => (this.showLoading = false),
       });
     
-    } 
+    } */
 
-    /* this.messages.push({
+     this.messages.push({
       sender: 'Ava',
-      content: 'Youre welcome. Have a great day!',
-    }); */
+      content: '',
+    }); 
+   
+    // var testtext = 'I am ChatGPT, a large language model developed by OpenAI using the GPT-3.5 architecture. As a language model, my primary function is to generate natural language responses to text-based inputs such as questions, prompts, and statements.\r\n\r\nI was trained on a massive dataset of written text from the internet and other sources, which allows me to understand and generate responses in a wide variety of topics and domains. My training data includes text in multiple languages, making me capable of generating responses in several languages.\r\n\r\nI use machine learning techniques such as deep neural networks to analyze and understand the structure and context of the input text. Based on this analysis, I generate a response that is meant to be natural-sounding and relevant to the input.\r\n\r\nOverall, my purpose is to assist users in generating high-quality, natural language responses to a wide range of prompts and queries, making communication and information retrieval more efficient and effective.';
+    // this.revealText(testtext,10);
+
+
     console.info("questionData");
  console.info(this.questionData);
 
@@ -147,5 +155,21 @@ export class AiChatComponent {
 
 
   }
+
+
+  revealText(text: string, delay: number) {
+    let index = 0;
+    let interval = setInterval(() => {
+      //console.log(text.charAt(index));
+      this.messages[this.messages.length - 1].content += text.charAt(index);
+      this.scrollToLastMessage();
+      index++;
+      if (index >= text.length) {
+        clearInterval(interval);
+      }
+    }, delay);
+  }
+
+
 
 }
