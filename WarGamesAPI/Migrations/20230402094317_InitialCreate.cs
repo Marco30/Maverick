@@ -112,7 +112,7 @@ namespace WarGamesAPI.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Text = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Time = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Date = table.Column<DateTime>(type: "datetime2", nullable: false),
                     QuestionId = table.Column<int>(type: "int", nullable: false),
                     ConversationId = table.Column<int>(type: "int", nullable: false)
                 },
