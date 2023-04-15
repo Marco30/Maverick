@@ -25,7 +25,7 @@ public class QuestionController : ControllerBase
         _mapper = mapper;
     }
 
-    //[ValidateToken]
+    [ValidateToken]
     [HttpPost("askquestion")]
     public async Task<ActionResult<AnswerDto>> AskQuestion(AskQuestionDto userQuestion)
     {
@@ -37,9 +37,9 @@ public class QuestionController : ControllerBase
         question.UserId = TokenData.getUserId(Request.Headers["Authorization"]!);
 
         
-        _logger.LogInformation($"AskQuestion called. userId: {question.UserId} Question: {question.Text}.");
+        //_logger.LogInformation($"AskQuestion called. userId: {question.UserId} Question: {question.QuestionText}.");
 
-        if (string.IsNullOrEmpty(question.Text))
+        if (string.IsNullOrEmpty(question.QuestionText))
         {
             return BadRequest("The text of the user question is required.");
         }
@@ -90,8 +90,7 @@ public class QuestionController : ControllerBase
         }
 
     }
-
-
+    
     [ValidateToken]
     [HttpGet("getuserquestions")]
     public async Task<ActionResult<List<QuestionDto>>> GetUserQuestions()
@@ -100,7 +99,7 @@ public class QuestionController : ControllerBase
             return BadRequest("The Authorization header is required.");
         var userId = TokenData.getUserId(Request.Headers["Authorization"]!);
 
-        _logger.LogInformation("GetMessages called");
+        //_logger.LogInformation("GetMessages called");
 
         var questions = await _questionRepo.GetUserQuestionsAsync(userId);
         return questions.Any() ? Ok(questions) : NotFound();
@@ -110,7 +109,7 @@ public class QuestionController : ControllerBase
     [HttpGet("getquestion/{questionId}")]
     public async Task<ActionResult<QuestionDto>> GetQuestion(int questionId)
     {
-        _logger.LogInformation($"GetQuestion called. QuestionId: {questionId}");
+        //_logger.LogInformation($"GetQuestion called. QuestionId: {questionId}");
         var question = await _questionRepo.GetQuestionAsync(questionId);
         return question is null ? NotFound() : Ok(question);
         
@@ -130,6 +129,26 @@ public class QuestionController : ControllerBase
     {
         var answers = await _questionRepo.GetAnswersAsync(questionId);
         return answers.Any() ? Ok(answers) : NotFound();
+    }
+
+    [ValidateToken]
+    [HttpGet("getconversation/{conversationId}")]
+    public async Task<ActionResult<ConversationDto>> GetConversation(int conversationId)
+    {
+        var conversation = await _questionRepo.GetConversationAsync(conversationId);
+        return conversation is null ? NotFound() : Ok(conversation);
+    }
+
+    [ValidateToken]
+    [HttpGet("getconversations")]
+    public async Task<ActionResult<List<ConversationDto>>> GetConversations()
+    {
+        if (!Request.Headers.ContainsKey("Authorization") || string.IsNullOrEmpty(Request.Headers["Authorization"])) 
+            return BadRequest("The Authorization header is required.");
+        var userId = TokenData.getUserId(Request.Headers["Authorization"]!);
+
+        var conversations = await _questionRepo.GetConversationsAsync(userId);
+        return conversations.Count == 0 ? NotFound() : Ok(conversations);
     }
 
     [ValidateToken]

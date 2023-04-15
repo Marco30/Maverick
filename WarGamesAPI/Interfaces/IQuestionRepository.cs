@@ -13,6 +13,7 @@ public interface IQuestionRepository
     Task<List<AnswerDto>> GetAnswersAsync(int questionId);
     Task<bool> ConversationExists(int conversationId);
     Task<int> GetConversationUserId(int conversationId);
+    Task<List<ConversationDto>> GetConversationsAsync(int userId);
     
 
     Task DeleteQuestionAsync(int questionId);

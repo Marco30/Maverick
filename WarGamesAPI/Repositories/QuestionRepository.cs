@@ -35,7 +35,7 @@ public class QuestionRepository : IQuestionRepository
 
         var question = new Question
         {
-            Text = userQuestion.Text, UserId = userId, 
+            Text = userQuestion.QuestionText, UserId = userId, 
             ConversationId = (int)userQuestion.ConversationId
         };
 
@@ -88,6 +88,12 @@ public class QuestionRepository : IQuestionRepository
     {
         return await _context.Conversation.Where(c => c.Id == conversationId)
             .ProjectTo<ConversationDto>(_mapper.ConfigurationProvider).SingleOrDefaultAsync();
+    }
+
+    public async Task<List<ConversationDto>> GetConversationsAsync(int userId)
+    {
+        return await _context.Conversation.Where(c => c.UserId == userId)
+            .ProjectTo<ConversationDto>(_mapper.ConfigurationProvider).ToListAsync();
     }
 
     public async Task<List<AnswerDto>> GetAnswersAsync(int questionId)

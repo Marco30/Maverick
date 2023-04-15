@@ -56,7 +56,7 @@ namespace WarGamesAPI.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Address");
+                    b.ToTable("Address", (string)null);
 
                     b.HasData(
                         new
@@ -96,7 +96,7 @@ namespace WarGamesAPI.Migrations
 
                     b.HasIndex("QuestionId");
 
-                    b.ToTable("Answer");
+                    b.ToTable("Answer", (string)null);
                 });
 
             modelBuilder.Entity("WarGamesAPI.Model.Conversation", b =>
@@ -107,9 +107,6 @@ namespace WarGamesAPI.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("ConversationText")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<int>("UserId")
                         .HasColumnType("int");
 
@@ -117,7 +114,7 @@ namespace WarGamesAPI.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Conversation");
+                    b.ToTable("Conversation", (string)null);
                 });
 
             modelBuilder.Entity("WarGamesAPI.Model.Question", b =>
@@ -143,7 +140,7 @@ namespace WarGamesAPI.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Question");
+                    b.ToTable("Question", (string)null);
                 });
 
             modelBuilder.Entity("WarGamesAPI.Model.User", b =>
@@ -198,7 +195,7 @@ namespace WarGamesAPI.Migrations
                     b.HasIndex("AddressId")
                         .IsUnique();
 
-                    b.ToTable("User");
+                    b.ToTable("User", (string)null);
 
                     b.HasData(
                         new

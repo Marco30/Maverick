@@ -1,6 +1,7 @@
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json.Serialization;
+using Serilog.Context;
 using WarGamesAPI.DTO;
 using WarGamesAPI.Interfaces;
 using JsonSerializer = System.Text.Json.JsonSerializer;
@@ -14,9 +15,9 @@ public class GptService : IGptService
     readonly IQuestionRepository _questionRepo;
     readonly string? _apiKey;
 
-    public GptService(ILogger<GptService> logger, IConfiguration configuration, IQuestionRepository questionRepo)
+    public GptService(ILoggerFactory loggerFactory, IConfiguration configuration, IQuestionRepository questionRepo)
     {
-        _logger = logger;
+        _logger = loggerFactory.CreateLogger<GptService>();
         _questionRepo = questionRepo;
         _apiKey = configuration["openAiKey"];
     }
@@ -47,11 +48,11 @@ public class GptService : IGptService
         var conversationAnswers = await _questionRepo.GetAnswersFromConversationAsync(question.ConversationId);
 
         
-        var messages = new List<Message> { new() { Role = "system", Content = "You are a helpful assistant" } };
+        var messages = new List<Message> { new() { Role = "system", Content = "You are a helpful but angry and rude assistant" } };
 
         foreach (var q in conversationQuestions)
         {
-            var questionMessage = new Message { Role = "user", Content = q.Text };
+            var questionMessage = new Message { Role = "user", Content = q.QuestionText };
             messages.Add(questionMessage);
             var answers = conversationAnswers.Where(a => a.QuestionId == q.Id);
             
@@ -99,10 +100,11 @@ public class GptService : IGptService
             {
                 if (data.usage != null)
                 {
-                    _logger.LogInformation($"completion tokens: {data.usage.completion_tokens}, prompt tokens: {data.usage.prompt_tokens}, total tokens: {data.usage.total_tokens}");
-                    //_logger.LogInformation($"role: {data.choices}, prompt tokens: {data.usage.prompt_tokens}, total tokens: {data.usage.total_tokens}");
-
+                    //_logger.LogInformation("GptServiceLog - completion tokens: {CompletionTokens}, prompt tokens: {PromptTokens}, total tokens: {TotalTokens}",
+                    //    data.usage.completion_tokens, data.usage.prompt_tokens, data.usage.total_tokens);
                 }
+
+
 
                 if (data.choices is null ) throw new Exception("Error generating answer");
 
