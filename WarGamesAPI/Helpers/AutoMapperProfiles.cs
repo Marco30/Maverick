@@ -11,7 +11,7 @@ public class AutoMapperProfiles : Profile
     {
         CreateMap<Question, QuestionDto>();
         CreateMap<AskQuestionDto, QuestionDto>();
-        CreateMap<Answer, AnswerDto>().ForMember(dest => dest.AnswerText, options => options.MapFrom(src => src.Text));
+        CreateMap<Answer, AnswerDto>().ForMember(dest => dest.Text, options => options.MapFrom(src => src.Text));
         CreateMap<User, UserDto>();
         CreateMap<RegisterUserDto, User>().ForMember(dest => dest.FullName, options => options.MapFrom(src => string.Concat(src.FirstName, " ", src.LastName)));
         CreateMap<RegisterAddressDto, Address>();

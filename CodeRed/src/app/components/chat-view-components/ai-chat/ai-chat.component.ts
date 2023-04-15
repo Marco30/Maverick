@@ -1,5 +1,7 @@
 import { Component, ElementRef, ViewChild } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { Question } from 'src/app/model/question/question';
+import { ConversationService } from 'src/app/service/conversation/conversation.service';
 
 @Component({
   selector: 'app-ai-chat',
@@ -10,8 +12,14 @@ export class AiChatComponent {
   messages: any[] = [];
   newMessage: string = '';
   @ViewChild('chatContainer', { static: false }) private chatContainer: ElementRef | null = null;
+  showError = false;
+  errorMessage = '';
+  questionData: Question = {
+    conversationId: 0,
+    text: '',
+  };
 
-  constructor(private http: HttpClient) { }
+  constructor(private conversationService: ConversationService,private http: HttpClient) { }
 
   ngOnInit() {
     console.info('Marco test');
@@ -102,38 +110,38 @@ export class AiChatComponent {
   }
 
   onSubmit() {
-    /*if (this.newMessage) {
-      this.messages.push({ sender: 'User', content: this.newMessage });
-      this.http
-        .post(
-          'https://api.openai.com/v1/engines/davinci-codex/completions',
-          {
-            prompt: this.newMessage,
-            max_tokens: 150,
-            n: 1,
-            stop: '\n',
-            temperature: 0.7,
-          },
-          {
-            headers: {
-              Authorization: 'Bearer ' + 'YOUR_API_KEY_HERE',
-              'Content-Type': 'application/json',
-            },
-          }
-        )
-        .subscribe((response: any) => {
-          const botMessage = response.choices[0].text.trim();
-          this.messages.push({ sender: 'Bot', content: botMessage });
-        });
-      this.newMessage = '';
-    } */
 
-    this.messages.push({
+    if (this.questionData.text != '') {
+
+     
+
+      this.conversationService.askTheAI(this.questionData).subscribe({
+        next: (res) => {
+
+          console.info('-----AskTheAI-----');
+          console.info(res);
+        
+
+        },
+        error: (err) => {
+          console.error('An error occurred:', err);
+          this.errorMessage = 'An error occurred while processing your request. Please try again later.';
+          this.showError = true;   
+          setTimeout(() => {
+            this.showError = false;
+          }, 5000); // hide after 5 seconds
+        },
+        // complete: () => (this.showLoading = false),
+      });
+    
+    } 
+
+    /* this.messages.push({
       sender: 'Ava',
       content: 'Youre welcome. Have a great day!',
-    });
-
- 
+    }); */
+    console.info("questionData");
+ console.info(this.questionData);
 
       this.scrollToLastMessage();
 
