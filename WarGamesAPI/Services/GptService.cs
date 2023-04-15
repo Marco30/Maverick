@@ -1,7 +1,6 @@
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json.Serialization;
-using Serilog.Context;
 using WarGamesAPI.DTO;
 using WarGamesAPI.Interfaces;
 using JsonSerializer = System.Text.Json.JsonSerializer;
@@ -25,10 +24,20 @@ public class GptService : IGptService
 
     public async Task<AnswerDto?> AskQuestion(QuestionDto question)
     {
-        var request = await GenerateRequestAsync(question);
-        
 
-        var answer = await SendRequest(request);
+        var request = await GenerateRequestAsync(question);
+
+        var answer = "";
+
+        if (question.MockReply)
+        {
+            answer = GetMockReply();
+        }
+        else
+        {
+            answer = await SendRequest(request);
+        }
+
 
         return new AnswerDto
         {
@@ -45,14 +54,21 @@ public class GptService : IGptService
     {
 
         var conversationQuestions = await _questionRepo.GetQuestionsFromConversationAsync(question.ConversationId);
-        var conversationAnswers = await _questionRepo.GetAnswersFromConversationAsync(question.ConversationId);
+        List<AnswerDto> conversationAnswers = await _questionRepo.GetAnswersFromConversationAsync(question.ConversationId);
 
-        
-        var messages = new List<Message> { new() { Role = "system", Content = "You are a helpful but angry and rude assistant" } };
+
+        //var messages = new List<Message> { new() { Role = "system", Content = "You are a helpful but angry and rude assistant" } };
+
+        var messages = new List<Message> { new() { Role = "system", Content = "You are a helpful assistant for software developers" } };
+
+        //var messages = new List<Message> { new() { Role = "system", Content = "You are a helpful but shy assistant " } };
+
+
+
 
         foreach (var q in conversationQuestions)
         {
-            var questionMessage = new Message { Role = "user", Content = q.QuestionText };
+            var questionMessage = new Message { Role = "user", Content = q.Text };
             messages.Add(questionMessage);
             var answers = conversationAnswers.Where(a => a.QuestionId == q.Id);
             
@@ -60,7 +76,7 @@ public class GptService : IGptService
             {
                 if (answer.ConversationId == q.ConversationId)
                 {
-                    var answerMessage = new Message { Role = "assistant", Content = answer.AnswerText };
+                    var answerMessage = new Message { Role = "assistant", Content = answer.Text };
                     messages.Add(answerMessage);
                 }
             }
@@ -143,6 +159,21 @@ public class GptService : IGptService
         }
 
         return null;
+    }
+
+    private string GetMockReply()
+    {
+        return "I am ChatGPT, a large language model developed by OpenAI using the GPT-3.5 architecture. " +
+               "As a language model, my primary function is to generate natural language responses to text-based " +
+               "inputs such as questions, prompts, and statements.\r\n\r\nI was trained on a massive dataset of " +
+               "written text from the internet and other sources, which allows me to understand and generate " +
+               "responses in a wide variety of topics and domains. My training data includes text in multiple " +
+               "languages, making me capable of generating responses in several languages.\r\n\r\nI use machine " +
+               "learning techniques such as deep neural networks to analyze and understand the structure and " +
+               "context of the input text. Based on this analysis, I generate a response that is meant to be " +
+               "natural-sounding and relevant to the input.\r\n\r\nOverall, my purpose is to assist users in " +
+               "generating high-quality, natural language responses to a wide range of prompts and queries, " +
+               "making communication and information retrieval more efficient and effective.";
     }
     
 }

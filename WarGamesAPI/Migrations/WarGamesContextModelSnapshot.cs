@@ -56,7 +56,7 @@ namespace WarGamesAPI.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Address", (string)null);
+                    b.ToTable("Address");
 
                     b.HasData(
                         new
@@ -81,14 +81,14 @@ namespace WarGamesAPI.Migrations
                     b.Property<int>("ConversationId")
                         .HasColumnType("int");
 
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("datetime2");
+
                     b.Property<int?>("QuestionId")
                         .HasColumnType("int");
 
                     b.Property<string>("Text")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("Date")
-                        .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
@@ -96,7 +96,7 @@ namespace WarGamesAPI.Migrations
 
                     b.HasIndex("QuestionId");
 
-                    b.ToTable("Answer", (string)null);
+                    b.ToTable("Answer");
                 });
 
             modelBuilder.Entity("WarGamesAPI.Model.Conversation", b =>
@@ -114,7 +114,7 @@ namespace WarGamesAPI.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Conversation", (string)null);
+                    b.ToTable("Conversation");
                 });
 
             modelBuilder.Entity("WarGamesAPI.Model.Question", b =>
@@ -140,7 +140,7 @@ namespace WarGamesAPI.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Question", (string)null);
+                    b.ToTable("Question");
                 });
 
             modelBuilder.Entity("WarGamesAPI.Model.User", b =>
@@ -195,7 +195,7 @@ namespace WarGamesAPI.Migrations
                     b.HasIndex("AddressId")
                         .IsUnique();
 
-                    b.ToTable("User", (string)null);
+                    b.ToTable("User");
 
                     b.HasData(
                         new

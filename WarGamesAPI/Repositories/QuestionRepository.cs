@@ -35,7 +35,7 @@ public class QuestionRepository : IQuestionRepository
 
         var question = new Question
         {
-            Text = userQuestion.QuestionText, UserId = userId, 
+            Text = userQuestion.Text, UserId = userId, 
             ConversationId = (int)userQuestion.ConversationId
         };
 
@@ -86,14 +86,49 @@ public class QuestionRepository : IQuestionRepository
 
     public async Task<ConversationDto?> GetConversationAsync(int conversationId)
     {
-        return await _context.Conversation.Where(c => c.Id == conversationId)
-            .ProjectTo<ConversationDto>(_mapper.ConfigurationProvider).SingleOrDefaultAsync();
+        var conversation = await _context.Conversation
+            .Include(c => c.Questions)
+            .Include(c => c.Answers)
+            .Where(c => c.Id == conversationId).SingleOrDefaultAsync();
+
+        if (conversation is null) return null;
+
+        var messages = new List<MessageDto>();
+
+        var questions = _mapper.Map<List<QuestionDto>>(conversation.Questions);
+        var answers = _mapper.Map<List<AnswerDto>>(conversation.Answers);
+
+        foreach (var question in questions)
+        {
+            var questionMessage = new MessageDto { Id = question.Id, Text = question.Text, Role = "User" };
+            messages.Add(questionMessage);
+
+            List<AnswerDto> answersToAdd = answers.Where(a => a.QuestionId == question.Id).ToList();
+            foreach (var answer in answersToAdd)
+            {
+                var answerMessage = new MessageDto { Id = answer.Id, Text = answer.Text, Role = "Assistant" };
+                messages.Add(answerMessage);
+            }
+        }
+        return new ConversationDto
+        {
+            Id = conversation.Id,
+            UserId = conversation.UserId,
+            Messages = messages
+        };
+        
     }
 
-    public async Task<List<ConversationDto>> GetConversationsAsync(int userId)
+    public async Task<List<ConversationDto?>> GetConversationsAsync(int userId)
     {
-        return await _context.Conversation.Where(c => c.UserId == userId)
-            .ProjectTo<ConversationDto>(_mapper.ConfigurationProvider).ToListAsync();
+        var result = new List<ConversationDto?>();
+        var conversations = await _context.Conversation.Where(c => c.UserId == userId).ToListAsync();
+        foreach (var c in conversations)
+        {
+            result.Add(await GetConversationAsync(c.Id));
+        }
+
+        return result;
     }
 
     public async Task<List<AnswerDto>> GetAnswersAsync(int questionId)

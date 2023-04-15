@@ -33,13 +33,15 @@ public class QuestionController : ControllerBase
             return BadRequest("The Authorization header is required.");
 
         var question = _mapper.Map<QuestionDto>(userQuestion);
+
+        var mockReply = userQuestion.MockReply;
         
         question.UserId = TokenData.getUserId(Request.Headers["Authorization"]!);
 
         
         //_logger.LogInformation($"AskQuestion called. userId: {question.UserId} Question: {question.QuestionText}.");
 
-        if (string.IsNullOrEmpty(question.QuestionText))
+        if (string.IsNullOrEmpty(question.Text))
         {
             return BadRequest("The text of the user question is required.");
         }
@@ -71,7 +73,7 @@ public class QuestionController : ControllerBase
             var savedQuestion = await _questionRepo.SaveQuestionAsync(question);
 
             if (savedQuestion is null) return StatusCode(500);
-
+            savedQuestion.MockReply = mockReply;
             var answer = await _gptService.AskQuestion(savedQuestion);
 
             if (answer is null) return StatusCode(500);
