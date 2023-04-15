@@ -1,3 +1,4 @@
+using crypto;
 using HtmlAgilityPack;
 using System.Text.RegularExpressions;
 using WarGamesAPI.DTO;

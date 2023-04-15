@@ -84,6 +84,53 @@ public class QuestionRepository : IQuestionRepository
             .ProjectTo<QuestionDto>(_mapper.ConfigurationProvider).SingleOrDefaultAsync();
     }
 
+    public async Task<ConversationDto?> GetConversationAsync(int conversationId)
+    {
+        var conversation = await _context.Conversation
+            .Include(c => c.Questions)
+            .Include(c => c.Answers)
+            .Where(c => c.Id == conversationId).SingleOrDefaultAsync();
+
+        if (conversation is null) return null;
+
+        var messages = new List<MessageDto>();
+
+        var questions = _mapper.Map<List<QuestionDto>>(conversation.Questions);
+        var answers = _mapper.Map<List<AnswerDto>>(conversation.Answers);
+
+        foreach (var question in questions)
+        {
+            var questionMessage = new MessageDto { Id = question.Id, Text = question.Text, Role = "User" };
+            messages.Add(questionMessage);
+
+            List<AnswerDto> answersToAdd = answers.Where(a => a.QuestionId == question.Id).ToList();
+            foreach (var answer in answersToAdd)
+            {
+                var answerMessage = new MessageDto { Id = answer.Id, Text = answer.Text, Role = "Assistant" };
+                messages.Add(answerMessage);
+            }
+        }
+        return new ConversationDto
+        {
+            Id = conversation.Id,
+            UserId = conversation.UserId,
+            Messages = messages
+        };
+        
+    }
+
+    public async Task<List<ConversationDto?>> GetConversationsAsync(int userId)
+    {
+        var result = new List<ConversationDto?>();
+        var conversations = await _context.Conversation.Where(c => c.UserId == userId).ToListAsync();
+        foreach (var c in conversations)
+        {
+            result.Add(await GetConversationAsync(c.Id));
+        }
+
+        return result;
+    }
+
     public async Task<List<AnswerDto>> GetAnswersAsync(int questionId)
     {
         return await _context.Answer.Where(a => a.QuestionId == questionId)
@@ -96,10 +143,16 @@ public class QuestionRepository : IQuestionRepository
             .SingleOrDefaultAsync();
     }
 
-    public async Task<ConversationDto?> GetConversationAsync(int conversationId)
+    public async Task<List<QuestionDto>> GetQuestionsFromConversationAsync(int conversationId)
     {
-        return await _context.Conversation.Where(c => c.Id == conversationId).ProjectTo<ConversationDto>(_mapper.ConfigurationProvider)
-            .SingleOrDefaultAsync();
+        return await _context.Question.Where(q => q.ConversationId == conversationId)
+            .ProjectTo<QuestionDto>(_mapper.ConfigurationProvider).ToListAsync();
+    }
+
+    public async Task<List<AnswerDto>> GetAnswersFromConversationAsync(int conversationId)
+    {
+        return await _context.Answer.Where(a => a.ConversationId == conversationId)
+            .ProjectTo<AnswerDto>(_mapper.ConfigurationProvider).ToListAsync();
     }
 
     public async Task<bool> ConversationExists(int conversationId)
@@ -107,6 +160,15 @@ public class QuestionRepository : IQuestionRepository
         return await _context.Conversation.AnyAsync(c => c.Id == conversationId);
     }
 
+    public async Task<int> GetConversationUserId(int conversationId)
+    {
+        var conversation = await _context.Conversation.SingleOrDefaultAsync(c => c.Id == conversationId);
+        if (conversation is null)
+        {
+            throw new NullReferenceException($"There is no conversation with id {conversationId}");
+        }
+        return conversation.UserId;
+    }
 
     public async Task DeleteQuestionAsync(int questionId)
     {
@@ -158,24 +220,6 @@ public class QuestionRepository : IQuestionRepository
 
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     private async Task<Conversation?> CreateConversationAsync(int userId)
     {
         var conversation = new Conversation { UserId = userId };
@@ -193,8 +237,5 @@ public class QuestionRepository : IQuestionRepository
         }
 
     }
-
-
-
 
 }

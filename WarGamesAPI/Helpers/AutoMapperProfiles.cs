@@ -9,7 +9,7 @@ public class AutoMapperProfiles : Profile
 {
     public AutoMapperProfiles()
     {
-        CreateMap<Question, QuestionDto>();
+        CreateMap<Question, QuestionDto>().ForMember(dest => dest.Text, options => options.MapFrom(src => src.Text));
         CreateMap<AskQuestionDto, QuestionDto>();
         CreateMap<Answer, AnswerDto>().ForMember(dest => dest.Text, options => options.MapFrom(src => src.Text));
         CreateMap<User, UserDto>();
@@ -23,6 +23,14 @@ public class AutoMapperProfiles : Profile
             .ForMember(dest => dest.City, opt => opt.MapFrom(src => src.Address.Municipality))
             .ForMember(dest => dest.Street, opt => opt.MapFrom(src => src.Address.Street))
             .ForMember(dest => dest.ZipCode, opt => opt.MapFrom(src => src.Address.ZipCode));
+        CreateMap<Conversation, ConversationDto>().ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
+            .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.UserId))
+            .ForMember(dest => dest.Messages, opt => opt.Ignore());
+
+
+
+
+
     }
 }
 

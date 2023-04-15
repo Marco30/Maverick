@@ -1,12 +1,11 @@
 
+using System.Reflection;
 using Courses.Api.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using Serilog;
-using Serilog.Events;
 using WarGamesAPI.Data;
 using WarGamesAPI.Helpers;
-using System.Reflection;
 using WarGamesAPI.Interfaces;
 using WarGamesAPI.Services;
 using WarGamesAPI.Settings;
@@ -78,16 +77,17 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddScoped<IQuestionRepository, QuestionRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+//builder.Services.AddSingleton<IConfiguration>(configuration);
+
 
 builder.Services.AddScoped<IGptService, GptService>();
 
 
 Log.Logger = new LoggerConfiguration()
-    .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+    .ReadFrom.Configuration(builder.Configuration)
     .Enrich.FromLogContext()
-    .WriteTo.Debug()
-    .WriteTo.File("log.txt", rollingInterval: RollingInterval.Day)
     .CreateLogger();
+
 
 builder.Host.UseSerilog();
 
@@ -100,6 +100,7 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+    app.UseDeveloperExceptionPage();
 }
 
 app.UseHttpsRedirection();
