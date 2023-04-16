@@ -93,28 +93,23 @@ public class QuestionRepository : IQuestionRepository
 
         if (conversation is null) return null;
 
-        var messages = new List<MessageDto>();
+        var messages = new List<QAItemDto>();
 
         var questions = _mapper.Map<List<QuestionDto>>(conversation.Questions);
         var answers = _mapper.Map<List<AnswerDto>>(conversation.Answers);
 
         foreach (var question in questions)
         {
-            var questionMessage = new MessageDto { Id = question.Id, Text = question.Text, Role = "User" };
-            messages.Add(questionMessage);
-
             List<AnswerDto> answersToAdd = answers.Where(a => a.QuestionId == question.Id).ToList();
-            foreach (var answer in answersToAdd)
-            {
-                var answerMessage = new MessageDto { Id = answer.Id, Text = answer.Text, Role = "Assistant" };
-                messages.Add(answerMessage);
-            }
+            var questionMessage = _mapper.Map<MessageDto>(question);
+            var answerMessages = _mapper.Map<List<MessageDto>>(answersToAdd);
+            foreach (var answer in answerMessages) answer.UserId = question.UserId;
+            messages.Add(new QAItemDto { Question = questionMessage, Answers = answerMessages }); 
+            
         }
         return new ConversationDto
         {
-            Id = conversation.Id,
-            UserId = conversation.UserId,
-            Messages = messages
+            Conversation = messages
         };
         
     }
