@@ -22,14 +22,14 @@ public class GptService : IGptService
     }
 
 
-    public async Task<AnswerDto?> AskQuestion(QuestionDto question)
+    public async Task<AnswerDto?> AskQuestion(QuestionDto question, bool mockReply)
     {
 
         var request = await GenerateRequestAsync(question);
 
         var answer = "";
 
-        if (question.MockReply)
+        if (mockReply)
         {
             answer = GetMockReply();
         }

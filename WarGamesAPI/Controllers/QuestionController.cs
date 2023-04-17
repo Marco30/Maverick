@@ -15,14 +15,41 @@ public class QuestionController : ControllerBase
     readonly IGptService _gptService;
     readonly IQuestionRepository _questionRepo;
     readonly IMapper _mapper;
+    readonly IValidationRepository _validationRepo;
 
     public QuestionController(ILogger<QuestionController> logger, IGptService gptService, 
-        IQuestionRepository questionRepo, IMapper mapper)
+        IQuestionRepository questionRepo, IMapper mapper, IValidationRepository validationRepo)
     {
         _logger = logger;
         _gptService = gptService;
         _questionRepo = questionRepo;
         _mapper = mapper;
+        _validationRepo = validationRepo;
+    }
+
+    
+    [ValidateToken]
+    [HttpGet("getquestions")]
+    public async Task<ActionResult<List<QuestionDto>>> GetQuestions()
+    {
+        if (!Request.Headers.ContainsKey("Authorization") || string.IsNullOrEmpty(Request.Headers["Authorization"])) 
+            return BadRequest("The Authorization header is required.");
+        var userId = TokenData.getUserId(Request.Headers["Authorization"]!);
+
+        
+        return Ok (await _questionRepo.GetUserQuestionsAsync(userId));
+    }
+
+    [ValidateToken]
+    [HttpGet("getconversations")]
+    public async Task<ActionResult<List<ConversationInfoDto>>> GetConversations()
+    {
+        if (!Request.Headers.ContainsKey("Authorization") || string.IsNullOrEmpty(Request.Headers["Authorization"])) 
+            return BadRequest("The Authorization header is required.");
+        var userId = TokenData.getUserId(Request.Headers["Authorization"]!);
+
+        var conversations = await _questionRepo.GetConversationInfosAsync(userId);
+        return Ok(conversations);
     }
 
     [ValidateToken]
@@ -32,49 +59,29 @@ public class QuestionController : ControllerBase
         if (!Request.Headers.ContainsKey("Authorization") || string.IsNullOrEmpty(Request.Headers["Authorization"])) 
             return BadRequest("The Authorization header is required.");
 
+        var userId = TokenData.getUserId(Request.Headers["Authorization"]!);
+
         var question = _mapper.Map<QuestionDto>(userQuestion);
 
-        var mockReply = userQuestion.MockReply;
-        
-        question.UserId = TokenData.getUserId(Request.Headers["Authorization"]!);
+        question.UserId = userId;
 
         
-        //_logger.LogInformation($"AskQuestion called. userId: {question.UserId} Question: {question.QuestionText}.");
-
-        if (string.IsNullOrEmpty(question.Text))
-        {
-            return BadRequest("The text of the user question is required.");
-        }
-
-        if (question.UserId == 0)
-        {
-            return BadRequest("Faulty userId");
-        }
+        if (string.IsNullOrEmpty(question.Text)) return BadRequest("The text of the user question is required.");
 
         if (question.ConversationId != 0)
         {
-            
-            if (!await _questionRepo.ConversationExists(question.ConversationId))
-            {
-                return BadRequest($"There is no conversation with Id {question.ConversationId}");
-            }
-
-            if (await _questionRepo.GetConversationUserId(question.ConversationId) != question.UserId)
-            {
-                return BadRequest("No such conversationId for this user");
-            }
-
+            if (!await _validationRepo.UserOwnsConversation(userId, question.ConversationId)) 
+                return BadRequest("Conversation not found");
         }
 
         
         try
         {
             
-            var savedQuestion = await _questionRepo.SaveQuestionAsync(question);
+            QuestionDto? savedQuestion = await _questionRepo.SaveQuestionAsync(question);
 
             if (savedQuestion is null) return StatusCode(500);
-            savedQuestion.MockReply = mockReply;
-            var answer = await _gptService.AskQuestion(savedQuestion);
+            AnswerDto? answer = await _gptService.AskQuestion(savedQuestion, userQuestion.MockReply);
 
             if (answer is null) return StatusCode(500);
             
@@ -92,80 +99,90 @@ public class QuestionController : ControllerBase
         }
 
     }
-    
+
     [ValidateToken]
-    [HttpGet("getuserquestions")]
-    public async Task<ActionResult<List<QuestionDto>>> GetUserQuestions()
+    [HttpPost("getquestion")]
+    public async Task<ActionResult<QuestionDto>> GetQuestion(GetQuestionDto getQuestion)
     {
         if (!Request.Headers.ContainsKey("Authorization") || string.IsNullOrEmpty(Request.Headers["Authorization"])) 
             return BadRequest("The Authorization header is required.");
         var userId = TokenData.getUserId(Request.Headers["Authorization"]!);
 
-        //_logger.LogInformation("GetMessages called");
+        if (!await _validationRepo.UserOwnsQuestion(userId, getQuestion.QuestionId)) return NotFound();
 
-        var questions = await _questionRepo.GetUserQuestionsAsync(userId);
-        return questions.Any() ? Ok(questions) : NotFound();
-    }
+        var question = await _questionRepo.GetQuestionAsync(getQuestion.QuestionId);
 
-    [ValidateToken]
-    [HttpGet("getquestion/{questionId}")]
-    public async Task<ActionResult<QuestionDto>> GetQuestion(int questionId)
-    {
-        //_logger.LogInformation($"GetQuestion called. QuestionId: {questionId}");
-        var question = await _questionRepo.GetQuestionAsync(questionId);
         return question is null ? NotFound() : Ok(question);
         
     }
 
     [ValidateToken]
-    [HttpGet("getanswer/{answerId}")]
-    public async Task<ActionResult<AnswerDto>> GetAnswer(int answerId)
-    {
-        var answer = await _questionRepo.GetAnswerAsync(answerId);
-        return answer is null ? NotFound() : Ok(answer);
-    }
-
-    [ValidateToken]
-    [HttpGet("getanswers/{questionId}")]
-    public async Task<ActionResult<List<AnswerDto>>> GetAnswers(int questionId)
-    {
-        var answers = await _questionRepo.GetAnswersAsync(questionId);
-        return answers.Any() ? Ok(answers) : NotFound();
-    }
-
-    [ValidateToken]
-    [HttpGet("getconversation/{conversationId}")]
-    public async Task<ActionResult<ConversationDto>> GetConversation(int conversationId)
-    {
-        var conversation = await _questionRepo.GetConversationAsync(conversationId);
-        return conversation is null ? NotFound() : Ok(conversation);
-    }
-
-    [ValidateToken]
-    [HttpGet("getconversations")]
-    public async Task<ActionResult<List<ConversationDto>>> GetConversations()
+    [HttpPost("getanswer")]
+    public async Task<ActionResult<AnswerDto>> GetAnswer(GetAnswerDto getAnswer)
     {
         if (!Request.Headers.ContainsKey("Authorization") || string.IsNullOrEmpty(Request.Headers["Authorization"])) 
             return BadRequest("The Authorization header is required.");
         var userId = TokenData.getUserId(Request.Headers["Authorization"]!);
 
-        var conversations = await _questionRepo.GetConversationsAsync(userId);
-        return conversations.Count == 0 ? NotFound() : Ok(conversations);
+        if (!await _validationRepo.UserOwnsAnswer(userId, getAnswer.AnswerId)) return NotFound();
+
+        var answer = await _questionRepo.GetAnswerAsync(getAnswer.AnswerId);
+
+        return answer is null ? NotFound() : Ok(answer);
+        
     }
 
     [ValidateToken]
-    [HttpDelete("deletequestion/{questionId}")]
-    public async Task<IActionResult> DeleteQuestion(int questionId)
+    [HttpPost("getanswers")]
+    public async Task<ActionResult<List<AnswerDto>>> GetAnswers(GetAnswersDto getAnswers)
     {
+        if (!Request.Headers.ContainsKey("Authorization") || string.IsNullOrEmpty(Request.Headers["Authorization"])) 
+            return BadRequest("The Authorization header is required.");
+        var userId = TokenData.getUserId(Request.Headers["Authorization"]!);
+
+        if (!await _validationRepo.UserOwnsQuestion(userId, getAnswers.QuestionId)) return NotFound();
+
+        var answers = await _questionRepo.GetAnswersAsync(getAnswers.QuestionId);
+        
+        return Ok(answers);
+    }
+
+    [ValidateToken]
+    [HttpPost("getconversation")]
+    public async Task<ActionResult<ConversationDto>> GetConversation(GetConversationDto getConversation)
+    {
+        if (!Request.Headers.ContainsKey("Authorization") || string.IsNullOrEmpty(Request.Headers["Authorization"])) 
+            return BadRequest("The Authorization header is required.");
+        var userId = TokenData.getUserId(Request.Headers["Authorization"]!);
+
+        if (!await _validationRepo.UserOwnsConversation(userId, getConversation.ConversationId)) return NotFound();
+
+        var conversation = await _questionRepo.GetConversationAsync(getConversation.ConversationId);
+
+        return conversation is null ? NotFound() : Ok(conversation);
+
+    }
+
+    
+    [ValidateToken]
+    [HttpDelete("deletequestion")]
+    public async Task<IActionResult> DeleteQuestion(GetQuestionDto deleteQuestion)
+    {
+        if (!Request.Headers.ContainsKey("Authorization") || string.IsNullOrEmpty(Request.Headers["Authorization"])) 
+            return BadRequest("The Authorization header is required.");
+        var userId = TokenData.getUserId(Request.Headers["Authorization"]!);
+        var questionId = deleteQuestion.QuestionId;
+
+        if (!await _validationRepo.UserOwnsQuestion(userId, questionId)) return NotFound();
 
         try
         {
             var question = await _questionRepo.GetQuestionAsync(questionId);
-            if (question == null)
+            if (question is null)
             {
-                return NotFound(new ResponseMessageDto { Message = $"Question with id {questionId} not found" });
+                return NotFound(new ResponseMessageDto 
+                    { Message = $"Question with id {questionId} not found" });
             }
-
 
             await _questionRepo.DeleteQuestionAsync(questionId);
             return NoContent();
@@ -181,10 +198,16 @@ public class QuestionController : ControllerBase
     }
 
     [ValidateToken]
-    [HttpDelete("deleteanswer/{answerId}")]
-    public async Task<IActionResult> DeleteAnswer(int answerId)
+    [HttpDelete("deleteanswer")]
+    public async Task<IActionResult> DeleteAnswer(GetAnswerDto deleteAnswer)
     {
+        if (!Request.Headers.ContainsKey("Authorization") || string.IsNullOrEmpty(Request.Headers["Authorization"])) 
+            return BadRequest("The Authorization header is required.");
+        var userId = TokenData.getUserId(Request.Headers["Authorization"]!);
+        var answerId = deleteAnswer.AnswerId;
 
+        if (!await _validationRepo.UserOwnsAnswer(userId, answerId)) return NotFound();
+        
         try
         {
             var answer = await _questionRepo.GetAnswerAsync(answerId);
@@ -207,9 +230,16 @@ public class QuestionController : ControllerBase
     }
 
     [ValidateToken]
-    [HttpDelete("deleteconversation/{conversationId}")]
-    public async Task<IActionResult> DeleteConversation(int conversationId)
+    [HttpDelete("deleteconversation")]
+    public async Task<IActionResult> DeleteConversation(GetConversationDto deleteConversation)
     {
+        if (!Request.Headers.ContainsKey("Authorization") || string.IsNullOrEmpty(Request.Headers["Authorization"])) 
+            return BadRequest("The Authorization header is required.");
+        var userId = TokenData.getUserId(Request.Headers["Authorization"]!);
+        var conversationId = deleteConversation.ConversationId;
+
+        if (!await _validationRepo.UserOwnsConversation(userId, conversationId)) return NotFound();
+
 
         try
         {

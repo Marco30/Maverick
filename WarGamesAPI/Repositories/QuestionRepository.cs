@@ -114,16 +114,30 @@ public class QuestionRepository : IQuestionRepository
         
     }
 
-    public async Task<List<ConversationDto?>> GetConversationsAsync(int userId)
+    public async Task<List<ConversationInfoDto>> GetConversationInfosAsync(int userId)
     {
-        var result = new List<ConversationDto?>();
-        var conversations = await _context.Conversation.Where(c => c.UserId == userId).ToListAsync();
-        foreach (var c in conversations)
+        var conversations = await _context.Conversation
+            .Include(c => c.Questions)
+            .Include(c => c.Answers)
+            .Where(c => c.UserId == userId).ToListAsync();
+
+        var result = new List<ConversationInfoDto>();
+
+        foreach (var conversation in conversations)
         {
-            result.Add(await GetConversationAsync(c.Id));
+            if (conversation.Questions.Count != 0)
+            {
+                var conversationInfo = _mapper.Map<ConversationInfoDto>(conversation);
+                conversationInfo.Name = conversation.Questions.First().Text;
+                conversationInfo.Date = conversation.Answers.First().Date;
+                result.Add(conversationInfo);
+            }
+
         }
 
         return result;
+
+
     }
 
     public async Task<List<AnswerDto>> GetAnswersAsync(int questionId)
@@ -149,22 +163,7 @@ public class QuestionRepository : IQuestionRepository
         return await _context.Answer.Where(a => a.ConversationId == conversationId)
             .ProjectTo<AnswerDto>(_mapper.ConfigurationProvider).ToListAsync();
     }
-
-    public async Task<bool> ConversationExists(int conversationId)
-    {
-        return await _context.Conversation.AnyAsync(c => c.Id == conversationId);
-    }
-
-    public async Task<int> GetConversationUserId(int conversationId)
-    {
-        var conversation = await _context.Conversation.SingleOrDefaultAsync(c => c.Id == conversationId);
-        if (conversation is null)
-        {
-            throw new NullReferenceException($"There is no conversation with id {conversationId}");
-        }
-        return conversation.UserId;
-    }
-
+    
     public async Task DeleteQuestionAsync(int questionId)
     {
         var question = await _context.Question.FindAsync(questionId);

@@ -77,6 +77,8 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddScoped<IQuestionRepository, QuestionRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IValidationRepository, ValidationRepository>();
+
 //builder.Services.AddSingleton<IConfiguration>(configuration);
 
 
