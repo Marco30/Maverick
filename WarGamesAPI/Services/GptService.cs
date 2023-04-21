@@ -1,6 +1,6 @@
 using System.Net.Http.Headers;
 using System.Text;
-using System.Text.Json.Serialization;
+using AI.Dev.OpenAI.GPT;
 using WarGamesAPI.DTO;
 using WarGamesAPI.Interfaces;
 using JsonSerializer = System.Text.Json.JsonSerializer;
@@ -13,6 +13,9 @@ public class GptService : IGptService
     readonly ILogger<GptService> _logger;
     readonly IQuestionRepository _questionRepo;
     readonly string? _apiKey;
+    private static string _apiEndpoint => "https://api.openai.com/v1/chat/completions";
+    static double _tokenPriceInUSDcents => 0.0002;
+    public string? Result { get; set; }
 
     public GptService(ILoggerFactory loggerFactory, IConfiguration configuration, IQuestionRepository questionRepo)
     {
@@ -21,34 +24,27 @@ public class GptService : IGptService
         _apiKey = configuration["openAiKey"];
     }
 
-
     public async Task<AnswerDto?> AskQuestion(QuestionDto question, bool mockReply)
     {
 
         var request = await GenerateRequestAsync(question);
 
-        var answer = "";
+        string? answer;
 
         if (mockReply)
-        {
             answer = GetMockReply();
-        }
         else
-        {
             answer = await SendRequest(request);
-        }
 
 
         return new AnswerDto
         {
-            QuestionId = question.Id, 
-            Text = answer, Date = DateTime.Now
+            QuestionId = question.Id,
+            Text = answer,
+            Date = DateTime.Now
         };
 
     }
-
-    public string? Result { get; set; }
-
 
     private async Task<OpenAIRequest> GenerateRequestAsync(QuestionDto question)
     {
@@ -68,10 +64,14 @@ public class GptService : IGptService
 
         foreach (var q in conversationQuestions)
         {
-            var questionMessage = new Message { Role = "user", Content = q.Text };
+            var messageText = "";
+
+            if (q.Text != null) messageText = CleanMessageText(q.Text);
+            var questionMessage = new Message { Role = "user", Content = messageText };
+
             messages.Add(questionMessage);
             var answers = conversationAnswers.Where(a => a.QuestionId == q.Id);
-            
+
             foreach (var answer in answers)
             {
                 if (answer.ConversationId == q.ConversationId)
@@ -83,74 +83,82 @@ public class GptService : IGptService
         }
         return new OpenAIRequest { Model = "gpt-3.5-turbo", Messages = messages };
 
-        
+
+    }
+
+    private int EstimateTokenCount(List<Message> messages)
+    {
+        var tokenCount = 0;
+
+        foreach (var message in messages)
+        {
+            if (message.Content != null)
+            {
+                List<int> tokens = GPT3Tokenizer.Encode(message.Content);
+                tokenCount += tokens.Count;
+            }
+        }
+
+        return tokenCount;
+    }
+
+    private string CleanMessageText(string messageText)
+    {
+        return string.Join(" ", messageText.Trim().Split(Array.Empty<char>(), StringSplitOptions.RemoveEmptyEntries));
+    }
+
+    private void LogTokenUsage(Root data, List<Message> messages)
+    {
+            var estimatedTokenCount = EstimateTokenCount(messages);
+            var numberOfMessages = messages.Count;
+            var cost = _tokenPriceInUSDcents * data.TokenUsage!.total_tokens;
+
+            _logger.LogInformation("Token usage: {@EstimatedTokenCount} {@NumberOfMessages} {@PromptTokens} {@CompletionTokens} {@TotalTokens} {@Cost}",
+            estimatedTokenCount,
+            numberOfMessages,
+            data.TokenUsage!.prompt_tokens,
+            data.TokenUsage.completion_tokens,
+            data.TokenUsage.total_tokens,
+            cost);
+
     }
 
     private async Task<string?> SendRequest(OpenAIRequest request)
     {
+        if (request.Messages is null)
+            throw new ArgumentException("Messages is null");
+
         try
         {
-            var client = new HttpClient();
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _apiKey);
-
-            var json = JsonSerializer.Serialize(request);
-            var stringContent = new StringContent(json, Encoding.UTF8, "application/json");
-            var response = await client.PostAsync("https://api.openai.com/v1/chat/completions", stringContent);
-            
-            
-            
-            var jsonResult = await response.Content.ReadAsStringAsync();
-            
-            if (!response.IsSuccessStatusCode)
+            using (var client = new HttpClient())
             {
-                var errorResponse = JsonSerializer.Deserialize<OpenAIErrorResponse>(jsonResult);
-                if (errorResponse != null)
-                    throw new Exception(errorResponse.Error.Message);
-                else
-                    throw new Exception("Error generating answer");
-            }
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _apiKey);
 
-            var data = JsonSerializer.Deserialize<Root>(jsonResult);
+                var jsonRequest = JsonSerializer.Serialize(request);
+                var stringContent = new StringContent(jsonRequest, Encoding.UTF8, "application/json");
 
-            if (data != null)
-            {
-                if (data.usage != null)
+                var response = await client.PostAsync(_apiEndpoint, stringContent);
+                var jsonResult = await response.Content.ReadAsStringAsync();
+
+                if (!response.IsSuccessStatusCode)
                 {
-                    //_logger.LogInformation("GptServiceLog - completion tokens: {CompletionTokens}, prompt tokens: {PromptTokens}, total tokens: {TotalTokens}",
-                    //    data.usage.completion_tokens, data.usage.prompt_tokens, data.usage.total_tokens);
+                    var errorResponse = JsonSerializer.Deserialize<OpenAIErrorResponse>(jsonResult);
+                    if (errorResponse != null && errorResponse.Error != null)
+                        throw new GptApiException(errorResponse.Error.Message);
+                    throw new GptApiException("Error generating answer");
                 }
 
+                Root? data = JsonSerializer.Deserialize<Root>(jsonResult);
 
 
-                if (data.choices is null ) throw new Exception("Error generating answer");
+                if (data is null) throw new InvalidOperationException("Error Deserializing Json");
+                if (data.TokenUsage is null) throw new InvalidOperationException("TokenUsage is null");
+                if (data.Choices is null) throw new InvalidOperationException("Error generating answer");
 
+                LogTokenUsage(data, request.Messages);
 
-                /*
-                 * REQUEST RESPONSE
-                 */
-                //string id = data.id;
-                //string @object = data.@object;
-                //int created = data.created;
-                //string model = data.model;  // gpt-3.5-turbo-0301
-
-                //int promptTokens = data.usage.prompt_tokens;    // tokens used generating the prompt
-                //int completionTokens = data.usage.completion_tokens;    // tokens used generating answer
-                //int totalTokens = data.usage.total_tokens;
-                
-
-                //Choice choice = data.choices[0];
-                //string finishReason = choice.finish_reason;
-                //int index = choice.index;
-                //Message message = choice.Message;
-                //string role = message.Role;         // 'assistant' or 'user', except for the first message in a conversation: 'system'
-                //string content = message.Content;   // this is the answer text
-
-
-                return data.choices[0].Message.Content;
-
+                return data.Choices[0].Message?.Content ?? throw new InvalidOperationException("Error generating answer");
             }
-
-            
         }
         catch (Exception e)
         {
@@ -160,6 +168,7 @@ public class GptService : IGptService
 
         return null;
     }
+
 
     private string GetMockReply()
     {
@@ -175,90 +184,20 @@ public class GptService : IGptService
                "generating high-quality, natural language responses to a wide range of prompts and queries, " +
                "making communication and information retrieval more efficient and effective.";
     }
-    
-}
-
-
-public class OpenAIRequest
-{
-    [JsonPropertyName("model")]
-    public string? Model { get; set; }
-    [JsonPropertyName("messages")]
-    public List<Message>? Messages { get; set; }
 
 }
 
-public class Message
-{
-    [JsonPropertyName("role")]
-    public string? Role { get; set; }
-    [JsonPropertyName("content")]
-    public string? Content { get; set; }
-}
 
 
 
-public class Choice
-{
-    
-    [JsonPropertyName("message")]
-    public Message? Message { get; set; }
-
-    [JsonPropertyName("index")]
-    public int index { get; set; }
-
-    [JsonPropertyName("finish_reason")]
-    public string? finish_reason { get; set; }
-}
-public class Root
-{
-    [JsonPropertyName("id")]
-    public string? id { get; set; }
-
-    [JsonPropertyName("object")]
-    public string? @object { get; set; }
-
-    [JsonPropertyName("created")]
-    public int created { get; set; }
-
-    [JsonPropertyName("model")] 
-    public string? model { get; set; }
-
-    [JsonPropertyName("choices")]
-    public List<Choice>? choices { get; set; }
-
-    [JsonPropertyName("usage")]
-    public Usage? usage { get; set; }
-}
-
-/*
- * $$$$$$$$$
- */
-public class Usage
-{
-    public int prompt_tokens { get; set; }
-    public int completion_tokens { get; set; }
-    public int total_tokens { get; set; }
-}
 
 
 
-public class OpenAIErrorResponse
-{
-    [JsonPropertyName("error")]
-    public OpenAIError? Error { get; set; }
-}
-public class OpenAIError
-{
-    [JsonPropertyName("message")]
-    public string? Message { get; set; }
 
-    [JsonPropertyName("type")]
-    public string? Type { get; set; }
 
-    [JsonPropertyName("param")]
-    public string? Param { get; set; }
 
-    [JsonPropertyName("code")]
-    public string? Code { get; set; }
-}
+
+
+
+
+

@@ -4,6 +4,7 @@ using Courses.Api.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using Serilog;
+using Serilog.Sinks.Elasticsearch;
 using WarGamesAPI.Data;
 using WarGamesAPI.Helpers;
 using WarGamesAPI.Interfaces;
@@ -11,6 +12,26 @@ using WarGamesAPI.Services;
 using WarGamesAPI.Settings;
 
 var builder = WebApplication.CreateBuilder(args);
+
+var configuration = builder.Configuration;
+
+// Configure Serilog
+Log.Logger = new LoggerConfiguration()
+    .ReadFrom.Configuration(configuration)
+    .WriteTo.Console()
+    .WriteTo.Elasticsearch(new ElasticsearchSinkOptions(new Uri(configuration["WarGamesConfiguration:Uri"]!))
+    {
+        AutoRegisterTemplate = true,
+        IndexFormat = $"{configuration["ApplicationName"]}-logs-{builder.Environment.EnvironmentName?.ToLower().Replace(".", "-")}-{DateTime.UtcNow:yyyy-MM}",
+        NumberOfShards = 2,
+        NumberOfReplicas = 1
+    })
+    .Enrich.WithProperty("Environment", builder.Environment.EnvironmentName ?? "unknown")
+    .Enrich.WithMachineName()
+    .Enrich.WithThreadId()
+    .ReadFrom.Configuration(builder.Configuration)
+    .CreateLogger();
+
 
 // Add services to the container.
 builder.Services.AddDbContext<WarGamesContext>(options =>
@@ -78,20 +99,11 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IQuestionRepository, QuestionRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IValidationRepository, ValidationRepository>();
-
-//builder.Services.AddSingleton<IConfiguration>(configuration);
-
-
 builder.Services.AddScoped<IGptService, GptService>();
 
 
-Log.Logger = new LoggerConfiguration()
-    .ReadFrom.Configuration(builder.Configuration)
-    .Enrich.FromLogContext()
-    .CreateLogger();
-
-
-builder.Host.UseSerilog();
+builder.Logging.ClearProviders(); // Remove default loggers
+builder.Logging.AddSerilog(); // Add Serilog logger
 
 var app = builder.Build();
 

@@ -36,6 +36,7 @@ public class QuestionController : ControllerBase
             return BadRequest("The Authorization header is required.");
         var userId = TokenData.getUserId(Request.Headers["Authorization"]!);
 
+        _logger.LogInformation("GetQuestions called");
         
         return Ok (await _questionRepo.GetUserQuestionsAsync(userId));
     }
@@ -56,6 +57,8 @@ public class QuestionController : ControllerBase
     [HttpPost("askquestion")]
     public async Task<ActionResult<AnswerDto>> AskQuestion(AskQuestionDto userQuestion)
     {
+
+
         if (!Request.Headers.ContainsKey("Authorization") || string.IsNullOrEmpty(Request.Headers["Authorization"])) 
             return BadRequest("The Authorization header is required.");
 
