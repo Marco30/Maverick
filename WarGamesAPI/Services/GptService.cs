@@ -60,8 +60,6 @@ public class GptService : IGptService
         //var messages = new List<Message> { new() { Role = "system", Content = "You are a helpful but shy assistant " } };
 
 
-
-
         foreach (var q in conversationQuestions)
         {
             var messageText = "";

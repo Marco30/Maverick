@@ -30,4 +30,10 @@ public class OpenAIRequest
     [JsonPropertyName("messages")]
     public List<Message>? Messages { get; set; }
 
+    [JsonPropertyName("temperature")]
+    public float Temperature { get; set; }
+
+    [JsonPropertyName("max_tokens")]
+    public int MaxTokens { get; set; }
+
 }

@@ -7,6 +7,9 @@ public class Conversation
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int Id { get; set; }
 
+    public string? Name { get; set; }
+    public DateTime Date { get; set; }
+
     [ForeignKey("UserId")]
     public int UserId { get; set; }
     public User? User { get; set; }

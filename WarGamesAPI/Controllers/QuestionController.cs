@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 using MiracleMileAPI.Sessions;
 using WarGamesAPI.DTO;
 using WarGamesAPI.Filters;
@@ -51,6 +52,37 @@ public class QuestionController : ControllerBase
 
         var conversations = await _questionRepo.GetConversationInfosAsync(userId);
         return Ok(conversations);
+    }
+
+    [ValidateToken]
+    [HttpPost("createconversation")]
+    public async Task<ActionResult<ConversationInfoDto>> CreateConversation(CreateConversationDto createConversation)
+    {
+        if (!Request.Headers.ContainsKey("Authorization") || string.IsNullOrEmpty(Request.Headers["Authorization"])) 
+            return BadRequest("The Authorization header is required.");
+        
+        var userId = TokenData.getUserId(Request.Headers["Authorization"]!);
+        
+        if (userId != createConversation.UserId) return BadRequest();
+
+        if (string.IsNullOrEmpty(createConversation.ConversationName?.Trim()))
+        {
+            return BadRequest("Conversation name is required");
+        }
+
+        
+        try
+        {
+            var newConversation = await _questionRepo.CreateConversationAsync(createConversation);
+            return Ok(_mapper.Map<ConversationInfoDto>(newConversation));
+
+        }
+        catch (Exception e)
+        {
+            var error = new ResponseMessageDto { StatusCode = 500, Message = e.Message };
+            return StatusCode(500, error);
+        }
+
     }
 
     [ValidateToken]
@@ -166,7 +198,28 @@ public class QuestionController : ControllerBase
 
     }
 
-    
+    [ValidateToken]
+    [HttpPost("changeconversationname")]
+    public async Task<ActionResult<string?>> ChangeConversationName(NameConversationDto name)
+    {
+        if (!Request.Headers.ContainsKey("Authorization") || string.IsNullOrEmpty(Request.Headers["Authorization"])) 
+            return BadRequest("The Authorization header is required.");
+        var userId = TokenData.getUserId(Request.Headers["Authorization"]!);
+
+        if (!await _validationRepo.UserOwnsConversation(userId, name.ConversationId)) return NotFound();
+
+        try
+        {
+            return Ok(await _questionRepo.ChangeConversationNameAsync(name));
+        }
+        catch (Exception e)
+        {
+            var error = new ResponseMessageDto { StatusCode = 500, Message = e.Message };
+            return StatusCode(500, error);
+        }
+        
+    }
+
     [ValidateToken]
     [HttpDelete("deletequestion")]
     public async Task<IActionResult> DeleteQuestion(GetQuestionDto deleteQuestion)
