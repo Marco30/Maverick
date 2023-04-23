@@ -22,13 +22,24 @@ public class QuestionRepository : IQuestionRepository
 
     public async Task<QuestionDto?> SaveQuestionAsync(QuestionDto userQuestion)
     {
-        var userId = (int)userQuestion.UserId!;
+        var userId = userQuestion.UserId;
 
         
         if (userQuestion.ConversationId == 0)
         {
+            var conversationName = "";
+            if (userQuestion.Text != null)
+            {
+                conversationName = string.Join(" ", userQuestion.Text.Trim().Split(Array.Empty<char>(), 
+                    StringSplitOptions.RemoveEmptyEntries));
+            }
 
-            var conversation = await CreateConversationAsync(userId);
+            var createConversation = new CreateConversationDto
+            {
+                UserId = userQuestion.UserId, ConversationName = conversationName
+            };
+
+            var conversation = await CreateConversationAsync(createConversation);
             userQuestion.ConversationId = conversation!.Id;
 
         }
@@ -114,6 +125,15 @@ public class QuestionRepository : IQuestionRepository
         
     }
 
+    public async Task<string?> ChangeConversationNameAsync(NameConversationDto name)
+    {
+        var conversation = await _context.Conversation.SingleOrDefaultAsync(c => c.Id == name.ConversationId);
+        if (conversation is null) return null;
+        conversation.Name = name.ConversationName;
+        await _context.SaveChangesAsync();
+        return conversation.Name;
+    }
+
     public async Task<List<ConversationInfoDto>> GetConversationInfosAsync(int userId)
     {
         var conversations = await _context.Conversation
@@ -121,22 +141,7 @@ public class QuestionRepository : IQuestionRepository
             .Include(c => c.Answers)
             .Where(c => c.UserId == userId).ToListAsync();
 
-        var result = new List<ConversationInfoDto>();
-
-        foreach (var conversation in conversations)
-        {
-            if (conversation.Questions.Count != 0)
-            {
-                var conversationInfo = _mapper.Map<ConversationInfoDto>(conversation);
-                conversationInfo.Name = conversation.Questions.First().Text;
-                conversationInfo.Date = conversation.Answers.First().Date;
-                result.Add(conversationInfo);
-            }
-
-        }
-
-        return result;
-
+        return conversations.Select(conversation => _mapper.Map<ConversationInfoDto>(conversation)).ToList();
 
     }
 
@@ -214,9 +219,18 @@ public class QuestionRepository : IQuestionRepository
 
     }
 
-    private async Task<Conversation?> CreateConversationAsync(int userId)
+    public async Task<Conversation?> CreateConversationAsync(CreateConversationDto newConversation)
     {
-        var conversation = new Conversation { UserId = userId };
+        if (newConversation.ConversationName is null) throw new Exception("Conversation name is required");
+
+        newConversation.ConversationName = await GenerateConversationNameAsync(newConversation);
+
+        var conversation = new Conversation
+        {
+            UserId = newConversation.UserId, 
+            Name = newConversation.ConversationName,
+            Date = DateTime.Now
+        };
         
         try
         {
@@ -231,5 +245,45 @@ public class QuestionRepository : IQuestionRepository
         }
 
     }
+
+    private async Task<string> GenerateConversationNameAsync(CreateConversationDto newConversation)
+    {
+        var userConversations =
+            await _context.Conversation.Where(c => c.UserId == newConversation.UserId).ToListAsync();
+
+        var newName = newConversation.ConversationName!;
+        var highestSuffix = userConversations.Select(c => GetSuffix(c.Name, newName)).Max();
+    
+        if (userConversations.All(c => c.Name != newName))
+        {
+            return newName;
+        }
+    
+        var suffixNumber = highestSuffix + 1;
+        var result = $"{newName}({suffixNumber})";
+
+        while (userConversations.Any(c => c.Name == result))
+        {
+            suffixNumber++;
+            result = $"{newName}({suffixNumber})";
+        }
+
+        return result;
+    }
+
+    private int GetSuffix(string? oldName, string newName)
+    {
+        if (oldName is null || !oldName.StartsWith(newName)) return 0;
+
+        var suffix = oldName[newName.Length..].Trim(); // extract suffix (n)
+
+        if (!suffix.StartsWith("(") || !suffix.EndsWith(")")) return 0;
+
+        suffix = suffix.Substring(1, suffix.Length - 2);    // remove parentheses
+        int.TryParse(suffix, out var result);
+
+        return result;
+    }
+
 
 }

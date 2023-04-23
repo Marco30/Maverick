@@ -1,4 +1,5 @@
 using WarGamesAPI.DTO;
+using WarGamesAPI.Model;
 
 namespace WarGamesAPI.Interfaces;
 
@@ -12,6 +13,8 @@ public interface IQuestionRepository
     Task<ConversationDto?> GetConversationAsync(int conversationId);
     Task<List<AnswerDto>> GetAnswersAsync(int questionId);
     Task<List<ConversationInfoDto>> GetConversationInfosAsync(int userId);
+    Task<string?> ChangeConversationNameAsync(NameConversationDto name);
+    Task<Conversation?> CreateConversationAsync(CreateConversationDto newConversation);
     
 
 
