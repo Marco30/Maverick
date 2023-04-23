@@ -116,7 +116,7 @@ public class QuestionRepository : IQuestionRepository
         }
         return new ConversationDto
         {
-            ChatMessages = messages
+            Conversation = messages
         };
         
     }

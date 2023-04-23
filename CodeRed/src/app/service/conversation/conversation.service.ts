@@ -21,19 +21,19 @@ export class ConversationService {
     return this.httpRequestService.postData<Question>(url, queryParams);
   }
 
-  conversation(conversationId: number) : Observable<any>{
+  conversation(conversationId: number) : Observable<ConversationTree>{
     const url = environment.get_conversation;
     console.info('conversationId')
     console.info(conversationId)
     let test = { conversationId: conversationId};
     const queryParams = { model: test};
-    return this.httpRequestService.postData<any>(url, queryParams);
+    return this.httpRequestService.postData<ConversationTree>(url, queryParams);
   }
 
   listConversations() : Observable<any>{
     const url = environment.get_ListOfconversations;
     const queryParams = { id: 0};
-    return this.httpRequestService.getData<any>(url, queryParams);
+    return this.httpRequestService.getData<any>(url);
   }
 
 }

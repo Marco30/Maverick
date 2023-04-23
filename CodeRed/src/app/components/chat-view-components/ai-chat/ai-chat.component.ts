@@ -5,6 +5,9 @@ import { ConversationService } from 'src/app/service/conversation/conversation.s
 import { SharedDataService } from 'src/app/service/sharedData/shared-data.service';
 import { ConversationInfo } from 'src/app/model/conversationInfo/conversation-info';
 import { Subject, takeUntil } from 'rxjs';
+import { Conversation } from 'src/app/model/conversation/conversation';
+import { ConversationTree } from 'src/app/model/conversationTree/conversation-tree';
+import { Answer } from 'src/app/model/answer/answer';
 
 
 @Component({
@@ -27,6 +30,16 @@ export class AiChatComponent {
     mockReply: true,
   };
 
+  answer1 = new Answer(1, 'Answer 1', new Date(), 1, 1);
+  answer2 = new Answer(2, 'Answer 2', new Date(), 1, 1);
+  answers = [this.answer1, this.answer2];
+
+  question = new Question(1, 'Question 1', false);
+
+  conversation = new Conversation(this.question, this.answers);
+
+  conversationTree: ConversationTree = new ConversationTree([this.conversation]);
+  
   conversationInfo = new ConversationInfo(0 , '', new Date, 0 );
 
   constructor(private conversationService: ConversationService,private http: HttpClient, private sharedDataService: SharedDataService) { }
@@ -37,6 +50,7 @@ export class AiChatComponent {
     console.info('Marco test');
     console.info(this.conversationInfo);
 
+    
     this.messages = [
       { sender: 'Ava', content: 'Hi there! How can I help you?' },
       { sender: 'User', content: 'Can you tell me more about your product?' },
@@ -73,8 +87,8 @@ export class AiChatComponent {
       next: (res) => {
 
         console.info('-----AIFulConversation-----');
-        console.info(res);
-        
+        this.conversationTree.conversation = res.conversation;
+        console.info(this.conversationTree.conversation);
       },
       error: (err) => {
         console.error('An error occurred:', err);
