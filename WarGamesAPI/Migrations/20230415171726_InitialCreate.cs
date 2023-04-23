@@ -112,8 +112,8 @@ namespace WarGamesAPI.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Text = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Time = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    QuestionId = table.Column<int>(type: "int", nullable: false),
+                    Date = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    QuestionId = table.Column<int>(type: "int", nullable: true),
                     ConversationId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -130,6 +130,16 @@ namespace WarGamesAPI.Migrations
                         principalTable: "Question",
                         principalColumn: "Id");
                 });
+
+            migrationBuilder.InsertData(
+                table: "Address",
+                columns: new[] { "Id", "Attention", "CareOf", "City", "Country", "Municipality", "Street", "UserId", "ZipCode" },
+                values: new object[] { 1, null, null, "Stockholm", "Sweden", null, "Röntgenvägen 5 lgh 1410", 5, "14152" });
+
+            migrationBuilder.InsertData(
+                table: "User",
+                columns: new[] { "Id", "AddressId", "AgreeMarketing", "Email", "FirstName", "FullName", "Gender", "LastName", "MobilePhoneNumber", "Password", "PhoneNumber", "ProfileImage", "SocialSecurityNumber", "SubscribeToEmailNotification" },
+                values: new object[] { 5, 1, true, "khaled@khaled.se", "Khaled", "Khaled Abo", "Man", "Abo", null, "123456", null, null, "198507119595", true });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Answer_ConversationId",

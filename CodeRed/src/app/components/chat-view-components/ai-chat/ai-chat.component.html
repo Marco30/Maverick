@@ -113,18 +113,23 @@
             </div>
           </nav>
           <!--test-->
+          <div class="alert alert-danger" [hidden]="!showError">{{errorMessage}}</div>
+
           <form class="form-inline mt-4" (ngSubmit)="onSubmit()">
             <div class="form-group mr-2">
               <input
                 type="text"
                 class="form-control"
                 placeholder="Type your message"
-                [(ngModel)]="newMessage"
+                [(ngModel)]="questionData.text"
                 name="newMessage"
               />
             </div>
             <button type="submit" class="btn btn-primary">Send</button>
           </form>
+
+          <div>{{conversationInfo.id}}</div>
+
         </div>
       </div>
     </div>

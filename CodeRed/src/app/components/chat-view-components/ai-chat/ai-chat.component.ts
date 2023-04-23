@@ -1,5 +1,14 @@
 import { Component, ElementRef, ViewChild } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { Question } from 'src/app/model/question/question';
+import { ConversationService } from 'src/app/service/conversation/conversation.service';
+import { SharedDataService } from 'src/app/service/sharedData/shared-data.service';
+import { ConversationInfo } from 'src/app/model/conversationInfo/conversation-info';
+import { Subject, takeUntil } from 'rxjs';
+import { Conversation } from 'src/app/model/conversation/conversation';
+import { ConversationTree } from 'src/app/model/conversationTree/conversation-tree';
+import { Answer } from 'src/app/model/answer/answer';
+
 
 @Component({
   selector: 'app-ai-chat',
@@ -7,15 +16,41 @@ import { HttpClient } from '@angular/common/http';
   styleUrls: ['./ai-chat.component.css'],
 })
 export class AiChatComponent {
+
+  onDestroy$: Subject<boolean> = new Subject();
+
   messages: any[] = [];
   newMessage: string = '';
   @ViewChild('chatContainer', { static: false }) private chatContainer: ElementRef | null = null;
+  showError = false;
+  errorMessage = '';
+  questionData: Question = {
+    conversationId: 0,
+    text: '',
+    mockReply: true,
+  };
 
-  constructor(private http: HttpClient) { }
+  answer1 = new Answer(1, 'Answer 1', new Date(), 1, 1);
+  answer2 = new Answer(2, 'Answer 2', new Date(), 1, 1);
+  answers = [this.answer1, this.answer2];
+
+  question = new Question(1, 'Question 1', false);
+
+  conversation = new Conversation(this.question, this.answers);
+
+  conversationTree: ConversationTree = new ConversationTree([this.conversation]);
+  
+  conversationInfo = new ConversationInfo(0 , '', new Date, 0 );
+
+  constructor(private conversationService: ConversationService,private http: HttpClient, private sharedDataService: SharedDataService) { }
 
   ngOnInit() {
-    console.info('Marco test');
 
+    this.getConversationInfo()
+    console.info('Marco test');
+    console.info(this.conversationInfo);
+
+    
     this.messages = [
       { sender: 'Ava', content: 'Hi there! How can I help you?' },
       { sender: 'User', content: 'Can you tell me more about your product?' },
@@ -37,6 +72,49 @@ export class AiChatComponent {
     this.exampleAnswers();
   }
 
+  ngOnDestroy(): void {
+
+    this.onDestroy$.next(true);
+    this.onDestroy$.unsubscribe();
+  
+}
+
+
+  getConversationData(){
+
+
+    this.conversationService.conversation(this.conversationInfo.id).pipe(takeUntil(this.onDestroy$)).subscribe({
+      next: (res) => {
+
+        console.info('-----AIFulConversation-----');
+        this.conversationTree.conversation = res.conversation;
+        console.info(this.conversationTree.conversation);
+      },
+      error: (err) => {
+        console.error('An error occurred:', err);
+        this.errorMessage = 'An error occurred while processing your request. Please try again later.';
+        this.showError = true;   
+        setTimeout(() => {
+          this.showError = false;
+        }, 5000); // hide after 5 seconds
+      },
+      // complete: () => (this.showLoading = false),
+    });
+
+  }
+
+  getConversationInfo(){
+
+    this.sharedDataService.selectedConversationInfo$.subscribe((value) => {
+      
+      this.conversationInfo = value;
+      if(this.conversationInfo.id != 0){
+      this.getConversationData();
+      }
+
+    });
+  }
+
   ngAfterViewInit() {
     if (this.chatContainer) {
       this.scrollToLastMessage()
@@ -45,29 +123,32 @@ export class AiChatComponent {
 
   scrollToLastMessage(): void {
     
-    setTimeout(() => {
-
     const element = document.getElementById("advanced-tools"); // Your target element
     const headerOffset = 45;
-
-    if (element) {
-      const elementPosition = element.getBoundingClientRect().top;
-      const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
-
-
-      window.scrollTo({
-        top: offsetPosition,
-        behavior: "smooth",
-      });
-    }
-    /* const lastMessageIndex = this.messages.length - 1;
+    const isScrolledToTarget = element && element.getBoundingClientRect().top <= headerOffset;
+  
+    if (!isScrolledToTarget) {
+      setTimeout(() => {
+        if (element) {
+          const elementPosition = element.getBoundingClientRect().top;
+          const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+  
+          window.scrollTo({
+            top: offsetPosition,
+            behavior: "smooth",
+          });
+          /*    const lastMessageIndex = this.messages.length - 1;
     const lastMessageId = 'message-' + lastMessageIndex;
     const lastMessageElement = document.getElementById('advanced-tools');
     if (lastMessageElement) {
       lastMessageElement.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    } */
-  },300);
+    }  */
 
+        }
+      }, 300);
+    }
+
+   
   }
 
 
@@ -101,43 +182,68 @@ export class AiChatComponent {
     });
   }
 
-  onSubmit() {
-    /*if (this.newMessage) {
-      this.messages.push({ sender: 'User', content: this.newMessage });
-      this.http
-        .post(
-          'https://api.openai.com/v1/engines/davinci-codex/completions',
-          {
-            prompt: this.newMessage,
-            max_tokens: 150,
-            n: 1,
-            stop: '\n',
-            temperature: 0.7,
-          },
-          {
-            headers: {
-              Authorization: 'Bearer ' + 'YOUR_API_KEY_HERE',
-              'Content-Type': 'application/json',
-            },
-          }
-        )
-        .subscribe((response: any) => {
-          const botMessage = response.choices[0].text.trim();
-          this.messages.push({ sender: 'Bot', content: botMessage });
-        });
-      this.newMessage = '';
-    } */
-
-    this.messages.push({
-      sender: 'Ava',
-      content: 'Youre welcome. Have a great day!',
-    });
-
  
+
+  
+  onSubmit() {
+
+    if (this.questionData.text != '') {
+
+      this.questionData.mockReply = true;
+     
+
+      this.conversationService.askTheAI(this.questionData).subscribe({
+        next: (res) => {
+
+          console.info('-----AskTheAI-----');
+          console.info(res);
+        
+
+        },
+        error: (err) => {
+          console.error('An error occurred:', err);
+          this.errorMessage = 'An error occurred while processing your request. Please try again later.';
+          this.showError = true;   
+          setTimeout(() => {
+            this.showError = false;
+          }, 5000); // hide after 5 seconds
+        },
+        // complete: () => (this.showLoading = false),
+      });
+    
+    } 
+
+     this.messages.push({
+      sender: 'Ava',
+      content: '',
+    }); 
+   
+   // var testtext = 'I am ChatGPT, a large language model developed by OpenAI using the GPT-3.5 architecture. As a language model, my primary function is to generate natural language responses to text-based inputs such as questions, prompts, and statements.\r\n\r\nI was trained on a massive dataset of written text from the internet and other sources, which allows me to understand and generate responses in a wide variety of topics and domains. My training data includes text in multiple languages, making me capable of generating responses in several languages.\r\n\r\nI use machine learning techniques such as deep neural networks to analyze and understand the structure and context of the input text. Based on this analysis, I generate a response that is meant to be natural-sounding and relevant to the input.\r\n\r\nOverall, my purpose is to assist users in generating high-quality, natural language responses to a wide range of prompts and queries, making communication and information retrieval more efficient and effective.';
+   // this.revealText(testtext,10);
+
+
+    console.info("questionData");
+ console.info(this.questionData);
 
       this.scrollToLastMessage();
 
 
   }
+
+
+  revealText(text: string, delay: number) {
+    let index = 0;
+    let interval = setInterval(() => {
+      //console.log(text.charAt(index));
+      this.messages[this.messages.length - 1].content += text.charAt(index);
+      this.scrollToLastMessage();
+      index++;
+      if (index >= text.length) {
+        clearInterval(interval);
+      }
+    }, delay);
+  }
+
+
 
 }

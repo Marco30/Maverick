@@ -1,6 +1,7 @@
 import { Component, ElementRef, Renderer2 } from '@angular/core';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { NavigationMenuComponent } from '../navigation-menu/navigation-menu.component';
+import { ListConversationsMenuComponent } from '../list-conversations-menu/list-conversations-menu.component';
 
 interface Item {
   name: string;
@@ -19,7 +20,7 @@ export class SidebarComponent {
   isCollapsed = [false, false, false];
   items = [
     { name: 'Toolbar 1', data: NavigationMenuComponent, position: 0 },
-    { name: 'Toolbar 2', data: null, position: 1 },
+    { name: 'Toolbar 2', data: ListConversationsMenuComponent, position: 1 },
     { name: 'Toolbar 3', data: null, position: 2 },
   ];
 
@@ -47,6 +48,9 @@ export class SidebarComponent {
             case 'NavigationMenuComponent':
               // If the component name is 'NavigationMenuComponent', return the component class
               return NavigationMenuComponent;
+            case 'ListConversationsMenuComponent':
+                // If the component name is 'NavigationMenuComponent', return the component class
+              return ListConversationsMenuComponent;
             case 'empty':
               // If the component name is 'empty', return null
               return null;

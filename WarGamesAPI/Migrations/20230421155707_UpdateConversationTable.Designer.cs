@@ -12,8 +12,8 @@ using WarGamesAPI.Data;
 namespace WarGamesAPI.Migrations
 {
     [DbContext(typeof(WarGamesContext))]
-    [Migration("20230402094317_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20230421155707_UpdateConversationTable")]
+    partial class UpdateConversationTable
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -60,6 +60,17 @@ namespace WarGamesAPI.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Address");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            City = "Stockholm",
+                            Country = "Sweden",
+                            Street = "Röntgenvägen 5 lgh 1410",
+                            UserId = 5,
+                            ZipCode = "14152"
+                        });
                 });
 
             modelBuilder.Entity("WarGamesAPI.Model.Answer", b =>
@@ -73,14 +84,14 @@ namespace WarGamesAPI.Migrations
                     b.Property<int>("ConversationId")
                         .HasColumnType("int");
 
-                    b.Property<int>("QuestionId")
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("QuestionId")
                         .HasColumnType("int");
 
                     b.Property<string>("Text")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("Time")
-                        .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
@@ -98,6 +109,12 @@ namespace WarGamesAPI.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("UserId")
                         .HasColumnType("int");
@@ -188,6 +205,22 @@ namespace WarGamesAPI.Migrations
                         .IsUnique();
 
                     b.ToTable("User");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 5,
+                            AddressId = 1,
+                            AgreeMarketing = true,
+                            Email = "khaled@khaled.se",
+                            FirstName = "Khaled",
+                            FullName = "Khaled Abo",
+                            Gender = "Man",
+                            LastName = "Abo",
+                            Password = "123456",
+                            SocialSecurityNumber = "198507119595",
+                            SubscribeToEmailNotification = true
+                        });
                 });
 
             modelBuilder.Entity("WarGamesAPI.Model.Answer", b =>
@@ -201,8 +234,7 @@ namespace WarGamesAPI.Migrations
                     b.HasOne("WarGamesAPI.Model.Question", "Question")
                         .WithMany("Answers")
                         .HasForeignKey("QuestionId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.Navigation("Conversation");
 

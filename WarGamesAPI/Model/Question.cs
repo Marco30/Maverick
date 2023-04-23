@@ -1,9 +1,8 @@
 using System.ComponentModel.DataAnnotations.Schema;
-using WarGamesAPIAPI.JsonCRUD;
 
 namespace WarGamesAPI.Model;
 
-public class Question : Json.IGenericIdInterface<Question>
+public class Question
 {
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int Id { get; set; }
