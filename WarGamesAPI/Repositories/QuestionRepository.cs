@@ -247,6 +247,11 @@ public class QuestionRepository : IQuestionRepository
         var userConversations =
             await _context.Conversation.Where(c => c.UserId == userId).ToListAsync();
 
+        if (userConversations.Count == 0)
+        {
+            return name;
+        }
+
         var highestSuffix = userConversations.Select(c => GetSuffix(c.Name, name)).Max();
     
         if (userConversations.All(c => c.Name != name))
