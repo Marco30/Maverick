@@ -1,0 +1,30 @@
+<div class="container">
+  <button class="btn btn-primary" (click)="toggleMoveable()">
+    <i class="fas fa-arrows-alt"></i>
+    {{ isMoveable ? 'Stop dargging' : 'Start dargging' }}
+  </button>
+  <div class="moveable-indicator" *ngIf="isMoveable">
+    <span>change the order of the list now</span>
+  </div>
+  <table class="table table-striped table-bordered table-hover">
+    <thead>
+      <tr>
+        <th scope="col">Name</th>
+        <th scope="col">Date</th>
+      </tr>
+    </thead>
+    <tbody *ngIf="conversations.list">
+      <tr *ngFor="let item of conversations.list; let i = index"
+          [attr.draggable]="isMoveable ? true : null"
+          (dragstart)="onDragStart($event, i)"
+          (dragover)="onDragOver($event)"
+          (drop)="onDrop($event, i)" 
+          (click)="isMoveable === false ? openConversation(item) : null">
+        <td>{{ item.name }}</td>
+        <td>{{ item.date | date }}</td>
+      </tr>
+    </tbody>
+  </table>
+   <!--test-->
+   <div class="alert alert-danger" [hidden]="!showError">{{errorMessage}}</div>
+</div>

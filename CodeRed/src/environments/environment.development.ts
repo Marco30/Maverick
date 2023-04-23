@@ -7,6 +7,7 @@ export const environment = {
   refreshToken_url: `${BaseUrl}/newToken`,
   register_url: `${BaseUrl}/registerUser`,
   ask_question: `${BaseUrl}/askquestion`,
-  get_conversations: `${BaseUrl}/getconversations`,
+  get_ListOfconversations: `${BaseUrl}/getconversations`,
+  get_conversation: `${BaseUrl}/getconversation`,
   get_user_data_from_security_number: `${BaseUrl}/getUserDataFromSecurityNumber`,
 };

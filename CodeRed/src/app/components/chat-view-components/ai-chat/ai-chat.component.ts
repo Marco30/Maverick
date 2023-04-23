@@ -2,6 +2,10 @@ import { Component, ElementRef, ViewChild } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Question } from 'src/app/model/question/question';
 import { ConversationService } from 'src/app/service/conversation/conversation.service';
+import { SharedDataService } from 'src/app/service/sharedData/shared-data.service';
+import { ConversationInfo } from 'src/app/model/conversationInfo/conversation-info';
+import { Subject, takeUntil } from 'rxjs';
+
 
 @Component({
   selector: 'app-ai-chat',
@@ -9,6 +13,9 @@ import { ConversationService } from 'src/app/service/conversation/conversation.s
   styleUrls: ['./ai-chat.component.css'],
 })
 export class AiChatComponent {
+
+  onDestroy$: Subject<boolean> = new Subject();
+
   messages: any[] = [];
   newMessage: string = '';
   @ViewChild('chatContainer', { static: false }) private chatContainer: ElementRef | null = null;
@@ -20,10 +27,15 @@ export class AiChatComponent {
     mockReply: true,
   };
 
-  constructor(private conversationService: ConversationService,private http: HttpClient) { }
+  conversationInfo = new ConversationInfo(0 , '', new Date, 0 );
+
+  constructor(private conversationService: ConversationService,private http: HttpClient, private sharedDataService: SharedDataService) { }
 
   ngOnInit() {
+
+    this.getConversationInfo()
     console.info('Marco test');
+    console.info(this.conversationInfo);
 
     this.messages = [
       { sender: 'Ava', content: 'Hi there! How can I help you?' },
@@ -44,6 +56,49 @@ export class AiChatComponent {
     ];
 
     this.exampleAnswers();
+  }
+
+  ngOnDestroy(): void {
+
+    this.onDestroy$.next(true);
+    this.onDestroy$.unsubscribe();
+  
+}
+
+
+  getConversationData(){
+
+
+    this.conversationService.conversation(this.conversationInfo.id).pipe(takeUntil(this.onDestroy$)).subscribe({
+      next: (res) => {
+
+        console.info('-----AIFulConversation-----');
+        console.info(res);
+        
+      },
+      error: (err) => {
+        console.error('An error occurred:', err);
+        this.errorMessage = 'An error occurred while processing your request. Please try again later.';
+        this.showError = true;   
+        setTimeout(() => {
+          this.showError = false;
+        }, 5000); // hide after 5 seconds
+      },
+      // complete: () => (this.showLoading = false),
+    });
+
+  }
+
+  getConversationInfo(){
+
+    this.sharedDataService.selectedConversationInfo$.subscribe((value) => {
+      
+      this.conversationInfo = value;
+      if(this.conversationInfo.id != 0){
+      this.getConversationData();
+      }
+
+    });
   }
 
   ngAfterViewInit() {
@@ -113,10 +168,14 @@ export class AiChatComponent {
     });
   }
 
+ 
+
+  
   onSubmit() {
 
-    /*if (this.questionData.text != '') {
+    if (this.questionData.text != '') {
 
+      this.questionData.mockReply = true;
      
 
       this.conversationService.askTheAI(this.questionData).subscribe({
@@ -138,15 +197,15 @@ export class AiChatComponent {
         // complete: () => (this.showLoading = false),
       });
     
-    } */
+    } 
 
      this.messages.push({
       sender: 'Ava',
       content: '',
     }); 
    
-    var testtext = 'I am ChatGPT, a large language model developed by OpenAI using the GPT-3.5 architecture. As a language model, my primary function is to generate natural language responses to text-based inputs such as questions, prompts, and statements.\r\n\r\nI was trained on a massive dataset of written text from the internet and other sources, which allows me to understand and generate responses in a wide variety of topics and domains. My training data includes text in multiple languages, making me capable of generating responses in several languages.\r\n\r\nI use machine learning techniques such as deep neural networks to analyze and understand the structure and context of the input text. Based on this analysis, I generate a response that is meant to be natural-sounding and relevant to the input.\r\n\r\nOverall, my purpose is to assist users in generating high-quality, natural language responses to a wide range of prompts and queries, making communication and information retrieval more efficient and effective.';
-    this.revealText(testtext,10);
+   // var testtext = 'I am ChatGPT, a large language model developed by OpenAI using the GPT-3.5 architecture. As a language model, my primary function is to generate natural language responses to text-based inputs such as questions, prompts, and statements.\r\n\r\nI was trained on a massive dataset of written text from the internet and other sources, which allows me to understand and generate responses in a wide variety of topics and domains. My training data includes text in multiple languages, making me capable of generating responses in several languages.\r\n\r\nI use machine learning techniques such as deep neural networks to analyze and understand the structure and context of the input text. Based on this analysis, I generate a response that is meant to be natural-sounding and relevant to the input.\r\n\r\nOverall, my purpose is to assist users in generating high-quality, natural language responses to a wide range of prompts and queries, making communication and information retrieval more efficient and effective.';
+   // this.revealText(testtext,10);
 
 
     console.info("questionData");

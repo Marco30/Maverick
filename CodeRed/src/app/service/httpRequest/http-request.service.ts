@@ -12,8 +12,8 @@ export class HttpRequestService {
   public postData<T>(url: string, QueryParams: object = {}): Observable<any> {
     return this.genericHttpService.post<T>(url, QueryParams);
   }
-  public getData<T>(url: string): Observable<any> {
-    return this.genericHttpService.get<T>(url);
+  public getData<T>(url: string, QueryParams: object = {}): Observable<any> {
+    return this.genericHttpService.get<T>(url, QueryParams);
   }
 
   public deleteData<T>(url: string, item: any): Observable<any> {
