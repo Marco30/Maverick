@@ -1,7 +1,7 @@
 export class Question {
     conversationId: number;
     text: string;
-    mockReply: boolean;
+    mockReply: boolean ;
     constructor(conversationId: number, text: string, mockReply: boolean) {
         this.conversationId = conversationId;
         this.text = text;
