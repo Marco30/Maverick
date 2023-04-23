@@ -2,5 +2,6 @@ namespace WarGamesAPI.DTO;
 
 public class ConversationDto
 {
-    public List<QAItemDto> Conversation { get; set; } = new();
+    public int UserId { get; set; }
+    public List<QAItemDto> ChatMessages { get; set; } = new();
 }

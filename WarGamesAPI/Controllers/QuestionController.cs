@@ -62,8 +62,6 @@ public class QuestionController : ControllerBase
             return BadRequest("The Authorization header is required.");
         
         var userId = TokenData.getUserId(Request.Headers["Authorization"]!);
-        
-        if (userId != createConversation.UserId) return BadRequest();
 
         if (string.IsNullOrEmpty(createConversation.ConversationName?.Trim()))
         {
@@ -73,7 +71,7 @@ public class QuestionController : ControllerBase
         
         try
         {
-            var newConversation = await _questionRepo.CreateConversationAsync(createConversation);
+            var newConversation = await _questionRepo.CreateConversationAsync(userId, createConversation.ConversationName);
             return Ok(_mapper.Map<ConversationInfoDto>(newConversation));
 
         }

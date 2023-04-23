@@ -14,7 +14,7 @@ public interface IQuestionRepository
     Task<List<AnswerDto>> GetAnswersAsync(int questionId);
     Task<List<ConversationInfoDto>> GetConversationInfosAsync(int userId);
     Task<string?> ChangeConversationNameAsync(NameConversationDto name);
-    Task<Conversation?> CreateConversationAsync(CreateConversationDto newConversation);
+    Task<Conversation?> CreateConversationAsync(int userId, string conversationName);
     
 
 

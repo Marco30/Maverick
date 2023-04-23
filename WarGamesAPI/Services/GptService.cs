@@ -79,7 +79,7 @@ public class GptService : IGptService
                 }
             }
         }
-        return new OpenAIRequest { Model = "gpt-3.5-turbo", Messages = messages };
+        return new OpenAIRequest { Model = "gpt-3.5-turbo", Messages = messages, MaxTokens = 1000};
 
 
     }

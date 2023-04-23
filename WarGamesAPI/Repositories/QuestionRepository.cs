@@ -34,12 +34,8 @@ public class QuestionRepository : IQuestionRepository
                     StringSplitOptions.RemoveEmptyEntries));
             }
 
-            var createConversation = new CreateConversationDto
-            {
-                UserId = userQuestion.UserId, ConversationName = conversationName
-            };
-
-            var conversation = await CreateConversationAsync(createConversation);
+            
+            var conversation = await CreateConversationAsync(userQuestion.UserId, conversationName);
             userQuestion.ConversationId = conversation!.Id;
 
         }
@@ -120,7 +116,7 @@ public class QuestionRepository : IQuestionRepository
         }
         return new ConversationDto
         {
-            Conversation = messages
+            ChatMessages = messages
         };
         
     }
@@ -129,7 +125,7 @@ public class QuestionRepository : IQuestionRepository
     {
         var conversation = await _context.Conversation.SingleOrDefaultAsync(c => c.Id == name.ConversationId);
         if (conversation is null) return null;
-        conversation.Name = name.ConversationName;
+        conversation.Name = name.NewName;
         await _context.SaveChangesAsync();
         return conversation.Name;
     }
@@ -219,16 +215,16 @@ public class QuestionRepository : IQuestionRepository
 
     }
 
-    public async Task<Conversation?> CreateConversationAsync(CreateConversationDto newConversation)
+    public async Task<Conversation?> CreateConversationAsync(int userId, string conversationName)
     {
-        if (newConversation.ConversationName is null) throw new Exception("Conversation name is required");
+        if (conversationName is null) throw new Exception("Conversation name is required");
 
-        newConversation.ConversationName = await GenerateConversationNameAsync(newConversation);
+        conversationName = await GenerateUniqueConversationNameAsync(userId, conversationName);
 
         var conversation = new Conversation
         {
-            UserId = newConversation.UserId, 
-            Name = newConversation.ConversationName,
+            UserId = userId, 
+            Name = conversationName,
             Date = DateTime.Now
         };
         
@@ -246,26 +242,25 @@ public class QuestionRepository : IQuestionRepository
 
     }
 
-    private async Task<string> GenerateConversationNameAsync(CreateConversationDto newConversation)
+    private async Task<string> GenerateUniqueConversationNameAsync(int userId, string name)
     {
         var userConversations =
-            await _context.Conversation.Where(c => c.UserId == newConversation.UserId).ToListAsync();
+            await _context.Conversation.Where(c => c.UserId == userId).ToListAsync();
 
-        var newName = newConversation.ConversationName!;
-        var highestSuffix = userConversations.Select(c => GetSuffix(c.Name, newName)).Max();
+        var highestSuffix = userConversations.Select(c => GetSuffix(c.Name, name)).Max();
     
-        if (userConversations.All(c => c.Name != newName))
+        if (userConversations.All(c => c.Name != name))
         {
-            return newName;
+            return name;
         }
     
         var suffixNumber = highestSuffix + 1;
-        var result = $"{newName}({suffixNumber})";
+        var result = $"{name}({suffixNumber})";
 
         while (userConversations.Any(c => c.Name == result))
         {
             suffixNumber++;
-            result = $"{newName}({suffixNumber})";
+            result = $"{name}({suffixNumber})";
         }
 
         return result;
