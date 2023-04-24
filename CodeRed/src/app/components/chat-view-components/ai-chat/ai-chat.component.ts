@@ -200,7 +200,7 @@ export class AiChatComponent {
       this.questionData.conversationId = this.conversationInfo.id;
       }
 
-      this.questionData.mockReply = true;
+      this.questionData.mockReply = false;
      
 
       this.conversationService.askTheAI(this.questionData).pipe(takeUntil(this.onDestroy$)).subscribe({
@@ -211,7 +211,9 @@ export class AiChatComponent {
           let answerData = new Answer(res.id, '', res.date, res.questionId, res.conversationId);
           let conversationData = new Conversation(this.questionData, [answerData]);
           this.conversationTree.conversation.push(conversationData); 
+          if(res.text){
           this.revealText(res.text,10);
+          }
 
         },
         error: (err) => {
