@@ -200,7 +200,7 @@ export class AiChatComponent {
       this.questionData.conversationId = this.conversationInfo.id;
       }
 
-      this.questionData.mockReply = false;
+      this.questionData.mockReply = true;
      
 
       this.conversationService.askTheAI(this.questionData).pipe(takeUntil(this.onDestroy$)).subscribe({
