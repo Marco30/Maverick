@@ -8,6 +8,7 @@ import { Subject, takeUntil } from 'rxjs';
 import { Conversation } from 'src/app/model/conversation/conversation';
 import { ConversationTree } from 'src/app/model/conversationTree/conversation-tree';
 import { Answer } from 'src/app/model/answer/answer';
+import { AuthenticationService } from 'src/app/service/authentication/authentication.service';
 
 
 @Component({
@@ -16,6 +17,8 @@ import { Answer } from 'src/app/model/answer/answer';
   styleUrls: ['./ai-chat.component.css'],
 })
 export class AiChatComponent {
+
+  constructor(private conversationService: ConversationService,private authenticationService: AuthenticationService, private sharedDataService: SharedDataService) { }
 
   onDestroy$: Subject<boolean> = new Subject();
 
@@ -30,6 +33,9 @@ export class AiChatComponent {
     mockReply: true,
   };
 
+  AIname = 'Ava';
+  userName = this.authenticationService.getDataFromToken('firstname');
+
   answer1 = new Answer(1, 'Answer 1', new Date(), 1, 1);
   answer2 = new Answer(2, 'Answer 2', new Date(), 1, 1);
   answers = [this.answer1, this.answer2];
@@ -42,7 +48,7 @@ export class AiChatComponent {
   
   conversationInfo = new ConversationInfo(0 , '', new Date, 0 );
 
-  constructor(private conversationService: ConversationService,private http: HttpClient, private sharedDataService: SharedDataService) { }
+  
 
   ngOnInit() {
 
@@ -88,6 +94,7 @@ export class AiChatComponent {
 
         console.info('-----AIFulConversation-----');
         this.conversationTree.conversation = res.conversation;
+        this.scrollToLastMessage();
         console.info(this.conversationTree.conversation);
       },
       error: (err) => {
@@ -105,7 +112,7 @@ export class AiChatComponent {
 
   getConversationInfo(){
 
-    this.sharedDataService.selectedConversationInfo$.subscribe((value) => {
+    this.sharedDataService.selectedConversationInfo$.pipe(takeUntil(this.onDestroy$)).subscribe((value) => {
       
       this.conversationInfo = value;
       if(this.conversationInfo.id != 0){
@@ -189,15 +196,22 @@ export class AiChatComponent {
 
     if (this.questionData.text != '') {
 
+      if(this.conversationInfo.id != 0){
+      this.questionData.conversationId = this.conversationInfo.id;
+      }
+
       this.questionData.mockReply = true;
      
 
-      this.conversationService.askTheAI(this.questionData).subscribe({
+      this.conversationService.askTheAI(this.questionData).pipe(takeUntil(this.onDestroy$)).subscribe({
         next: (res) => {
 
           console.info('-----AskTheAI-----');
           console.info(res);
-        
+          let answerData = new Answer(res.id, '', res.date, res.questionId, res.conversationId);
+          let conversationData = new Conversation(this.questionData, [answerData]);
+          this.conversationTree.conversation.push(conversationData); 
+          this.revealText(res.text,10);
 
         },
         error: (err) => {
@@ -235,7 +249,7 @@ export class AiChatComponent {
     let index = 0;
     let interval = setInterval(() => {
       //console.log(text.charAt(index));
-      this.messages[this.messages.length - 1].content += text.charAt(index);
+      this.conversationTree.conversation[this.conversationTree.conversation.length - 1].answers[0].text += text.charAt(index);
       this.scrollToLastMessage();
       index++;
       if (index >= text.length) {

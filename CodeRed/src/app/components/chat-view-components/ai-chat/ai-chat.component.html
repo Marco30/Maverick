@@ -5,7 +5,7 @@
         <div class="card-body">
           <div class="chat-container" #chatContainer>
             <div
-              *ngFor="let message of messages; let i = index"
+              *ngFor="let message of this.conversationTree.conversation; let i = index"
               class="message"
               [attr.id]="'message-' + i"
             >
@@ -86,9 +86,15 @@
 
               <!--test-->
               <div class="message-header">
-                <strong>{{ message.sender }}</strong>
+                <strong>{{ userName }}</strong>
               </div>
-              <div class="message-body">{{ message.content }}</div>
+              <div class="message-body">{{ message.question.text }}</div>
+              <div class="message-header">
+                <strong>{{  AIname }}</strong>
+              </div>
+              <div *ngFor=" let answer of message.answers; let i = index">
+              <div class="message-body">{{ answer.text }}</div>
+            </div>
             </div>
           </div>
 
