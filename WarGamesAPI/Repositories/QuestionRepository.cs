@@ -20,11 +20,11 @@ public class QuestionRepository : IQuestionRepository
         _mapper = mapper;
     }
 
-    public async Task<QuestionDto?> SaveQuestionAsync(QuestionDto userQuestion)
+    public async Task<Answer> SaveQuestionAndAnswerAsync(QuestionDto userQuestion, AnswerDto answer)
     {
         var userId = userQuestion.UserId;
 
-        
+
         if (userQuestion.ConversationId == 0)
         {
             var conversationName = "";
@@ -34,51 +34,35 @@ public class QuestionRepository : IQuestionRepository
                     StringSplitOptions.RemoveEmptyEntries));
             }
 
-            
             var conversation = await CreateConversationAsync(userQuestion.UserId, conversationName);
-            userQuestion.ConversationId = conversation!.Id;
-
+            userQuestion.ConversationId = conversation.Id;
         }
 
-        var question = new Question
+        var questionToSave = new Question
         {
-            Text = userQuestion.Text, UserId = userId, 
-            ConversationId = (int)userQuestion.ConversationId
+            Text = userQuestion.Text, UserId = userId, ConversationId = userQuestion.ConversationId
         };
 
-        try
-        {
-            await _context.Question.AddAsync(question);
-            await _context.SaveChangesAsync();
-        }
-        catch (Exception e)
-        {
-            throw new Exception("Error saving question", e);
-        }
+        await _context.Question.AddAsync(questionToSave);
+        await _context.SaveChangesAsync();
 
-        return _mapper.Map<QuestionDto>(question);
-
-    }
-
-    public async Task<AnswerDto?> SaveAnswerAsync(AnswerDto answer)
-    {
         var answerToSave = new Answer
         {
             Text = answer.Text,
             Date = answer.Date,
-            QuestionId = answer.QuestionId,
-            ConversationId = answer.ConversationId
+            QuestionId = questionToSave.Id,
+            ConversationId = questionToSave.ConversationId
         };
 
         await _context.Answer.AddAsync(answerToSave);
         await _context.SaveChangesAsync();
 
-        answer.Id = answerToSave.Id;
+        
 
-        return answer;
+        return answerToSave;
 
     }
-
+    
     public async Task<List<QuestionDto>> GetUserQuestionsAsync(int userId)
     {
         return await _context.Question.Where(q => q.UserId == userId)
@@ -227,13 +211,13 @@ public class QuestionRepository : IQuestionRepository
             Name = conversationName,
             Date = DateTime.Now
         };
-        
+
         try
         {
             await _context.Conversation.AddAsync(conversation);
             await _context.SaveChangesAsync();
             return conversation;
-            
+
         }
         catch (Exception e)
         {
