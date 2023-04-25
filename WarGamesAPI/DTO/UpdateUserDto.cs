@@ -1,8 +1,7 @@
 using WarGamesAPI.DTO;
 
-public class UserDto
+public class UpdateUserDto
 {
-    public int? Id { get; set; }
     public string? SocialSecurityNumber { get; set; }
     public string? FirstName { get; set; }
     public string? LastName { get; set; }
@@ -14,7 +13,8 @@ public class UserDto
     public bool AgreeMarketing { get; set; }
     public bool SubscribeToEmailNotification { get; set; }
     public string? ProfileImage { get; set; }
+    public string? Gender { get; set; }
+
 
     public AddressDto? Address { get; set; }
-    public string? Gender { get; set; }
 }

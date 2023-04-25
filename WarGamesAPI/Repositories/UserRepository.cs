@@ -12,11 +12,13 @@ public class UserRepository : IUserRepository
 {
     readonly WarGamesContext _context;
     readonly IMapper _mapper;
+    readonly IQuestionRepository _questionRepo;
 
-    public UserRepository(WarGamesContext context, IMapper mapper)
+    public UserRepository(WarGamesContext context, IMapper mapper, IQuestionRepository questionRepo)
     {
         _context = context;
         _mapper = mapper;
+        _questionRepo = questionRepo;
     }
    
     public async Task<UserDto?> GetUserFromEmailAsync(string email)
@@ -37,6 +39,43 @@ public class UserRepository : IUserRepository
             .ProjectTo<UserDto>(_mapper.ConfigurationProvider).SingleOrDefaultAsync();
     }
 
+    public async Task DeleteUserAsync(int userId)
+    {
+        var user = await _context.User.Where(u => u.Id == userId).SingleOrDefaultAsync();
+        
+        if (user is null)
+        {
+            throw new Exception("User not found");
+        }
+
+        var userConversations = await _context.Conversation.Where(c => c.UserId == userId).ToListAsync();
+
+        foreach (var c in userConversations)
+        {
+            await _questionRepo.DeleteConversationAsync(c.Id);
+        }
+
+        _context.User.Remove(user);
+        
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task UpdateUserAsync(int userId, UpdateUserDto updateUser)
+    {
+        var user = await _context.User.Where(u => u.Id == userId).SingleOrDefaultAsync();
+        
+        if (user is null)
+        {
+            throw new Exception("User not found");
+        }
+
+        _mapper.Map(updateUser, user);
+        var address = await _context.Address.SingleOrDefaultAsync(a => a.UserId == userId);
+        _mapper.Map(updateUser.Address, address);
+        
+        await _context.SaveChangesAsync();
+    }
+    
     public async Task<bool> UpdateUserPassword(int userId, string password)
     {
         var user = await _context.User.SingleOrDefaultAsync(u => u.Id == userId);
@@ -63,9 +102,15 @@ public class UserRepository : IUserRepository
     {
         var user = _mapper.Map<User>(register);
 
+        if (register.Address != null)
+        {
+            var addressToAdd = _mapper.Map<Address>(register.Address);
+            user.Address = addressToAdd;
+        }
+
         try
         {
-            await _context.User.AddAsync(user);
+            _context.User.Add(user);
             await _context.SaveChangesAsync();
             return _mapper.Map<UserDto>(user);
         }
@@ -76,21 +121,7 @@ public class UserRepository : IUserRepository
         
     }
 
-    public async Task<int> AddAddress(RegisterAddressDto address)
-    {
-        try
-        {
-            var addressToAdd = _mapper.Map<Address>(address);
-            await _context.Address.AddAsync(addressToAdd);
-            await _context.SaveChangesAsync();
-            return addressToAdd.Id;
-        }
-        catch (Exception e)
-        {
-            throw new Exception("Error saving Address", e);
-        }
-    }
-
+   
 
 
 

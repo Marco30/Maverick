@@ -15,7 +15,6 @@ public class GptService : IGptService
     readonly string? _apiKey;
     private static string _apiEndpoint => "https://api.openai.com/v1/chat/completions";
     static double _tokenPriceInUSDcents => 0.0002;
-    public string? Result { get; set; }
 
     public GptService(ILoggerFactory loggerFactory, IConfiguration configuration, IQuestionRepository questionRepo)
     {
@@ -155,16 +154,20 @@ public class GptService : IGptService
 
                 LogTokenUsage(data, request.Messages);
 
-                return data.Choices[0].Message?.Content ?? throw new InvalidOperationException("Error generating answer");
+                return data.Choices[0].Message?.Content ??
+                       throw new InvalidOperationException("Error generating answer");
             }
+        }
+        catch (GptApiException)
+        {
+            throw;
         }
         catch (Exception e)
         {
             _logger.LogError(e, "An error occurred while making the OpenAI API request");
-            Result = $"An error occurred: {e.Message}";
+            throw;
         }
 
-        return null;
     }
 
 

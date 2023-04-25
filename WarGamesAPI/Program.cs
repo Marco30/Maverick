@@ -29,7 +29,6 @@ Log.Logger = new LoggerConfiguration()
     .Enrich.WithProperty("Environment", builder.Environment.EnvironmentName ?? "unknown")
     .Enrich.WithMachineName()
     .Enrich.WithThreadId()
-    .ReadFrom.Configuration(builder.Configuration)
     .CreateLogger();
 
 

@@ -110,19 +110,20 @@ public class QuestionController : ControllerBase
         
         try
         {
-            
-            QuestionDto? savedQuestion = await _questionRepo.SaveQuestionAsync(question);
 
-            if (savedQuestion is null) return StatusCode(500);
-            AnswerDto? answer = await _gptService.AskQuestion(savedQuestion, userQuestion.MockReply);
+
+            var answer = await _gptService.AskQuestion(question, userQuestion.MockReply);
 
             if (answer is null) return StatusCode(500);
+
+            var savedAnswer = await _questionRepo.SaveQuestionAndAnswerAsync(question, answer);
+
+            if (savedAnswer is null) return StatusCode(500);
+
             
-            answer.ConversationId = savedQuestion.ConversationId;
+            return StatusCode(201, _mapper.Map<AnswerDto>(savedAnswer));
             
-            var result = await _questionRepo.SaveAnswerAsync(answer);
-        
-            return StatusCode(201, result);
+
 
         }
         catch (Exception e)
@@ -130,6 +131,8 @@ public class QuestionController : ControllerBase
             var error = new ResponseMessageDto { Error = true, StatusCode = 500, Message = $"{e.Message}" };
             return StatusCode(500, error);
         }
+
+        return StatusCode(500);
 
     }
 

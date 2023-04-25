@@ -218,12 +218,7 @@ public class AuthController : ControllerBase
 
         try
         {
-            if (register.Address != null)
-            {
-                var addressId = await _userRepo.AddAddress(register.Address);
-                register.AddressId = addressId;
-            }
-
+            
             var registeredUser = await _userRepo.AddUser(register);
             
             var token = TokenData.CreateJwtToken(registeredUser!);
