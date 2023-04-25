@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WarGamesAPI.Data;
 
@@ -11,9 +12,11 @@ using WarGamesAPI.Data;
 namespace WarGamesAPI.Migrations
 {
     [DbContext(typeof(WarGamesContext))]
-    partial class WarGamesContextModelSnapshot : ModelSnapshot
+    [Migration("20230425093151_UpdateUserAddressRelationship")]
+    partial class UpdateUserAddressRelationship
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -24,8 +27,11 @@ namespace WarGamesAPI.Migrations
 
             modelBuilder.Entity("WarGamesAPI.Model.Address", b =>
                 {
-                    b.Property<int>("UserId")
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Attention")
                         .HasColumnType("nvarchar(max)");
@@ -45,20 +51,27 @@ namespace WarGamesAPI.Migrations
                     b.Property<string>("Street")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
                     b.Property<string>("ZipCode")
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("UserId");
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
 
                     b.ToTable("Address");
 
                     b.HasData(
                         new
                         {
-                            UserId = 5,
+                            Id = 1,
                             City = "Stockholm",
                             Country = "Sweden",
                             Street = "Röntgenvägen 5 lgh 1410",
+                            UserId = 5,
                             ZipCode = "14152"
                         });
                 });
@@ -150,6 +163,9 @@ namespace WarGamesAPI.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int?>("AddressId")
+                        .HasColumnType("int");
+
                     b.Property<bool>("AgreeMarketing")
                         .HasColumnType("bit");
 
@@ -194,6 +210,7 @@ namespace WarGamesAPI.Migrations
                         new
                         {
                             Id = 5,
+                            AddressId = 1,
                             AgreeMarketing = true,
                             Email = "khaled@khaled.se",
                             FirstName = "Khaled",

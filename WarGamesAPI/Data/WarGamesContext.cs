@@ -11,7 +11,6 @@ public class WarGamesContext : DbContext
     public DbSet<User> User => Set<User>();
     public DbSet<Conversation> Conversation => Set<Conversation>();
 
-
     public WarGamesContext(DbContextOptions options) : base(options) {}
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -30,23 +29,22 @@ public class WarGamesContext : DbContext
             SubscribeToEmailNotification = true,
             ProfileImage = null,
             Gender = "Man",
-            AddressId = 1
         });
         
         modelBuilder.Entity<Address>().HasData(new Address
         {
-            Id = 1,
+            UserId = 5,
             City = "Stockholm",
             Country = "Sweden",
             Street = "Röntgenvägen 5 lgh 1410",
             ZipCode = "14152",
-            UserId = 5
         });
 
         modelBuilder.Entity<Address>()
             .HasOne(a => a.User)
             .WithOne(u => u.Address)
-            .HasForeignKey<User>(u => u.AddressId);
+            .HasForeignKey<Address>(a => a.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
 
         modelBuilder.Entity<Conversation>()
             .HasOne(c => c.User)

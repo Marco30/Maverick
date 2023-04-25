@@ -1,11 +1,7 @@
-using System.ComponentModel.DataAnnotations.Schema;
+using WarGamesAPI.DTO;
 
-namespace WarGamesAPI.Model;
-
-public class User
+public class UpdateUserDto
 {
-    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public int Id { get; set; }
     public string? SocialSecurityNumber { get; set; }
     public string? FirstName { get; set; }
     public string? LastName { get; set; }
@@ -19,12 +15,6 @@ public class User
     public string? ProfileImage { get; set; }
     public string? Gender { get; set; }
 
-    public Address? Address { get; set; }
 
-    public ICollection<Question> Questions { get; set; } = new List<Question>();
-    public ICollection<Conversation> Conversations { get; set; } = new List<Conversation>();
-
+    public AddressDto? Address { get; set; }
 }
-
-
-
