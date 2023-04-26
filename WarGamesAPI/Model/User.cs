@@ -1,9 +1,8 @@
 using System.ComponentModel.DataAnnotations.Schema;
-using WarGamesAPIAPI.JsonCRUD;
 
 namespace WarGamesAPI.Model;
 
-public class User : Json.IGenericIdInterface<User>
+public class User
 {
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int Id { get; set; }
@@ -20,7 +19,6 @@ public class User : Json.IGenericIdInterface<User>
     public string? ProfileImage { get; set; }
     public string? Gender { get; set; }
 
-    public int AddressId { get; set; }
     public Address? Address { get; set; }
 
     public ICollection<Question> Questions { get; set; } = new List<Question>();
