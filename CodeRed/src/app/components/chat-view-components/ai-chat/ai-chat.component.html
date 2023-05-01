@@ -1,49 +1,15 @@
 <div class="ai-chat bg-primary-color">
   <div class="row g-0 justify-content-center">
-    <div class="chat-box col-md-8">
+    <div class="chat-box col-md-10">
       <div class="card mt-4">
         <div class="card-body">
 <!--test-->
-<div class="chat-container" #chatContainer *ngIf="this.conversationTree.conversation[0].question.text == 'Question 1'">
-  <div class="row g-4 py-5 row-cols-1 row-cols-lg-3">
-    <div class="feature col">
-      <div class="feature-icon d-inline-flex align-items-center justify-content-center text-bg-primary bg-gradient fs-2 mb-3">
-        <svg class="bi" width="1em" height="1em"><use xlink:href="#collection"></use></svg>
-      </div>
-      <h3 class="fs-2">Featured title</h3>
-      <p>Paragraph of text beneath the heading to explain the heading. We'll add onto it with another sentence and probably just keep going until we run out of words.</p>
-      <a href="#" class="icon-link">
-        Call to action
-        <svg class="bi"><use xlink:href="#chevron-right"></use></svg>
-      </a>
-    </div>
-    <div class="feature col">
-      <div class="feature-icon d-inline-flex align-items-center justify-content-center text-bg-primary bg-gradient fs-2 mb-3">
-        <svg class="bi" width="1em" height="1em"><use xlink:href="#people-circle"></use></svg>
-      </div>
-      <h3 class="fs-2">Featured title</h3>
-      <p>Paragraph of text beneath the heading to explain the heading. We'll add onto it with another sentence and probably just keep going until we run out of words.</p>
-      <a href="#" class="icon-link">
-        Call to action
-        <svg class="bi"><use xlink:href="#chevron-right"></use></svg>
-      </a>
-    </div>
-    <div class="feature col">
-      <div class="feature-icon d-inline-flex align-items-center justify-content-center text-bg-primary bg-gradient fs-2 mb-3">
-        <svg class="bi" width="1em" height="1em"><use xlink:href="#toggles2"></use></svg>
-      </div>
-      <h3 class="fs-2">Featured title</h3>
-      <p>Paragraph of text beneath the heading to explain the heading. We'll add onto it with another sentence and probably just keep going until we run out of words.</p>
-      <a href="#" class="icon-link">
-        Call to action
-        <svg class="bi"><use xlink:href="#chevron-right"></use></svg>
-      </a>
-    </div>
-  </div>
-</div>
+ 
+          <app-information *ngIf="newConversation"></app-information>
+    
 
  <!--test-->
-          <div class="chat-container" #chatContainer *ngIf="this.conversationTree.conversation[0].question.text != 'Question 1'">
+          <div class="chat-container" #chatContainer *ngIf="!newConversation">
             <div 
               *ngFor="let message of this.conversationTree.conversation; let i = index"
               class="message"

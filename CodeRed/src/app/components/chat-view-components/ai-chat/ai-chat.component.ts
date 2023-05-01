@@ -32,7 +32,7 @@ export class AiChatComponent {
     text: '',
     mockReply: true,
   };
-
+  newConversation = true;
   AIname = 'Ava';
   userName = this.authenticationService.getDataFromToken('firstname');
 
@@ -50,7 +50,7 @@ export class AiChatComponent {
 
   
   ngOnInit() {
-
+    this.getConversations()
     this.getConversationInfo()
     console.info('Marco test');
     console.info(this.conversationInfo);
@@ -96,10 +96,29 @@ export class AiChatComponent {
       
       this.conversationInfo = value;
       if(this.conversationInfo.id != 0){
+        this.newConversation = false;
       this.getConversationData();
+      }else{
+        this.newConversation = true;
+        this.resetConversationToEmpty();
       }
 
     });
+  }
+
+  resetConversationToEmpty(){
+    const answerTemp1 = new Answer(1, 'Answer 1', new Date(), 1, 1);
+    const answerTemp2= new Answer(2, 'Answer 2', new Date(), 1, 1);
+    const answersTemp = [answerTemp1, answerTemp2];
+  
+    const questionTemp = new Question(1, 'Question 1', false);
+  
+    const conversationTemp = new Conversation(questionTemp, answersTemp);
+
+    const conversationTreeTemp: ConversationTree = new ConversationTree([conversationTemp]);
+
+    this.conversationTree = conversationTreeTemp;
+
   }
 
   ngAfterViewInit() {
@@ -140,7 +159,28 @@ export class AiChatComponent {
 
 
 
- 
+  getConversations(){
+
+
+    this.conversationService.listConversations().pipe(takeUntil(this.onDestroy$)).subscribe({
+      next: (res) => {
+        console.info('-----NewAIlistConversation-----');
+        console.info(res);
+        this.sharedDataService.setConversationsList(res);
+        
+      },
+      error: (err) => {
+        console.error('An error occurred:', err);
+        this.errorMessage = 'An error occurred while processing your request. Please try again later.';
+        this.showError = true;   
+        setTimeout(() => {
+          this.showError = false;
+        }, 5000); // hide after 5 seconds
+      },
+      // complete: () => (this.showLoading = false),
+    });
+  
+  }
 
  
 
@@ -167,6 +207,7 @@ export class AiChatComponent {
           if(res.text){
           this.revealText(res.text,10);
           }
+          this.getConversations();
 
         },
         error: (err) => {

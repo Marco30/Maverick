@@ -1,0 +1,14 @@
+<div class="row g-4 py-5 row-cols-1 row-cols-lg-3">
+    <div class="feature col" *ngFor="let info of visibleInfos">
+      <div class="feature-icon d-inline-flex align-items-center justify-content-center text-bg-primary bg-gradient fs-2 mb-3">
+        <i class="{{ info.icon }}"></i>
+      </div>
+      <h3 class="fs-2">{{ info.title }}</h3>
+      <p>{{ info.description }}</p>
+      <a *ngIf="info.link" href="{{info.link}}" class="icon-link">
+        {{ info.actionText }}
+        <i class="{{ info.actionIcon }}"></i>
+      </a>
+    </div>
+  </div>
+  

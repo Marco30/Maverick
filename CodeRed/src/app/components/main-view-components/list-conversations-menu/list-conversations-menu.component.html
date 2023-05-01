@@ -1,4 +1,8 @@
 <div class="container">
+  <button class="btn btn-primary" (click)="newConversation()">
+    <i class="fas fa-comment-alt"></i>
+    {{ 'New conversation' }}
+  </button>
   <button class="btn btn-primary" (click)="toggleMoveable()">
     <i class="fas fa-arrows-alt"></i>
     {{ isMoveable ? 'Stop dargging' : 'Start dargging' }}
