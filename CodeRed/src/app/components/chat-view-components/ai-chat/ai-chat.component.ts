@@ -49,33 +49,13 @@ export class AiChatComponent {
   conversationInfo = new ConversationInfo(0 , '', new Date, 0 );
 
   
-
   ngOnInit() {
 
     this.getConversationInfo()
     console.info('Marco test');
     console.info(this.conversationInfo);
 
-    
-    this.messages = [
-      { sender: 'Ava', content: 'Hi there! How can I help you?' },
-      { sender: 'User', content: 'Can you tell me more about your product?' },
-      { sender: 'Ava', content: 'Sure! Our product is designed to...' },
-      { sender: 'User', content: 'That sounds great. How do I get started?' },
-      { sender: 'Ava', content: 'You can get started by...' },
-      { sender: 'Ava', content: 'Hi there! How can I help you?' },
-      { sender: 'User', content: 'Can you tell me more about your product?' },
-      { sender: 'Ava', content: 'Sure! Our product is designed to...' },
-      { sender: 'User', content: 'That sounds great. How do I get started?' },
-      { sender: 'Ava', content: 'You can get started by...' },
-      { sender: 'Ava', content: 'Hi there! How can I help you?' },
-      { sender: 'User', content: 'Can you tell me more about your product?' },
-      { sender: 'Ava', content: 'Sure! Our product is designed to...' },
-      { sender: 'User', content: 'That sounds great. How do I get started?' },
-      { sender: 'Ava', content: 'You can get started by...' },
-    ];
-
-    this.exampleAnswers();
+  
   }
 
   ngOnDestroy(): void {
@@ -160,34 +140,7 @@ export class AiChatComponent {
 
 
 
-  exampleAnswers() {
-    this.messages.push({
-      sender: 'Ava',
-      content: 'Hello! How can I help you today?',
-    });
-    this.messages.push({
-      sender: 'User',
-      content: 'Can you tell me about the weather in New York?',
-    });
-    this.messages.push({
-      sender: 'Ava',
-      content:
-        'Sure! The weather in New York is currently 70 degrees and sunny.',
-    });
-    this.messages.push({
-      sender: 'User',
-      content: 'What is the capital of France?',
-    });
-    this.messages.push({
-      sender: 'Ava',
-      content: 'The capital of France is Paris.',
-    });
-    this.messages.push({ sender: 'User', content: 'Thanks for your help!' });
-    this.messages.push({
-      sender: 'Ava',
-      content: 'Youre welcome. Have a great day!',
-    });
-  }
+ 
 
  
 
@@ -229,10 +182,6 @@ export class AiChatComponent {
     
     } 
 
-     this.messages.push({
-      sender: 'Ava',
-      content: '',
-    }); 
    
    // var testtext = 'I am ChatGPT, a large language model developed by OpenAI using the GPT-3.5 architecture. As a language model, my primary function is to generate natural language responses to text-based inputs such as questions, prompts, and statements.\r\n\r\nI was trained on a massive dataset of written text from the internet and other sources, which allows me to understand and generate responses in a wide variety of topics and domains. My training data includes text in multiple languages, making me capable of generating responses in several languages.\r\n\r\nI use machine learning techniques such as deep neural networks to analyze and understand the structure and context of the input text. Based on this analysis, I generate a response that is meant to be natural-sounding and relevant to the input.\r\n\r\nOverall, my purpose is to assist users in generating high-quality, natural language responses to a wide range of prompts and queries, making communication and information retrieval more efficient and effective.';
    // this.revealText(testtext,10);
