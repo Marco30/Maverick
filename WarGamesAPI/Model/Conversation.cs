@@ -9,6 +9,7 @@ public class Conversation
 
     public string? Name { get; set; }
     public DateTime Date { get; set; }
+    public DateTime Updated { get; set; }
 
     [ForeignKey("UserId")]
     public int UserId { get; set; }

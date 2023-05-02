@@ -6,8 +6,7 @@ namespace WarGamesAPI.Interfaces;
 
 public interface IQuestionRepository
 {
-    //Task<QuestionDto?> AddQuestionAsync(QuestionDto userQuestion);
-    //Task<AnswerDto?> AddAnswerAsync(AnswerDto answer);
+
     Task<List<QuestionDto>> GetUserQuestionsAsync(int userId);
     Task<QuestionDto?> GetQuestionAsync(int questionId);
     Task<AnswerDto?> GetAnswerAsync(int answerId);
@@ -25,10 +24,9 @@ public interface IQuestionRepository
     Task<List<QuestionDto>> GetQuestionsFromConversationAsync(int conversationId);
     Task<List<AnswerDto>> GetAnswersFromConversationAsync(int conversationId);
 
-    Task<Answer> SaveQuestionAndAnswerAsync(QuestionDto userQuestion, AnswerDto answer);
+    Task<Answer?> SaveQuestionAndAnswerAsync(QuestionDto userQuestion, AnswerDto answer);
 
-
-
+    Task UpdateConversationAsync(int conversationId);
 }
 
 
