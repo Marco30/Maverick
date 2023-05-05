@@ -20,7 +20,7 @@ public class QuestionRepository : IQuestionRepository
         _mapper = mapper;
     }
 
-    public async Task<Answer> SaveQuestionAndAnswerAsync(QuestionDto userQuestion, AnswerDto answer)
+    public async Task<Answer?> SaveQuestionAndAnswerAsync(QuestionDto userQuestion, AnswerDto answer)
     {
         var userId = userQuestion.UserId;
 
@@ -62,7 +62,20 @@ public class QuestionRepository : IQuestionRepository
         return answerToSave;
 
     }
-    
+
+    public async Task UpdateConversationAsync(int conversationId)
+    {
+        var conversation = await _context.Conversation.SingleOrDefaultAsync(c => c.Id == conversationId);
+        if (conversation is null)
+        {
+            throw new InvalidOperationException("Conversation not found");
+        }
+
+        conversation.Updated = DateTime.Now;
+        await _context.SaveChangesAsync();
+
+    }
+
     public async Task<List<QuestionDto>> GetUserQuestionsAsync(int userId)
     {
         return await _context.Question.Where(q => q.UserId == userId)
@@ -110,6 +123,7 @@ public class QuestionRepository : IQuestionRepository
         var conversation = await _context.Conversation.SingleOrDefaultAsync(c => c.Id == name.ConversationId);
         if (conversation is null) return null;
         conversation.Name = name.NewName;
+        conversation.Updated = DateTime.Now;
         await _context.SaveChangesAsync();
         return conversation.Name;
     }
@@ -209,7 +223,8 @@ public class QuestionRepository : IQuestionRepository
         {
             UserId = userId, 
             Name = conversationName,
-            Date = DateTime.Now
+            Date = DateTime.Now,
+            Updated = DateTime.Now
         };
 
         try

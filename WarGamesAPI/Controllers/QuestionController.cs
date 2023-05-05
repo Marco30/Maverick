@@ -118,6 +118,8 @@ public class QuestionController : ControllerBase
 
             var savedAnswer = await _questionRepo.SaveQuestionAndAnswerAsync(question, answer);
 
+            await _questionRepo.UpdateConversationAsync(question.ConversationId);
+            
             if (savedAnswer is null) return StatusCode(500);
 
             
