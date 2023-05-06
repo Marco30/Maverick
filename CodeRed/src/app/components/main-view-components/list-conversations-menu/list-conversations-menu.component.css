@@ -7,6 +7,10 @@
     --even-row-bg-color: #f2f2f2;
     --hover-row-bg-color: #ddd;
   }
+
+  .form-check{
+    color: var(--text-color);
+  }
   
   .container {
     display: flex;

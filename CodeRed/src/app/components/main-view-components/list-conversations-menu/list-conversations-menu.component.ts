@@ -77,6 +77,15 @@ export class ListConversationsMenuComponent {
     
   }
 
+  onNameChange(event: Event, conversation: ConversationInfo): void {
+    const newName = (event.target as HTMLTableCellElement).innerText.trim();
+    if (newName !== conversation.name) {
+      conversation.name = newName;
+      // TODO: call your service to save the updated conversation name
+    }
+  }
+  
+
   newConversation(){
     const conversationInfo = new ConversationInfo(0 , '', new Date, 0 );
     this.sharedDataService.setConversationsInfo(conversationInfo);
@@ -111,6 +120,31 @@ export class ListConversationsMenuComponent {
     sessionStorage.setItem('ListConversationsOrder', JSON.stringify(this.conversations.list.map((_, i) => i)));
   }
   
+  }
+
+  public sortByDateDescending(): void {
+    this.conversations.list.sort((a, b) => {
+      const dateA = new Date(a.date).getTime();
+      const dateB = new Date(b.date).getTime();
+      return dateB - dateA;
+    });
+  }
+
+  public sortByDateAscending(): void {
+    this.conversations.list.sort((a, b) => {
+      const dateA = new Date(a.date).getTime();
+      const dateB = new Date(b.date).getTime();
+      return dateA - dateB;
+    });
+  }
+
+  public onDateSortChange(event: Event): void {
+    const checkbox = event.target as HTMLInputElement;
+    if (checkbox.checked) {
+      this.sortByDateDescending();
+    } else {
+      this.sortByDateAscending();
+    }
   }
 
 }
