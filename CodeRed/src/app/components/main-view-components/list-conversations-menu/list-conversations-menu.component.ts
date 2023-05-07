@@ -81,9 +81,30 @@ export class ListConversationsMenuComponent {
     const newName = (event.target as HTMLTableCellElement).innerText.trim();
     if (newName !== conversation.name) {
       conversation.name = newName;
+
       // TODO: call your service to save the updated conversation name
+
+      this.conversationService.changeConversationName(conversation).pipe(takeUntil(this.onDestroy$)).subscribe({
+        next: (res) => {
+  
+          console.info('-----AIConversatioConversationName-----');
+          console.info(res);
+        },
+        error: (err) => {
+          console.error('An error occurred:', err);
+          this.errorMessage = 'An error occurred while processing your request. Please try again later.';
+          this.showError = true;   
+          setTimeout(() => {
+            this.showError = false;
+          }, 5000); // hide after 5 seconds
+        },
+        // complete: () => (this.showLoading = false),
+      });
+
     }
   }
+
+
   
 
   newConversation(){

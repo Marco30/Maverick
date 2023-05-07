@@ -7,6 +7,7 @@ import { Observable } from 'rxjs';
 import { Conversation } from 'src/app/model/conversation/conversation';
 import { Conversations } from 'src/app/model/conversations/conversations';
 import { ConversationTree } from 'src/app/model/conversationTree/conversation-tree';
+import { ConversationInfo } from 'src/app/model/conversationInfo/conversation-info';
 
 @Injectable({
   providedIn: 'root'
@@ -21,12 +22,22 @@ export class ConversationService {
     return this.httpRequestService.postData<Question>(url, queryParams);
   }
 
+  changeConversationName(conversationInfo: ConversationInfo) : Observable<any>{
+    const url = environment.changeconversation_name;
+    console.info('conversationInfo namn')
+    console.info(conversationInfo.name)
+    let conversationObject = { conversationId: conversationInfo.id, newName: conversationInfo.name};
+    const queryParams = { model: conversationObject};
+    return this.httpRequestService.postData<any>(url, queryParams);
+  }
+
+
   conversation(conversationId: number) : Observable<ConversationTree>{
     const url = environment.get_conversation;
     console.info('conversationId')
     console.info(conversationId)
-    let test = { conversationId: conversationId};
-    const queryParams = { model: test};
+    let conversationObject = { conversationId: conversationId};
+    const queryParams = { model: conversationObject};
     return this.httpRequestService.postData<ConversationTree>(url, queryParams);
   }
 
