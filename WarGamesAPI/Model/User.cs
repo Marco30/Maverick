@@ -23,6 +23,8 @@ public class User
 
     public ICollection<Question> Questions { get; set; } = new List<Question>();
     public ICollection<Conversation> Conversations { get; set; } = new List<Conversation>();
+    public ICollection<LibraryConversation> LibraryConversations { get; set; } = new List<LibraryConversation>();
+
 
 }
 

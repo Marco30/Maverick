@@ -1,10 +1,9 @@
-using Microsoft.EntityFrameworkCore;
 using WarGamesAPI.DTO;
 using WarGamesAPI.Model;
 
 namespace WarGamesAPI.Interfaces;
 
-public interface IQuestionRepository
+public interface IChatHistoryRepository
 {
 
     Task<List<QuestionDto>> GetUserQuestionsAsync(int userId);

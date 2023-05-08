@@ -10,6 +10,9 @@ public class WarGamesContext : DbContext
     public DbSet<Question> Question => Set<Question>();
     public DbSet<User> User => Set<User>();
     public DbSet<Conversation> Conversation => Set<Conversation>();
+    public DbSet<LibraryConversation> LibraryConversation => Set<LibraryConversation>();
+    public DbSet<LibraryQuestion> LibraryQuestion => Set<LibraryQuestion>();
+    public DbSet<LibraryAnswer> LibraryAnswer => Set<LibraryAnswer>();
 
     public WarGamesContext(DbContextOptions options) : base(options) {}
 
@@ -74,6 +77,24 @@ public class WarGamesContext : DbContext
             .HasOne(a => a.Conversation)
             .WithMany(c => c.Answers)
             .HasForeignKey(a => a.ConversationId)
+            .OnDelete(DeleteBehavior.NoAction);
+
+        modelBuilder.Entity<LibraryConversation>()
+            .HasOne(lc => lc.User)
+            .WithMany(u => u.LibraryConversations)
+            .HasForeignKey(lc => lc.UserId)
+            .OnDelete(DeleteBehavior.NoAction);
+
+        modelBuilder.Entity<LibraryQuestion>()
+            .HasOne(sq => sq.LibraryConversation)
+            .WithMany(lc => lc.LibraryQuestions)
+            .HasForeignKey(lq => lq.LibraryConversationId)
+            .OnDelete(DeleteBehavior.NoAction);
+
+        modelBuilder.Entity<LibraryAnswer>()
+            .HasOne(la => la.LibraryQuestion)
+            .WithMany(lq => lq.LibraryAnswers)
+            .HasForeignKey(la => la.LibraryQuestionId)
             .OnDelete(DeleteBehavior.NoAction);
     }
 

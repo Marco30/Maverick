@@ -11,12 +11,12 @@ namespace WarGamesAPI.Services;
 public class GptService : IGptService
 {
     readonly ILogger<GptService> _logger;
-    readonly IQuestionRepository _questionRepo;
+    readonly IChatHistoryRepository _questionRepo;
     readonly string? _apiKey;
     private static string _apiEndpoint => "https://api.openai.com/v1/chat/completions";
     static double _tokenPriceInUSDcents => 0.0002;
 
-    public GptService(ILoggerFactory loggerFactory, IConfiguration configuration, IQuestionRepository questionRepo)
+    public GptService(ILoggerFactory loggerFactory, IConfiguration configuration, IChatHistoryRepository questionRepo)
     {
         _logger = loggerFactory.CreateLogger<GptService>();
         _questionRepo = questionRepo;

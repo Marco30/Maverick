@@ -12,9 +12,9 @@ public class UserRepository : IUserRepository
 {
     readonly WarGamesContext _context;
     readonly IMapper _mapper;
-    readonly IQuestionRepository _questionRepo;
+    readonly IChatHistoryRepository _questionRepo;
 
-    public UserRepository(WarGamesContext context, IMapper mapper, IQuestionRepository questionRepo)
+    public UserRepository(WarGamesContext context, IMapper mapper, IChatHistoryRepository questionRepo)
     {
         _context = context;
         _mapper = mapper;

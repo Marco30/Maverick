@@ -8,6 +8,7 @@ using Serilog.Sinks.Elasticsearch;
 using WarGamesAPI.Data;
 using WarGamesAPI.Helpers;
 using WarGamesAPI.Interfaces;
+using WarGamesAPI.Repositories;
 using WarGamesAPI.Services;
 using WarGamesAPI.Settings;
 
@@ -95,9 +96,10 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddScoped<IQuestionRepository, QuestionRepository>();
+builder.Services.AddScoped<IChatHistoryRepository, ChatHistoryRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IValidationRepository, ValidationRepository>();
+builder.Services.AddScoped<ILibraryRepository, LibraryRepository>();
 builder.Services.AddScoped<IGptService, GptService>();
 
 

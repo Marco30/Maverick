@@ -7,14 +7,14 @@ using WarGamesAPI.Interfaces;
 using WarGamesAPI.Model;
 
 
-namespace Courses.Api.Repositories;
+namespace WarGamesAPI.Repositories;
 
-public class QuestionRepository : IQuestionRepository
+public class ChatHistoryRepository : IChatHistoryRepository
 {
     readonly WarGamesContext _context;
     readonly IMapper _mapper;
 
-    public QuestionRepository(WarGamesContext context, IMapper mapper)
+    public ChatHistoryRepository(WarGamesContext context, IMapper mapper)
     {
         _context = context;
         _mapper = mapper;

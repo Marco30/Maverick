@@ -10,16 +10,16 @@ namespace WarGamesAPI.Controllers;
 
 [Route("wargames")]
 [ApiController]
-public class QuestionController : ControllerBase
+public class ConversationController : ControllerBase
 {
-    readonly ILogger<QuestionController> _logger;
+    readonly ILogger<ConversationController> _logger;
     readonly IGptService _gptService;
-    readonly IQuestionRepository _questionRepo;
+    readonly IChatHistoryRepository _questionRepo;
     readonly IMapper _mapper;
     readonly IValidationRepository _validationRepo;
 
-    public QuestionController(ILogger<QuestionController> logger, IGptService gptService, 
-        IQuestionRepository questionRepo, IMapper mapper, IValidationRepository validationRepo)
+    public ConversationController(ILogger<ConversationController> logger, IGptService gptService, 
+        IChatHistoryRepository questionRepo, IMapper mapper, IValidationRepository validationRepo)
     {
         _logger = logger;
         _gptService = gptService;
@@ -54,34 +54,34 @@ public class QuestionController : ControllerBase
         return Ok(conversations);
     }
 
-    [ValidateToken]
-    [HttpPost("createconversation")]
-    public async Task<ActionResult<ConversationInfoDto>> CreateConversation(CreateConversationDto createConversation)
-    {
-        if (!Request.Headers.ContainsKey("Authorization") || string.IsNullOrEmpty(Request.Headers["Authorization"])) 
-            return BadRequest("The Authorization header is required.");
+    //[ValidateToken]
+    //[HttpPost("createconversation")]
+    //public async Task<ActionResult<ConversationInfoDto>> CreateConversation(CreateConversationDto createConversation)
+    //{
+    //    if (!Request.Headers.ContainsKey("Authorization") || string.IsNullOrEmpty(Request.Headers["Authorization"])) 
+    //        return BadRequest("The Authorization header is required.");
         
-        var userId = TokenData.getUserId(Request.Headers["Authorization"]!);
+    //    var userId = TokenData.getUserId(Request.Headers["Authorization"]!);
 
-        if (string.IsNullOrEmpty(createConversation.ConversationName?.Trim()))
-        {
-            return BadRequest("Conversation name is required");
-        }
+    //    if (string.IsNullOrEmpty(createConversation.ConversationName?.Trim()))
+    //    {
+    //        return BadRequest("Conversation name is required");
+    //    }
 
         
-        try
-        {
-            var newConversation = await _questionRepo.CreateConversationAsync(userId, createConversation.ConversationName);
-            return Ok(_mapper.Map<ConversationInfoDto>(newConversation));
+    //    try
+    //    {
+    //        var newConversation = await _questionRepo.CreateConversationAsync(userId, createConversation.ConversationName, false);
+    //        return Ok(_mapper.Map<ConversationInfoDto>(newConversation));
 
-        }
-        catch (Exception e)
-        {
-            var error = new ResponseMessageDto { StatusCode = 500, Message = e.Message };
-            return StatusCode(500, error);
-        }
+    //    }
+    //    catch (Exception e)
+    //    {
+    //        var error = new ResponseMessageDto { StatusCode = 500, Message = e.Message };
+    //        return StatusCode(500, error);
+    //    }
 
-    }
+    //}
 
     [ValidateToken]
     [HttpPost("askquestion")]
@@ -110,8 +110,7 @@ public class QuestionController : ControllerBase
         
         try
         {
-
-
+            
             var answer = await _gptService.AskQuestion(question, userQuestion.MockReply);
 
             if (answer is null) return StatusCode(500);
@@ -134,7 +133,6 @@ public class QuestionController : ControllerBase
             return StatusCode(500, error);
         }
 
-        return StatusCode(500);
 
     }
 

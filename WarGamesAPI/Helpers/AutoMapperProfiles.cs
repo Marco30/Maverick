@@ -25,6 +25,9 @@ public class AutoMapperProfiles : Profile
         CreateMap<Address, AddressDto>();
         CreateMap<Conversation, ConversationDto>();
         CreateMap<Conversation, ConversationInfoDto>();
+        CreateMap<LibraryConversation, ConversationInfoDto>();
+
+
         CreateMap<UserDto, UserDataDto>()
             .ForMember(dest => dest.City, opt => opt.MapFrom(src => src.Address.Municipality))
             .ForMember(dest => dest.Street, opt => opt.MapFrom(src => src.Address.Street))
