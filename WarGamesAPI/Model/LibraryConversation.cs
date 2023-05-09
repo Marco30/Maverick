@@ -11,6 +11,9 @@ public class LibraryConversation
     public DateTime Date { get; set; }
     public DateTime Updated { get; set; }
 
+    public int? ChatHistoryConversationId { get; set; }
+    public Conversation? Conversation { get; set; }
+
     [ForeignKey("UserId")]
     public int UserId { get; set; }
     public User? User { get; set; }

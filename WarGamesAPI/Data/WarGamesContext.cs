@@ -80,6 +80,13 @@ public class WarGamesContext : DbContext
             .OnDelete(DeleteBehavior.NoAction);
 
         modelBuilder.Entity<LibraryConversation>()
+            .HasOne(lc => lc.Conversation)
+            .WithMany()
+            .HasForeignKey(lc => lc.ChatHistoryConversationId)
+            .OnDelete(DeleteBehavior.SetNull);
+
+
+        modelBuilder.Entity<LibraryConversation>()
             .HasOne(lc => lc.User)
             .WithMany(u => u.LibraryConversations)
             .HasForeignKey(lc => lc.UserId)
