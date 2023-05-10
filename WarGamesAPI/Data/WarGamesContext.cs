@@ -84,7 +84,18 @@ public class WarGamesContext : DbContext
             .WithMany()
             .HasForeignKey(lc => lc.ChatHistoryConversationId)
             .OnDelete(DeleteBehavior.SetNull);
+        
+        modelBuilder.Entity<LibraryAnswer>()
+            .HasOne(la => la.Answer)
+            .WithMany()
+            .HasForeignKey(la => la.ChatHistoryAnswerId)
+            .OnDelete(DeleteBehavior.SetNull);
 
+        modelBuilder.Entity<LibraryQuestion>()
+            .HasOne(lq => lq.Question)
+            .WithMany()
+            .HasForeignKey(lq => lq.ChatHistoryQuestionId)
+            .OnDelete(DeleteBehavior.SetNull);
 
         modelBuilder.Entity<LibraryConversation>()
             .HasOne(lc => lc.User)

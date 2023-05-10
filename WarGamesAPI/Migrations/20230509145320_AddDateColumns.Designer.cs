@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WarGamesAPI.Data;
 
@@ -11,9 +12,11 @@ using WarGamesAPI.Data;
 namespace WarGamesAPI.Migrations
 {
     [DbContext(typeof(WarGamesContext))]
-    partial class WarGamesContextModelSnapshot : ModelSnapshot
+    [Migration("20230509145320_AddDateColumns")]
+    partial class AddDateColumns
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

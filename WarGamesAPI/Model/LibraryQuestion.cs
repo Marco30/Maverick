@@ -7,6 +7,10 @@ public class LibraryQuestion
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int Id { get; set; }
     public string? Text { get; set; }
+    public DateTime? Date { get; set; }
+
+    public int? ChatHistoryQuestionId { get; set; }
+    public Question? Question { get; set; }
 
     [ForeignKey("UserId")]
     public int UserId { get; set; }

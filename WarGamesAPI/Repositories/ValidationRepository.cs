@@ -39,4 +39,31 @@ public class ValidationRepository : IValidationRepository
 
     }
 
+    public async Task<bool> UserOwnsLibraryConversation(int userId, int conversationId)
+    {
+        var conversation = await _context.LibraryConversation.FirstOrDefaultAsync(lc => lc.Id == conversationId);
+        if (conversation is null) return false;
+        return conversation.UserId == userId;
+
+    }
+
+    public async Task<bool> UserOwnsLibraryAnswer(int userId, int answerId)
+    {
+        var answer = await _context.LibraryAnswer.FirstOrDefaultAsync(la => la.Id == answerId);
+        if (answer is null) return false;
+        var question = await _context.LibraryQuestion.FirstOrDefaultAsync(lq => lq.Id == answer.LibraryQuestionId);
+        if (question is null) return false;
+        
+        return question.UserId == userId;
+    }
+
+    public async Task<bool> UserOwnsLibraryQuestion(int userId, int questionId)
+    {
+        var question = await _context.LibraryQuestion.FirstOrDefaultAsync(lq => lq.Id == questionId);
+        if (question is null) return false;
+
+        return question.UserId == userId;
+    }
+    
+
 }

@@ -54,34 +54,34 @@ public class ConversationController : ControllerBase
         return Ok(conversations);
     }
 
-    //[ValidateToken]
-    //[HttpPost("createconversation")]
-    //public async Task<ActionResult<ConversationInfoDto>> CreateConversation(CreateConversationDto createConversation)
-    //{
-    //    if (!Request.Headers.ContainsKey("Authorization") || string.IsNullOrEmpty(Request.Headers["Authorization"])) 
-    //        return BadRequest("The Authorization header is required.");
-        
-    //    var userId = TokenData.getUserId(Request.Headers["Authorization"]!);
+    [ValidateToken]
+    [HttpPost("createconversation")]
+    public async Task<ActionResult<ConversationInfoDto>> CreateConversation(CreateConversationDto createConversation)
+    {
+        if (!Request.Headers.ContainsKey("Authorization") || string.IsNullOrEmpty(Request.Headers["Authorization"]))
+            return BadRequest("The Authorization header is required.");
 
-    //    if (string.IsNullOrEmpty(createConversation.ConversationName?.Trim()))
-    //    {
-    //        return BadRequest("Conversation name is required");
-    //    }
+        var userId = TokenData.getUserId(Request.Headers["Authorization"]!);
 
-        
-    //    try
-    //    {
-    //        var newConversation = await _questionRepo.CreateConversationAsync(userId, createConversation.ConversationName, false);
-    //        return Ok(_mapper.Map<ConversationInfoDto>(newConversation));
+        if (string.IsNullOrEmpty(createConversation.ConversationName?.Trim()))
+        {
+            return BadRequest("Conversation name is required");
+        }
 
-    //    }
-    //    catch (Exception e)
-    //    {
-    //        var error = new ResponseMessageDto { StatusCode = 500, Message = e.Message };
-    //        return StatusCode(500, error);
-    //    }
 
-    //}
+        try
+        {
+            var newConversation = await _questionRepo.CreateConversationAsync(userId, createConversation.ConversationName);
+            return Ok(_mapper.Map<ConversationInfoDto>(newConversation));
+
+        }
+        catch (Exception e)
+        {
+            var error = new ResponseMessageDto { StatusCode = 500, Message = e.Message };
+            return StatusCode(500, error);
+        }
+
+    }
 
     [ValidateToken]
     [HttpPost("askquestion")]
@@ -318,4 +318,6 @@ public class ConversationController : ControllerBase
 
 
     }
+
+
 }

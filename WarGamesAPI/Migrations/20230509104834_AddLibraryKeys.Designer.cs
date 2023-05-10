@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WarGamesAPI.Data;
 
@@ -11,9 +12,11 @@ using WarGamesAPI.Data;
 namespace WarGamesAPI.Migrations
 {
     [DbContext(typeof(WarGamesContext))]
-    partial class WarGamesContextModelSnapshot : ModelSnapshot
+    [Migration("20230509104834_AddLibraryKeys")]
+    partial class AddLibraryKeys
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -196,9 +199,6 @@ namespace WarGamesAPI.Migrations
                     b.Property<int?>("ChatHistoryQuestionId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime?>("Date")
-                        .HasColumnType("datetime2");
-
                     b.Property<int>("LibraryConversationId")
                         .HasColumnType("int");
 
@@ -229,9 +229,6 @@ namespace WarGamesAPI.Migrations
 
                     b.Property<int>("ConversationId")
                         .HasColumnType("int");
-
-                    b.Property<DateTime?>("Date")
-                        .HasColumnType("datetime2");
 
                     b.Property<string>("Text")
                         .HasColumnType("nvarchar(max)");

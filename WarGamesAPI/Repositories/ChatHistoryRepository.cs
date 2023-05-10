@@ -40,7 +40,7 @@ public class ChatHistoryRepository : IChatHistoryRepository
 
         var questionToSave = new Question
         {
-            Text = userQuestion.Text, UserId = userId, ConversationId = userQuestion.ConversationId
+            Text = userQuestion.Text, UserId = userId, ConversationId = userQuestion.ConversationId, Date = DateTime.Now
         };
 
         await _context.Question.AddAsync(questionToSave);
