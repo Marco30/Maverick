@@ -18,6 +18,4 @@ public class Question
     public Conversation? Conversation { get; set; }
 
     public ICollection<Answer> Answers { get; set; } = new List<Answer>();
-
-
-}
+} 

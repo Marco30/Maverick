@@ -16,7 +16,4 @@ public class Conversation
     public User? User { get; set; }
 
     public ICollection<Question> Questions { get; set; } = new List<Question>();
-    public ICollection<Answer> Answers { get; set; } = new List<Answer>();
-
-
 }

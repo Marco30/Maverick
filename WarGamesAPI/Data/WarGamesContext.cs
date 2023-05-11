@@ -60,12 +60,6 @@ public class WarGamesContext : DbContext
             .WithMany(u => u.Questions)
             .HasForeignKey(q => q.UserId)
             .OnDelete(DeleteBehavior.NoAction);
-        
-        modelBuilder.Entity<Answer>()
-            .HasOne(a => a.Question)
-            .WithMany(q => q.Answers)
-            .HasForeignKey(a => a.QuestionId)
-            .OnDelete(DeleteBehavior.NoAction);
 
         modelBuilder.Entity<Question>()
             .HasOne(q => q.Conversation)
@@ -74,9 +68,9 @@ public class WarGamesContext : DbContext
             .OnDelete(DeleteBehavior.NoAction);
 
         modelBuilder.Entity<Answer>()
-            .HasOne(a => a.Conversation)
-            .WithMany(c => c.Answers)
-            .HasForeignKey(a => a.ConversationId)
+            .HasOne(a => a.Question)
+            .WithMany(q => q.Answers)
+            .HasForeignKey(a => a.QuestionId)
             .OnDelete(DeleteBehavior.NoAction);
 
         modelBuilder.Entity<LibraryConversation>()

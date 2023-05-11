@@ -12,8 +12,4 @@ public class Answer
     [ForeignKey("QuestionId")]
     public int? QuestionId { get; set; }
     public Question? Question { get; set; }
-
-    [ForeignKey("ConversationId")]
-    public int? ConversationId { get; set; }
-    public Conversation? Conversation { get; set; }
-}
+} 

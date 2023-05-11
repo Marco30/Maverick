@@ -92,44 +92,47 @@ public class LibraryRepository : ILibraryRepository
         int originalConversationId)
     {
         
-            var originalConversation = await _context.Conversation.SingleOrDefaultAsync(c => c.Id == originalConversationId);
-            if (originalConversation is null || originalConversation.UserId != userId)
-            {
-                throw new Exception("Original conversation not found");
-            }
+        var originalConversation = await _context.Conversation
+            .Include(c => c.Questions)
+            .ThenInclude(q => q.Answers)
+            .SingleOrDefaultAsync(c => c.Id == originalConversationId);
+        if (originalConversation is null || originalConversation.UserId != userId)
+        {
+            throw new Exception("Original conversation not found");
+        }
+    
+
+        if (newName is null)
+        {
+            newName = originalConversation.Name;
+        }
+        else
+        {
+            newName = await GenerateUniqueConversationNameAsync(userId, newName);
+        }
         
+        var libraryConversation = new LibraryConversation
+        {
+            UserId = userId,
+            Name = newName,
+            Date = DateTime.Now,
+            Updated = DateTime.Now,
+            ChatHistoryConversationId = originalConversationId
+        };
 
-            if (newName is null)
-            {
-                newName = originalConversation.Name;
-            }
-            else
-            {
-                newName = await GenerateUniqueConversationNameAsync(userId, newName);
-            }
-            
-            var libraryConversation = new LibraryConversation
-            {
-                UserId = userId,
-                Name = newName,
-                Date = DateTime.Now,
-                Updated = DateTime.Now,
-                ChatHistoryConversationId = originalConversationId
-            };
+        try
+        {
+            await _context.LibraryConversation.AddAsync(libraryConversation);
+            await _context.SaveChangesAsync();
+            return libraryConversation;
 
-            try
-            {
-                await _context.LibraryConversation.AddAsync(libraryConversation);
-                await _context.SaveChangesAsync();
-                return libraryConversation;
+        }
+        catch (Exception e)
+        {
+            throw new Exception("Error saving conversation", e);
+        }
 
-            }
-            catch (Exception e)
-            {
-                throw new Exception("Error saving conversation", e);
-            }
-
-    }
+    } 
 
     public async Task<LibraryConversation?> SaveQuestionAndAnswersToLibraryAsync(int questionId, int? libraryConversationId)
     {

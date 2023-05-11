@@ -24,7 +24,6 @@ public class ChatHistoryRepository : IChatHistoryRepository
     {
         var userId = userQuestion.UserId;
 
-
         if (userQuestion.ConversationId == 0)
         {
             var conversationName = "";
@@ -40,7 +39,10 @@ public class ChatHistoryRepository : IChatHistoryRepository
 
         var questionToSave = new Question
         {
-            Text = userQuestion.Text, UserId = userId, ConversationId = userQuestion.ConversationId, Date = DateTime.Now
+            Text = userQuestion.Text, 
+            UserId = userId, 
+            ConversationId = userQuestion.ConversationId, 
+            Date = DateTime.Now
         };
 
         await _context.Question.AddAsync(questionToSave);
@@ -50,18 +52,15 @@ public class ChatHistoryRepository : IChatHistoryRepository
         {
             Text = answer.Text,
             Date = answer.Date,
-            QuestionId = questionToSave.Id,
-            ConversationId = questionToSave.ConversationId
+            QuestionId = questionToSave.Id
         };
 
         await _context.Answer.AddAsync(answerToSave);
         await _context.SaveChangesAsync();
 
-        
-
         return answerToSave;
-
     }
+
 
     public async Task UpdateConversationAsync(int conversationId)
     {
@@ -92,31 +91,30 @@ public class ChatHistoryRepository : IChatHistoryRepository
     {
         var conversation = await _context.Conversation
             .Include(c => c.Questions)
-            .Include(c => c.Answers)
+            .ThenInclude(q => q.Answers)
             .Where(c => c.Id == conversationId).SingleOrDefaultAsync();
 
         if (conversation is null) return null;
 
         var messages = new List<QAItemDto>();
 
-        var questions = _mapper.Map<List<QuestionDto>>(conversation.Questions);
-        var answers = _mapper.Map<List<AnswerDto>>(conversation.Answers);
-
-        foreach (var question in questions)
+        foreach (var question in conversation.Questions)
         {
-            List<AnswerDto> answersToAdd = answers.Where(a => a.QuestionId == question.Id).ToList();
-            var questionMessage = _mapper.Map<MessageDto>(question);
-            var answerMessages = _mapper.Map<List<MessageDto>>(answersToAdd);
+            var questionDto = _mapper.Map<QuestionDto>(question);
+            var answerDtos = _mapper.Map<List<AnswerDto>>(question.Answers);
+
+            var questionMessage = _mapper.Map<MessageDto>(questionDto);
+            var answerMessages = _mapper.Map<List<MessageDto>>(answerDtos);
+
             foreach (var answer in answerMessages) answer.UserId = question.UserId;
             messages.Add(new QAItemDto { Question = questionMessage, Answers = answerMessages }); 
-            
         }
         return new ConversationDto
         {
             Conversation = messages
-        };
-        
-    }
+        };   
+    } 
+
 
     public async Task<string?> ChangeConversationNameAsync(NameConversationDto name)
     {
@@ -132,12 +130,12 @@ public class ChatHistoryRepository : IChatHistoryRepository
     {
         var conversations = await _context.Conversation
             .Include(c => c.Questions)
-            .Include(c => c.Answers)
+            .ThenInclude(q => q.Answers)
             .Where(c => c.UserId == userId).ToListAsync();
 
         return conversations.Select(conversation => _mapper.Map<ConversationInfoDto>(conversation)).ToList();
-
     }
+
 
     public async Task<List<AnswerDto>> GetAnswersAsync(int questionId)
     {
@@ -159,9 +157,16 @@ public class ChatHistoryRepository : IChatHistoryRepository
 
     public async Task<List<AnswerDto>> GetAnswersFromConversationAsync(int conversationId)
     {
-        return await _context.Answer.Where(a => a.ConversationId == conversationId)
-            .ProjectTo<AnswerDto>(_mapper.ConfigurationProvider).ToListAsync();
-    }
+        var answers = await _context.Conversation
+            .Where(c => c.Id == conversationId)
+            .SelectMany(c => c.Questions)
+            .SelectMany(q => q.Answers)
+            .ProjectTo<AnswerDto>(_mapper.ConfigurationProvider)
+            .ToListAsync();
+
+        return answers;
+    } 
+
     
     public async Task DeleteQuestionAsync(int questionId)
     {
@@ -196,22 +201,25 @@ public class ChatHistoryRepository : IChatHistoryRepository
 
     public async Task DeleteConversationAsync(int conversationId)
     {
-        var conversation = await _context.Conversation.FindAsync(conversationId);
+        var conversation = await _context.Conversation
+            .Include(c => c.Questions)
+            .ThenInclude(q => q.Answers)
+            .SingleOrDefaultAsync(c => c.Id == conversationId);
         if (conversation is null)
         {
             throw new Exception($"Conversation with id {conversationId} not found");
         }
 
-        var questions = await _context.Question.Where(q => q.ConversationId == conversationId).ToListAsync();
-        var answers = await _context.Answer.Where(a => a.ConversationId == conversationId).ToListAsync();
-
-        _context.Question.RemoveRange(questions);
-        _context.Answer.RemoveRange(answers);
+        foreach(var question in conversation.Questions)
+        {
+            _context.Answer.RemoveRange(question.Answers);
+        }
+        _context.Question.RemoveRange(conversation.Questions);
         _context.Conversation.Remove(conversation);
 
         await _context.SaveChangesAsync();
+    } 
 
-    }
 
     public async Task<Conversation?> CreateConversationAsync(int userId, string conversationName)
     {
