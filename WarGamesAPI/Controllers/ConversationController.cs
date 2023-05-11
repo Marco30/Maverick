@@ -211,7 +211,12 @@ public class ConversationController : ControllerBase
 
         try
         {
-            return Ok(await _questionRepo.ChangeConversationNameAsync(name));
+            await _questionRepo.ChangeConversationNameAsync(name);
+            var obj = new
+            {
+                Info = "name has changed"
+            };
+            return Ok(obj);
         }
         catch (Exception e)
         {

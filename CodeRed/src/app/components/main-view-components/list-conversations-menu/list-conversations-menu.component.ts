@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { Subject, takeUntil } from 'rxjs';
+import { ConversationInfo } from 'src/app/model/conversationInfo/conversation-info';
 import { Conversations } from 'src/app/model/conversations/conversations';
 import { ConversationService } from 'src/app/service/conversation/conversation.service';
 import { SharedDataService } from 'src/app/service/sharedData/shared-data.service';
@@ -37,9 +38,18 @@ export class ListConversationsMenuComponent {
   getConversations(){
 
    
+    this.sharedDataService.selectedConversationsList$.pipe(takeUntil(this.onDestroy$)).subscribe((value) => {
+      
+    if(value){
+      this.conversations.list = value;
+      console.info('-----AIlistConversation-----');
+      console.info(this.conversations.list);
+    }
+    
 
+    });
 
-    this.conversationService.listConversations().pipe(takeUntil(this.onDestroy$)).subscribe({
+    /*this.conversationService.listConversations().pipe(takeUntil(this.onDestroy$)).subscribe({
       next: (res) => {
 
        this.conversations.list = res;
@@ -56,7 +66,7 @@ export class ListConversationsMenuComponent {
         }, 5000); // hide after 5 seconds
       },
       // complete: () => (this.showLoading = false),
-    });
+    });*/
   
   }
 
@@ -65,6 +75,41 @@ export class ListConversationsMenuComponent {
       this.onDestroy$.next(true);
       this.onDestroy$.unsubscribe();
     
+  }
+
+  onNameChange(event: Event, conversation: ConversationInfo): void {
+    const newName = (event.target as HTMLTableCellElement).innerText.trim();
+    if (newName !== conversation.name) {
+      conversation.name = newName;
+
+      // TODO: call your service to save the updated conversation name
+
+      this.conversationService.changeConversationName(conversation).pipe(takeUntil(this.onDestroy$)).subscribe({
+        next: (res) => {
+  
+          console.info('-----AIConversatioConversationName-----');
+          console.info(res);
+        },
+        error: (err) => {
+          console.error('An error occurred:', err);
+          this.errorMessage = 'An error occurred while processing your request. Please try again later.';
+          this.showError = true;   
+          setTimeout(() => {
+            this.showError = false;
+          }, 5000); // hide after 5 seconds
+        },
+        // complete: () => (this.showLoading = false),
+      });
+
+    }
+  }
+
+
+  
+
+  newConversation(){
+    const conversationInfo = new ConversationInfo(0 , '', new Date, 0 );
+    this.sharedDataService.setConversationsInfo(conversationInfo);
   }
 
   openConversation(item: any){
@@ -96,6 +141,31 @@ export class ListConversationsMenuComponent {
     sessionStorage.setItem('ListConversationsOrder', JSON.stringify(this.conversations.list.map((_, i) => i)));
   }
   
+  }
+
+  public sortByDateDescending(): void {
+    this.conversations.list.sort((a, b) => {
+      const dateA = new Date(a.date).getTime();
+      const dateB = new Date(b.date).getTime();
+      return dateB - dateA;
+    });
+  }
+
+  public sortByDateAscending(): void {
+    this.conversations.list.sort((a, b) => {
+      const dateA = new Date(a.date).getTime();
+      const dateB = new Date(b.date).getTime();
+      return dateA - dateB;
+    });
+  }
+
+  public onDateSortChange(event: Event): void {
+    const checkbox = event.target as HTMLInputElement;
+    if (checkbox.checked) {
+      this.sortByDateDescending();
+    } else {
+      this.sortByDateAscending();
+    }
   }
 
 }

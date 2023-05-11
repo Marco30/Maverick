@@ -7,12 +7,14 @@ import { ChatViewComponent } from './chat-view.component';
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { AiChatComponent } from 'src/app/components/chat-view-components/ai-chat/ai-chat.component';
+import { InformationComponent } from 'src/app/components/chat-view-components/information/information.component';
 
 
 @NgModule({
   declarations: [
     ChatViewComponent,
-    AiChatComponent
+    AiChatComponent,
+    InformationComponent
   ],
   imports: [
     CommonModule,

@@ -8,6 +8,7 @@ import { Subject, takeUntil } from 'rxjs';
 import { Conversation } from 'src/app/model/conversation/conversation';
 import { ConversationTree } from 'src/app/model/conversationTree/conversation-tree';
 import { Answer } from 'src/app/model/answer/answer';
+import { AuthenticationService } from 'src/app/service/authentication/authentication.service';
 
 
 @Component({
@@ -16,6 +17,8 @@ import { Answer } from 'src/app/model/answer/answer';
   styleUrls: ['./ai-chat.component.css'],
 })
 export class AiChatComponent {
+
+  constructor(private conversationService: ConversationService,private authenticationService: AuthenticationService, private sharedDataService: SharedDataService) { }
 
   onDestroy$: Subject<boolean> = new Subject();
 
@@ -29,6 +32,9 @@ export class AiChatComponent {
     text: '',
     mockReply: true,
   };
+  newConversation = true;
+  AIname = 'Ava';
+  userName = this.authenticationService.getDataFromToken('firstname');
 
   answer1 = new Answer(1, 'Answer 1', new Date(), 1, 1);
   answer2 = new Answer(2, 'Answer 2', new Date(), 1, 1);
@@ -42,34 +48,14 @@ export class AiChatComponent {
   
   conversationInfo = new ConversationInfo(0 , '', new Date, 0 );
 
-  constructor(private conversationService: ConversationService,private http: HttpClient, private sharedDataService: SharedDataService) { }
-
+  
   ngOnInit() {
-
+    this.getConversations()
     this.getConversationInfo()
     console.info('Marco test');
     console.info(this.conversationInfo);
 
-    
-    this.messages = [
-      { sender: 'Ava', content: 'Hi there! How can I help you?' },
-      { sender: 'User', content: 'Can you tell me more about your product?' },
-      { sender: 'Ava', content: 'Sure! Our product is designed to...' },
-      { sender: 'User', content: 'That sounds great. How do I get started?' },
-      { sender: 'Ava', content: 'You can get started by...' },
-      { sender: 'Ava', content: 'Hi there! How can I help you?' },
-      { sender: 'User', content: 'Can you tell me more about your product?' },
-      { sender: 'Ava', content: 'Sure! Our product is designed to...' },
-      { sender: 'User', content: 'That sounds great. How do I get started?' },
-      { sender: 'Ava', content: 'You can get started by...' },
-      { sender: 'Ava', content: 'Hi there! How can I help you?' },
-      { sender: 'User', content: 'Can you tell me more about your product?' },
-      { sender: 'Ava', content: 'Sure! Our product is designed to...' },
-      { sender: 'User', content: 'That sounds great. How do I get started?' },
-      { sender: 'Ava', content: 'You can get started by...' },
-    ];
-
-    this.exampleAnswers();
+  
   }
 
   ngOnDestroy(): void {
@@ -88,6 +74,7 @@ export class AiChatComponent {
 
         console.info('-----AIFulConversation-----');
         this.conversationTree.conversation = res.conversation;
+        this.scrollToLastMessage();
         console.info(this.conversationTree.conversation);
       },
       error: (err) => {
@@ -105,14 +92,33 @@ export class AiChatComponent {
 
   getConversationInfo(){
 
-    this.sharedDataService.selectedConversationInfo$.subscribe((value) => {
+    this.sharedDataService.selectedConversationInfo$.pipe(takeUntil(this.onDestroy$)).subscribe((value) => {
       
       this.conversationInfo = value;
       if(this.conversationInfo.id != 0){
+        this.newConversation = false;
       this.getConversationData();
+      }else{
+        this.newConversation = true;
+        this.resetConversationToEmpty();
       }
 
     });
+  }
+
+  resetConversationToEmpty(){
+    const answerTemp1 = new Answer(1, 'Answer 1', new Date(), 1, 1);
+    const answerTemp2= new Answer(2, 'Answer 2', new Date(), 1, 1);
+    const answersTemp = [answerTemp1, answerTemp2];
+  
+    const questionTemp = new Question(1, 'Question 1', false);
+  
+    const conversationTemp = new Conversation(questionTemp, answersTemp);
+
+    const conversationTreeTemp: ConversationTree = new ConversationTree([conversationTemp]);
+
+    this.conversationTree = conversationTreeTemp;
+
   }
 
   ngAfterViewInit() {
@@ -153,33 +159,27 @@ export class AiChatComponent {
 
 
 
-  exampleAnswers() {
-    this.messages.push({
-      sender: 'Ava',
-      content: 'Hello! How can I help you today?',
+  getConversations(){
+
+
+    this.conversationService.listConversations().pipe(takeUntil(this.onDestroy$)).subscribe({
+      next: (res) => {
+        console.info('-----NewAIlistConversation-----');
+        console.info(res);
+        this.sharedDataService.setConversationsList(res);
+        
+      },
+      error: (err) => {
+        console.error('An error occurred:', err);
+        this.errorMessage = 'An error occurred while processing your request. Please try again later.';
+        this.showError = true;   
+        setTimeout(() => {
+          this.showError = false;
+        }, 5000); // hide after 5 seconds
+      },
+      // complete: () => (this.showLoading = false),
     });
-    this.messages.push({
-      sender: 'User',
-      content: 'Can you tell me about the weather in New York?',
-    });
-    this.messages.push({
-      sender: 'Ava',
-      content:
-        'Sure! The weather in New York is currently 70 degrees and sunny.',
-    });
-    this.messages.push({
-      sender: 'User',
-      content: 'What is the capital of France?',
-    });
-    this.messages.push({
-      sender: 'Ava',
-      content: 'The capital of France is Paris.',
-    });
-    this.messages.push({ sender: 'User', content: 'Thanks for your help!' });
-    this.messages.push({
-      sender: 'Ava',
-      content: 'Youre welcome. Have a great day!',
-    });
+  
   }
 
  
@@ -189,15 +189,25 @@ export class AiChatComponent {
 
     if (this.questionData.text != '') {
 
+      if(this.conversationInfo.id != 0){
+      this.questionData.conversationId = this.conversationInfo.id;
+      }
+
       this.questionData.mockReply = true;
      
 
-      this.conversationService.askTheAI(this.questionData).subscribe({
+      this.conversationService.askTheAI(this.questionData).pipe(takeUntil(this.onDestroy$)).subscribe({
         next: (res) => {
 
           console.info('-----AskTheAI-----');
           console.info(res);
-        
+          let answerData = new Answer(res.id, '', res.date, res.questionId, res.conversationId);
+          let conversationData = new Conversation(this.questionData, [answerData]);
+          this.conversationTree.conversation.push(conversationData); 
+          if(res.text){
+          this.revealText(res.text,10);
+          }
+          this.getConversations();
 
         },
         error: (err) => {
@@ -213,10 +223,6 @@ export class AiChatComponent {
     
     } 
 
-     this.messages.push({
-      sender: 'Ava',
-      content: '',
-    }); 
    
    // var testtext = 'I am ChatGPT, a large language model developed by OpenAI using the GPT-3.5 architecture. As a language model, my primary function is to generate natural language responses to text-based inputs such as questions, prompts, and statements.\r\n\r\nI was trained on a massive dataset of written text from the internet and other sources, which allows me to understand and generate responses in a wide variety of topics and domains. My training data includes text in multiple languages, making me capable of generating responses in several languages.\r\n\r\nI use machine learning techniques such as deep neural networks to analyze and understand the structure and context of the input text. Based on this analysis, I generate a response that is meant to be natural-sounding and relevant to the input.\r\n\r\nOverall, my purpose is to assist users in generating high-quality, natural language responses to a wide range of prompts and queries, making communication and information retrieval more efficient and effective.';
    // this.revealText(testtext,10);
@@ -235,7 +241,7 @@ export class AiChatComponent {
     let index = 0;
     let interval = setInterval(() => {
       //console.log(text.charAt(index));
-      this.messages[this.messages.length - 1].content += text.charAt(index);
+      this.conversationTree.conversation[this.conversationTree.conversation.length - 1].answers[0].text += text.charAt(index);
       this.scrollToLastMessage();
       index++;
       if (index >= text.length) {
