@@ -211,7 +211,7 @@ public class ConversationController : ControllerBase
 
         try
         {
-            await _questionRepo.ChangeConversationNameAsync(name);
+            await _questionRepo.ChangeConversationNameAsync(name.ConversationId, name.NewName);
             var obj = new
             {
                 Info = "name has changed"

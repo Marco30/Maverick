@@ -135,10 +135,9 @@ public class LibraryController : ControllerBase
 
     }
 
-
     [ValidateToken]
     [HttpPost("savequestionandanswerstolibrary")]
-    public async Task<ActionResult<ConversationInfoDto>> SaveQuestionAndAnswersToLibrary(SaveQuestionDto saveQuestion)
+    public async Task<ActionResult> SaveQuestionAndAnswersToLibrary(SaveQuestionDto saveQuestion)
     {
         if (!Request.Headers.ContainsKey("Authorization") || string.IsNullOrEmpty(Request.Headers["Authorization"]))
             return BadRequest("The Authorization header is required.");
@@ -153,10 +152,10 @@ public class LibraryController : ControllerBase
 
         try
         {
-            var libraryConversation = await _libraryRepo
+            await _libraryRepo
                 .SaveQuestionAndAnswersToLibraryAsync(saveQuestion.QuestionId, saveQuestion.LibraryConversationId);
 
-            return Ok(_mapper.Map<ConversationInfoDto>(libraryConversation));
+            return Ok();
         }
         catch (Exception e)
         {
@@ -185,37 +184,6 @@ public class LibraryController : ControllerBase
         {
             var libraryConversation = await _libraryRepo
                 .SaveAnswerToLibraryAsync(saveAnswer.AnswerId, saveAnswer.LibraryConversationId);
-
-            return Ok(_mapper.Map<ConversationInfoDto>(libraryConversation));
-        }
-        catch (Exception e)
-        {
-            var error = new ResponseMessageDto { StatusCode = 500, Message = e.Message };
-            return StatusCode(500, error);
-        }
-
-    }
-
-
-    [ValidateToken]
-    [HttpPost("savequestiontolibrary")]
-    public async Task<ActionResult<ConversationInfoDto>> SaveQuestionToLibrary(SaveQuestionDto saveQuestion)
-    {
-        if (!Request.Headers.ContainsKey("Authorization") || string.IsNullOrEmpty(Request.Headers["Authorization"]))
-            return BadRequest("The Authorization header is required.");
-
-        var userId = TokenData.getUserId(Request.Headers["Authorization"]!);
-
-        if (saveQuestion.QuestionId != 0)
-        {
-            if (!await _validationRepo.UserOwnsQuestion(userId, saveQuestion.QuestionId))
-                return BadRequest("Question not found");
-        }
-
-        try
-        {
-            var libraryConversation = await _libraryRepo
-                .SaveQuestionToLibraryAsync(saveQuestion.QuestionId, saveQuestion.LibraryConversationId);
 
             return Ok(_mapper.Map<ConversationInfoDto>(libraryConversation));
         }
@@ -304,8 +272,6 @@ public class LibraryController : ControllerBase
         }
         
     }
-
-
 
 
 }

@@ -61,7 +61,6 @@ public class ChatHistoryRepository : IChatHistoryRepository
         return answerToSave;
     }
 
-
     public async Task UpdateConversationAsync(int conversationId)
     {
         var conversation = await _context.Conversation.SingleOrDefaultAsync(c => c.Id == conversationId);
@@ -114,13 +113,12 @@ public class ChatHistoryRepository : IChatHistoryRepository
             Conversation = messages
         };   
     } 
-
-
-    public async Task<string?> ChangeConversationNameAsync(NameConversationDto name)
+    
+    public async Task<string?> ChangeConversationNameAsync(int conversationId, string newName)
     {
-        var conversation = await _context.Conversation.SingleOrDefaultAsync(c => c.Id == name.ConversationId);
+        var conversation = await _context.Conversation.SingleOrDefaultAsync(c => c.Id == conversationId);
         if (conversation is null) return null;
-        conversation.Name = name.NewName;
+        conversation.Name = await GenerateUniqueConversationNameAsync(conversation.UserId, newName);
         conversation.Updated = DateTime.Now;
         await _context.SaveChangesAsync();
         return conversation.Name;
@@ -135,8 +133,7 @@ public class ChatHistoryRepository : IChatHistoryRepository
 
         return conversations.Select(conversation => _mapper.Map<ConversationInfoDto>(conversation)).ToList();
     }
-
-
+    
     public async Task<List<AnswerDto>> GetAnswersAsync(int questionId)
     {
         return await _context.Answer.Where(a => a.QuestionId == questionId)
@@ -166,7 +163,6 @@ public class ChatHistoryRepository : IChatHistoryRepository
 
         return answers;
     } 
-
     
     public async Task DeleteQuestionAsync(int questionId)
     {
@@ -205,6 +201,7 @@ public class ChatHistoryRepository : IChatHistoryRepository
             .Include(c => c.Questions)
             .ThenInclude(q => q.Answers)
             .SingleOrDefaultAsync(c => c.Id == conversationId);
+
         if (conversation is null)
         {
             throw new Exception($"Conversation with id {conversationId} not found");
@@ -214,13 +211,13 @@ public class ChatHistoryRepository : IChatHistoryRepository
         {
             _context.Answer.RemoveRange(question.Answers);
         }
+
         _context.Question.RemoveRange(conversation.Questions);
         _context.Conversation.Remove(conversation);
 
         await _context.SaveChangesAsync();
     } 
-
-
+    
     public async Task<Conversation?> CreateConversationAsync(int userId, string conversationName)
     {
         if (conversationName is null) throw new Exception("Conversation name is required");

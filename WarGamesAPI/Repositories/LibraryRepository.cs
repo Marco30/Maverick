@@ -23,7 +23,7 @@ public class LibraryRepository : ILibraryRepository
     {
         var conversations = await _context.LibraryConversation
             .Include(lc => lc.LibraryQuestions)
-            .Include(lc => lc.LibraryAnswers)
+            .ThenInclude(lq => lq.LibraryAnswers)
             .Where(lc => lc.UserId == userId).ToListAsync();
 
         return conversations.Select(conversation => _mapper.Map<ConversationInfoDto>(conversation)).ToList();
@@ -32,24 +32,29 @@ public class LibraryRepository : ILibraryRepository
 
     public async Task<ConversationDto?> GetConversationAsync(int conversationId)
     {
-        var conversation = await _context.LibraryConversation
+        var libraryConversation = await _context.LibraryConversation
             .Include(lc => lc.LibraryQuestions)
-            .Include(lc => lc.LibraryAnswers)
+            .ThenInclude(lq => lq.LibraryAnswers)
             .Where(lc => lc.Id == conversationId).SingleOrDefaultAsync();
 
-        if (conversation is null) return null;
+        if (libraryConversation is null) return null;
 
         var messages = new List<QAItemDto>();
 
-        var questions = _mapper.Map<List<QuestionDto>>(conversation.LibraryQuestions);
-        var answers = _mapper.Map<List<AnswerDto>>(conversation.LibraryAnswers);
-
-        foreach (var question in questions)
+        
+        foreach (var libraryQuestion in libraryConversation.LibraryQuestions)
         {
-            List<AnswerDto> answersToAdd = answers.Where(a => a.QuestionId == question.Id).ToList();
-            var questionMessage = _mapper.Map<MessageDto>(question);
-            var answerMessages = _mapper.Map<List<MessageDto>>(answersToAdd);
-            foreach (var answer in answerMessages) answer.UserId = question.UserId;
+            var questionDto = _mapper.Map<QuestionDto>(libraryQuestion);
+            var answerDtos = _mapper.Map<List<AnswerDto>>(libraryQuestion.LibraryAnswers);
+
+            var questionMessage = _mapper.Map<MessageDto>(questionDto);
+            var answerMessages = _mapper.Map<List<MessageDto>>(answerDtos);
+
+            foreach (var answer in answerMessages)
+            {
+                answer.UserId = libraryQuestion.UserId;
+            }
+
             messages.Add(new QAItemDto { Question = questionMessage, Answers = answerMessages }); 
             
         }
@@ -96,6 +101,7 @@ public class LibraryRepository : ILibraryRepository
             .Include(c => c.Questions)
             .ThenInclude(q => q.Answers)
             .SingleOrDefaultAsync(c => c.Id == originalConversationId);
+
         if (originalConversation is null || originalConversation.UserId != userId)
         {
             throw new Exception("Original conversation not found");
@@ -124,6 +130,13 @@ public class LibraryRepository : ILibraryRepository
         {
             await _context.LibraryConversation.AddAsync(libraryConversation);
             await _context.SaveChangesAsync();
+
+            foreach (var question in originalConversation.Questions)
+            {
+                await SaveQuestionAndAnswersToLibraryAsync(question.Id, libraryConversation.Id);
+            }
+
+
             return libraryConversation;
 
         }
@@ -134,7 +147,7 @@ public class LibraryRepository : ILibraryRepository
 
     } 
 
-    public async Task<LibraryConversation?> SaveQuestionAndAnswersToLibraryAsync(int questionId, int? libraryConversationId)
+    public async Task SaveQuestionAndAnswersToLibraryAsync(int questionId, int? libraryConversationId)
     {
         var question = await _context.Question.SingleOrDefaultAsync(q => q.Id == questionId);
         if (question is null)
@@ -169,7 +182,7 @@ public class LibraryRepository : ILibraryRepository
 
         await _context.SaveChangesAsync();
 
-
+     
         foreach (var answer in historyAnswers)
         {
             var libraryAnswer = new LibraryAnswer
@@ -185,44 +198,40 @@ public class LibraryRepository : ILibraryRepository
         
         await _context.SaveChangesAsync();
 
-        
-        return libraryConversation;
-
-        
-
     }
 
     public async Task<LibraryConversation?> SaveAnswerToLibraryAsync(int answerId, int? libraryConversationId)
     {
-        var answer = await _context.Answer.SingleOrDefaultAsync(a => a.Id == answerId);
-        if (answer is null)
-        {
-            throw new Exception($"Answer with id {answerId} not found");
-        }
+        
+        var answer = await _context.Answer
+            .Include(a => a.Question)
+            .ThenInclude(q => q!.Conversation)
+            .SingleOrDefaultAsync(a => a.Id == answerId);
 
-        var question = await _context.Question.SingleOrDefaultAsync(q => q.Id == answer.QuestionId);
-        if (question is null)
-        {
-            throw new Exception($"Question with id {answer.QuestionId} not found");
-        }
+        if (answer == null) throw new Exception($"Answer with id {answerId} not found");
+        var question = answer.Question;
+        if (question == null) throw new Exception($"Question for answer with id {answerId} not found");
+        var conversation = question.Conversation;
+        if (conversation == null) throw new Exception($"Conversation for question with id {question.Id} not found");
 
-        var conversation = await _context.Conversation.SingleOrDefaultAsync(c => c.Id == question.ConversationId);
-        if (conversation is null)
-        {
-            throw new Exception($"Conversation with id {question.ConversationId} not found");
-        }
 
-        var libraryConversation = new LibraryConversation();
+        LibraryConversation? libraryConversation;
 
 
         if (libraryConversationId is null)
         {
-            libraryConversation = await CreateLibraryConversationFromChatHistoryAsync(conversation.UserId, question.Text, conversation.Id);
+            libraryConversation = await CreateLibraryConversationAsync(conversation.UserId, question.Text);
+        }
+        else
+        {
+            libraryConversation = await _context.LibraryConversation
+                .Include(lc => lc.LibraryQuestions)
+                .SingleOrDefaultAsync(lc => lc.Id == libraryConversationId);
         }
 
-        var libraryQuestion = libraryConversation!.LibraryQuestions.SingleOrDefault(lq => lq.ChatHistoryQuestionId == question.Id);
-
         // Check if question is already in library
+        var libraryQuestion = libraryConversation!.LibraryQuestions.FirstOrDefault(lq => lq.ChatHistoryQuestionId == question.Id);
+
         if (libraryQuestion is null)
         {
             libraryQuestion = new LibraryQuestion
@@ -233,7 +242,9 @@ public class LibraryRepository : ILibraryRepository
                 ChatHistoryQuestionId = question.Id,
                 LibraryConversationId = libraryConversation.Id
             };
+
             _context.LibraryQuestion.Add(libraryQuestion);
+
             await _context.SaveChangesAsync();
         }
 
@@ -243,66 +254,33 @@ public class LibraryRepository : ILibraryRepository
             Date = answer.Date,
             LibraryQuestionId = libraryQuestion.Id,
             ChatHistoryAnswerId = answer.Id,
-            LibraryConversationId = libraryConversation.Id
         };
 
+        libraryConversation.Updated = DateTime.Now;
         _context.LibraryAnswer.Add(libraryAnswer);
         await _context.SaveChangesAsync();
 
         return libraryConversation;
     }
     
-    public async Task<LibraryConversation?> SaveQuestionToLibraryAsync(int questionId, int? libraryConversationId)
-    {
-        var question = await _context.Question.SingleOrDefaultAsync(q => q.Id == questionId);
-        if (question is null)
-        {
-            throw new Exception($"Question with id {questionId} not found");
-        }
-
-        var userId = question.UserId;
-
-        var libraryConversation = await _context.LibraryConversation.SingleOrDefaultAsync(c =>
-            c.Id == libraryConversationId);
-
-
-        if (libraryConversation is null)
-        {
-            libraryConversation = await CreateLibraryConversationFromChatHistoryAsync(question.UserId, question.Text, question.ConversationId);
-        }
-        
-        libraryConversation!.Updated = DateTime.Now;
-
-        
-        var libraryQuestion = new LibraryQuestion
-        {
-            UserId = userId,
-            Text = question.Text,
-            Date = question.Date,
-            ChatHistoryQuestionId = question.Id,
-            LibraryConversationId = libraryConversation.Id
-        };
-        _context.LibraryQuestion.Add(libraryQuestion);
-
-        await _context.SaveChangesAsync();
-
-        return libraryConversation;
-
-    }
-
     public async Task DeleteLibraryConversationAsync(int conversationId)
     {
-        var conversation = await _context.LibraryConversation.FindAsync(conversationId);
+        var conversation = await _context.LibraryConversation
+            .Include(lc => lc.LibraryQuestions)
+            .ThenInclude(lq => lq.LibraryAnswers)
+            .SingleOrDefaultAsync(lc => lc.Id == conversationId);
+
         if (conversation is null)
         {
             throw new Exception($"Conversation with id {conversationId} not found");
         }
 
-        var questions = await _context.LibraryQuestion.Where(q => q.LibraryConversationId == conversationId).ToListAsync();
-        var answers = await _context.LibraryAnswer.Where(a => a.LibraryConversationId == conversationId).ToListAsync();
-
-        _context.LibraryQuestion.RemoveRange(questions);
-        _context.LibraryAnswer.RemoveRange(answers);
+        foreach (var question in conversation.LibraryQuestions)
+        {
+            _context.LibraryAnswer.RemoveRange(question.LibraryAnswers);
+        }
+        
+        _context.LibraryQuestion.RemoveRange(conversation.LibraryQuestions);
         _context.LibraryConversation.Remove(conversation);
 
         await _context.SaveChangesAsync();
@@ -311,12 +289,17 @@ public class LibraryRepository : ILibraryRepository
 
     public async Task DeleteLibraryAnswerAsync(int answerId)
     {
-        var answer = await _context.LibraryAnswer.FindAsync(answerId);
-        if (answer is null)
-        {
-            throw new Exception($"Answer with id {answerId} not found");
-        }
+        var answer = await _context.LibraryAnswer
+            .Include(la => la.LibraryQuestion)
+            .ThenInclude(lq => lq!.LibraryConversation)
+            .SingleOrDefaultAsync(la => la.Id == answerId);
 
+        if (answer is null) throw new Exception($"Answer with id {answerId} not found");
+
+        var libraryConversation = answer.LibraryQuestion?.LibraryConversation;
+        if (libraryConversation == null) throw new Exception($"LibraryConversation for answer with id {answerId} not found");
+        
+        libraryConversation.Updated = DateTime.Now;
         _context.LibraryAnswer.Remove(answer);
 
         await _context.SaveChangesAsync();
@@ -326,12 +309,13 @@ public class LibraryRepository : ILibraryRepository
     public async Task DeleteLibraryQuestionAsync(int questionId)
     {
         var question = await _context.LibraryQuestion.FindAsync(questionId);
-        if (question is null)
-        {
-            throw new Exception($"Question with id {questionId} not found");
-        }
+        if (question is null) throw new Exception($"Question with id {questionId} not found");
 
         var answersToQuestion = _context.LibraryAnswer.Where(a => a.LibraryQuestionId == questionId);
+        
+        var libraryConversation = await _context.LibraryConversation.FindAsync(question.LibraryConversationId);
+        if (libraryConversation == null) throw new Exception($"LibraryConversation for question with id {questionId} not found");
+        libraryConversation.Updated = DateTime.Now;
 
         _context.LibraryQuestion.Remove(question);
         _context.LibraryAnswer.RemoveRange(answersToQuestion);
@@ -344,7 +328,7 @@ public class LibraryRepository : ILibraryRepository
     {
         var conversation = await _context.LibraryConversation.SingleOrDefaultAsync(lc => lc.Id == conversationId);
         if (conversation is null) return null;
-        conversation.Name = newName;
+        conversation.Name = await GenerateUniqueConversationNameAsync(conversation.UserId, newName);
         conversation.Updated = DateTime.Now;
         await _context.SaveChangesAsync();
         return conversation.Name;
@@ -392,6 +376,5 @@ public class LibraryRepository : ILibraryRepository
 
         return result;
     }
-
 
 }

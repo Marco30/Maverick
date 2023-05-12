@@ -8,8 +8,8 @@ public interface ILibraryRepository
 {
     Task<List<ConversationInfoDto>> GetConversationInfosAsync(int userId);
     Task<ConversationDto?> GetConversationAsync(int conversationId);
-    Task<LibraryConversation?> SaveQuestionAndAnswersToLibraryAsync(int questionId, int? libraryConversationId);
-    Task<LibraryConversation?> SaveQuestionToLibraryAsync(int questionId, int? libraryConversationId);
+    Task SaveQuestionAndAnswersToLibraryAsync(int questionId, int? libraryConversationId);
+    //Task<LibraryConversation?> SaveQuestionToLibraryAsync(int questionId, int? libraryConversationId);
     Task<LibraryConversation?> SaveAnswerToLibraryAsync(int answerId, int? libraryConversationId);
     Task DeleteLibraryConversationAsync(int conversationId);
     Task DeleteLibraryAnswerAsync(int answerId);

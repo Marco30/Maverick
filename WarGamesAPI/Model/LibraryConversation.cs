@@ -12,14 +12,13 @@ public class LibraryConversation
     public DateTime Updated { get; set; }
 
     public int? ChatHistoryConversationId { get; set; }
-    public Conversation? Conversation { get; set; }
+    public Conversation? ChatHistoryConversation { get; set; }
 
     [ForeignKey("UserId")]
     public int UserId { get; set; }
     public User? User { get; set; }
 
     public ICollection<LibraryQuestion> LibraryQuestions { get; set; } = new List<LibraryQuestion>();
-    public ICollection<LibraryAnswer> LibraryAnswers { get; set; } = new List<LibraryAnswer>();
 
 
 }

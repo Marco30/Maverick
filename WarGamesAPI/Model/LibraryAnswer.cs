@@ -15,8 +15,5 @@ public class LibraryAnswer
     [ForeignKey("LibraryQuestionId")]
     public int? LibraryQuestionId { get; set; }
     public LibraryQuestion? LibraryQuestion { get; set; }
-
-    [ForeignKey("LibraryConversationId")]
-    public int? LibraryConversationId { get; set; }
-    public LibraryConversation? LibraryConversation { get; set; }
+    
 }

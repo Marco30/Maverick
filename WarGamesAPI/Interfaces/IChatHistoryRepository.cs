@@ -12,7 +12,7 @@ public interface IChatHistoryRepository
     Task<ConversationDto?> GetConversationAsync(int conversationId);
     Task<List<AnswerDto>> GetAnswersAsync(int questionId);
     Task<List<ConversationInfoDto>> GetConversationInfosAsync(int userId);
-    Task<string?> ChangeConversationNameAsync(NameConversationDto name);
+    Task<string?> ChangeConversationNameAsync(int conversationId, string newName);
     Task<Conversation?> CreateConversationAsync(int userId, string conversationName);
     
 
