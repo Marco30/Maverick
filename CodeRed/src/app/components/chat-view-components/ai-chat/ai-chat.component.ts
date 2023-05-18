@@ -166,6 +166,10 @@ export class AiChatComponent {
       next: (res) => {
         console.info('-----NewAIlistConversation-----');
         console.info(res);
+        if(!this.newConversation){
+          this.conversationInfo.id = res[res.length-1].id;
+        }
+       
         this.sharedDataService.setConversationsList(res);
         
       },
@@ -192,6 +196,11 @@ export class AiChatComponent {
       if(this.conversationInfo.id != 0){
       this.questionData.conversationId = this.conversationInfo.id;
       }
+      
+      if(this.newConversation){
+        this.questionData.conversationId = this.conversationInfo.id;
+      }
+    
 
       this.questionData.mockReply = true;
      
@@ -203,7 +212,18 @@ export class AiChatComponent {
           console.info(res);
           let answerData = new Answer(res.id, '', res.date, res.questionId, res.conversationId);
           let conversationData = new Conversation(this.questionData, [answerData]);
-          this.conversationTree.conversation.push(conversationData); 
+          this.newConversation = false;
+          //this.conversationTree.conversation.push(conversationData); 
+
+          if(this.questionData.conversationId === 0){
+
+            this.conversationTree.conversation = [conversationData]; 
+
+          }else{
+           
+            this.conversationTree.conversation.push(conversationData); 
+          }
+
           if(res.text){
           this.revealText(res.text,10);
           }
