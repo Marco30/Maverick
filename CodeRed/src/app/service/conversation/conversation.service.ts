@@ -47,4 +47,13 @@ export class ConversationService {
     return this.httpRequestService.getData<any>(url);
   }
 
+  deleteConversation(conversationId: number): Observable<any>{
+    const url = environment.delete_conversation;
+    console.info('delete conversationId')
+    console.info(conversationId)
+    let conversationObject = { ConversationId: conversationId};
+    const queryParams = { model: conversationObject};
+    return this.httpRequestService.postData<any>(url, queryParams);
+  }
+
 }

@@ -43,17 +43,24 @@ public class Crawlers
         }
 
         browser.Navigate().GoToUrl(pageURL);
-        
-  
-        browser.FindElement(By.Id("inpField10")).SendKeys(socialSecurityNumber);
-        browser.FindElement(By.Id("inpField10")).Submit();
+
+        Thread.Sleep(3000);
+
         if (IsElementPresent(browser, By.XPath("/html/body/div[1]/div/div/div/div[2]/div/button[2]")))
         {
             browser.FindElement(By.XPath("/html/body/div[1]/div/div/div/div[2]/div/button[2]")).Click();
         }
-        Thread.Sleep(3000);
 
-        browser.FindElement(By.XPath("/html/body/div[3]/div[2]/div/div[2]/div[2]/a")).Click();
+
+        browser.FindElement(By.Id("inpField10")).SendKeys(socialSecurityNumber);
+        browser.FindElement(By.Id("inpField10")).Submit();
+
+        
+        if (IsElementPresent(browser, By.XPath("/html/body/div[2]/div[2]/div/div[2]/div[2]/a")))
+        {
+            browser.FindElement(By.XPath("/html/body/div[2]/div[2]/div/div[2]/div[2]/a")).Click();
+        }
+
         var userInfoPage = browser.PageSource;
 
         browser.Close();

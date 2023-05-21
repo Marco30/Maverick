@@ -292,7 +292,7 @@ public class ConversationController : ControllerBase
     }
 
     [ValidateToken]
-    [HttpDelete("deleteconversation")]
+    [HttpPost("deleteconversation")]
     public async Task<IActionResult> DeleteConversation(GetConversationDto deleteConversation)
     {
         if (!Request.Headers.ContainsKey("Authorization") || string.IsNullOrEmpty(Request.Headers["Authorization"])) 
@@ -312,7 +312,11 @@ public class ConversationController : ControllerBase
             }
 
             await _questionRepo.DeleteConversationAsync(conversationId);
-            return NoContent();
+            var obj = new
+            {
+                Info = "Conversation is deleted"
+            };
+            return Ok(obj);
 
         }
         catch (Exception e)

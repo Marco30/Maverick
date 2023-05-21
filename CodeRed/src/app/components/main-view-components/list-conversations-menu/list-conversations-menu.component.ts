@@ -48,25 +48,6 @@ export class ListConversationsMenuComponent {
     
 
     });
-
-    /*this.conversationService.listConversations().pipe(takeUntil(this.onDestroy$)).subscribe({
-      next: (res) => {
-
-       this.conversations.list = res;
-        console.info('-----AIlistConversation-----');
-        console.info(this.conversations.list);
-        
-      },
-      error: (err) => {
-        console.error('An error occurred:', err);
-        this.errorMessage = 'An error occurred while processing your request. Please try again later.';
-        this.showError = true;   
-        setTimeout(() => {
-          this.showError = false;
-        }, 5000); // hide after 5 seconds
-      },
-      // complete: () => (this.showLoading = false),
-    });*/
   
   }
 
@@ -104,7 +85,31 @@ export class ListConversationsMenuComponent {
     }
   }
 
+  deleteConversation(conversation: ConversationInfo, index: number): void {
+    if (confirm('Are you sure you want to delete this conversation?')) {
 
+      this.conversationService.deleteConversation(conversation.id).pipe(takeUntil(this.onDestroy$)).subscribe({
+        next: (res) => {
+  
+          console.info('-----Delete Conversation finished -----');
+          console.info(res);
+          this.conversations.list.splice(index, 1);
+
+        },
+        error: (err) => {
+          console.error('An error occurred:', err);
+          this.errorMessage = 'An error occurred while processing your request. Please try again later.';
+          this.showError = true;   
+          setTimeout(() => {
+            this.showError = false;
+          }, 5000); // hide after 5 seconds
+        },
+        // complete: () => (this.showLoading = false),
+      });
+
+      
+    }
+  }
   
 
   newConversation(){

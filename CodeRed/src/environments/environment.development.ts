@@ -9,6 +9,7 @@ export const environment = {
   ask_question: `${BaseUrl}/askquestion`,
   get_ListOfconversations: `${BaseUrl}/getconversations`,
   get_conversation: `${BaseUrl}/getconversation`,
+  delete_conversation: `${BaseUrl}/deleteconversation`,
   changeconversation_name: `${BaseUrl}/changeconversationname`,
   get_user_data_from_security_number: `${BaseUrl}/getUserDataFromSecurityNumber`,
 };

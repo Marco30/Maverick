@@ -84,14 +84,10 @@ public class Parsers
 
                 }
 
-                var phone = htmlDocument.DocumentNode.SelectNodes("/html/body/div[1]/div[3]/div/div/div[1]/div/div[9]/div/div/a");
+                var phone = htmlDocument.DocumentNode.SelectNodes("/html/body/div[1]/div[3]/div/div/div[1]/div/div[10]/div/div/a");
 
                 try
                 {
-
-                
-                    
-                    if(phone!= null) { 
 
                         if(phone != null) {
                             for (int i = 0; i < phone.Count; i++)
@@ -114,7 +110,7 @@ public class Parsers
                         }
                     
 
-                    }
+               
 
                     var Street = htmlDocument.DocumentNode.SelectSingleNode("/html/body/div[1]/div[3]/div/div/div[1]/div/div[6]/div[2]/span[2]");
 
