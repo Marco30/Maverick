@@ -42,18 +42,26 @@ export class ConversationService {
   }
 
   listConversations() : Observable<any>{
-    const url = environment.get_ListOfconversations;
+    const url = environment.get_list_of_conversations;
     const queryParams = { id: 0};
     return this.httpRequestService.getData<any>(url);
   }
+
+  
+  listSavedConversations() : Observable<any>{
+    const url = environment.get_list_of_saved_conversations;
+    const queryParams = { id: 0};
+    return this.httpRequestService.getData<any>(url);
+  }
+
 
   deleteConversation(conversationId: number): Observable<any>{
     const url = environment.delete_conversation;
     console.info('delete conversationId')
     console.info(conversationId)
     let conversationObject = { ConversationId: conversationId};
-    const queryParams = { model: conversationObject};
-    return this.httpRequestService.postData<any>(url, queryParams);
+    const queryParams = { params: conversationObject};
+    return this.httpRequestService.deleteData1<any>(url, conversationObject);
   }
 
 }

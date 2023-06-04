@@ -126,7 +126,7 @@ export class AuthenticationService {
   }
 
   public getNewtoken(): Observable<AuthToken> {
-    const url = environment.refreshToken_url;
+    const url = environment.refresh_token_url;
 
     //return this.genericHttpService.post<any>(url);
     return this.httpRequestService.postData<any>(url);

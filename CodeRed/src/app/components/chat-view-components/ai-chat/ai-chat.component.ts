@@ -50,8 +50,9 @@ export class AiChatComponent {
 
   
   ngOnInit() {
-    this.getConversations()
-    this.getConversationInfo()
+    this.getConversations();
+    this.getSaveConversations()
+    this.getConversationInfo();
     console.info('Marco test');
     console.info(this.conversationInfo);
 
@@ -65,6 +66,11 @@ export class AiChatComponent {
   
 }
 
+SaveQuestionAndAnswer(conversation: Conversation, index: number){
+console.info("conversation and index")
+console.info(conversation)
+console.info(index)
+}
 
   getConversationData(){
 
@@ -186,7 +192,32 @@ export class AiChatComponent {
   
   }
 
- 
+  getSaveConversations(){
+
+
+    this.conversationService.listSavedConversations().pipe(takeUntil(this.onDestroy$)).subscribe({
+      next: (res) => {
+        console.info('-----NewAISavedListConversation-----');
+        console.info(res);
+        if(!this.newConversation){
+          this.conversationInfo.id = res[res.length-1].id;
+        }
+       
+        this.sharedDataService.setSavedConversationsList(res);
+        
+      },
+      error: (err) => {
+        console.error('An error occurred:', err);
+        this.errorMessage = 'An error occurred while processing your request. Please try again later.';
+        this.showError = true;   
+        setTimeout(() => {
+          this.showError = false;
+        }, 5000); // hide after 5 seconds
+      },
+      // complete: () => (this.showLoading = false),
+    });
+  
+  }
 
   
   onSubmit() {

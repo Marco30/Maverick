@@ -2,6 +2,7 @@ import { Component, ElementRef, Renderer2 } from '@angular/core';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { NavigationMenuComponent } from '../navigation-menu/navigation-menu.component';
 import { ListConversationsMenuComponent } from '../list-conversations-menu/list-conversations-menu.component';
+import { ListSavedConversationsMenuComponent } from '../list-saved-conversations-menu/list-saved-conversations-menu.component';
 
 interface Item {
   name: string;
@@ -21,7 +22,7 @@ export class SidebarComponent {
   items = [
     { name: 'Toolbar 1', data: NavigationMenuComponent, position: 0 },
     { name: 'Toolbar 2', data: ListConversationsMenuComponent, position: 1 },
-    { name: 'Toolbar 3', data: null, position: 2 },
+    { name: 'Toolbar 3', data: ListSavedConversationsMenuComponent, position: 2 },
   ];
 
   // Inject ElementRef and Renderer2 into the constructor

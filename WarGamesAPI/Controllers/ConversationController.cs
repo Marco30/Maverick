@@ -261,7 +261,7 @@ public class ConversationController : ControllerBase
 
     [ValidateToken]
     [HttpDelete("deleteanswer")]
-    public async Task<IActionResult> DeleteAnswer(GetAnswerDto deleteAnswer)
+    public async Task<IActionResult> DeleteAnswer([FromBody]GetAnswerDto deleteAnswer)
     {
         if (!Request.Headers.ContainsKey("Authorization") || string.IsNullOrEmpty(Request.Headers["Authorization"])) 
             return BadRequest("The Authorization header is required.");
@@ -292,8 +292,8 @@ public class ConversationController : ControllerBase
     }
 
     [ValidateToken]
-    [HttpPost("deleteconversation")]
-    public async Task<IActionResult> DeleteConversation(GetConversationDto deleteConversation)
+    [HttpDelete("deleteconversation")]
+    public async Task<IActionResult> DeleteConversation([FromBody] GetConversationDto deleteConversation)
     {
         if (!Request.Headers.ContainsKey("Authorization") || string.IsNullOrEmpty(Request.Headers["Authorization"])) 
             return BadRequest("The Authorization header is required.");

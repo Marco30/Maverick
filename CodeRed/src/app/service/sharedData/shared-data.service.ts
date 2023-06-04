@@ -11,8 +11,12 @@ export class SharedDataService {
   private conversationInfo$: BehaviorSubject<ConversationInfo> = new BehaviorSubject<ConversationInfo>({ id: 0, name : '', date: new Date, userId: 0, });
   selectedConversationInfo$: Observable<ConversationInfo> = this.conversationInfo$.asObservable();
 
-  private ConversationsList$: BehaviorSubject<ConversationInfo[]> = new BehaviorSubject<ConversationInfo[]>([]);
-  selectedConversationsList$: Observable<ConversationInfo[]> = this.ConversationsList$.asObservable();
+  private conversationsList$: BehaviorSubject<ConversationInfo[]> = new BehaviorSubject<ConversationInfo[]>([]);
+  selectedConversationsList$: Observable<ConversationInfo[]> = this.conversationsList$.asObservable();
+
+  
+  private savedConversationsList$: BehaviorSubject<ConversationInfo[]> = new BehaviorSubject<ConversationInfo[]>([]);
+  selectedSavedConversationsList$: Observable<ConversationInfo[]> = this.savedConversationsList$.asObservable();
 
   conversations = new Conversations([]);
 
@@ -27,11 +31,20 @@ export class SharedDataService {
   }
 
   public setConversationsList(conversationsList: ConversationInfo[]) {
-    this.ConversationsList$.next(conversationsList);
+    this.conversationsList$.next(conversationsList);
   }
 
   public getConversationsList() {
-    return this.ConversationsList$.value;
+    return this.conversationsList$.value;
   }
+
+  public setSavedConversationsList(conversationsList: ConversationInfo[]) {
+    this.savedConversationsList$.next(conversationsList);
+  }
+
+  public getSavedConversationsList() {
+    return this.savedConversationsList$.value;
+  }
+
 
 }

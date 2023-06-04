@@ -1,4 +1,4 @@
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
@@ -71,5 +71,25 @@ export class GenericHttpService {
   delete<T>(url: string, item: any) {
     return this.httpClient.delete(url, item);
   }
+
+  delete1<T>(url: string, params: object = {}): Observable<T> {
+
+    let httQueryParams: object;
+  
+    if (this.checkIfParams(params)) { 
+      httQueryParams = this.addParamsToHttp(params);
+    
+    } else {
+      httQueryParams = this.getModel(params);
+    }
+    
+console.info('options test');
+console.info(httQueryParams);
+    return this.httpClient.delete<T>(url, httQueryParams);
+  }
+
+
+
+
 
 }
