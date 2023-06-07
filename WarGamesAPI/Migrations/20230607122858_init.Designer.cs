@@ -12,8 +12,8 @@ using WarGamesAPI.Data;
 namespace WarGamesAPI.Migrations
 {
     [DbContext(typeof(WarGamesContext))]
-    [Migration("20230511091208_RemoveRelationshipAnswerToConversation")]
-    partial class RemoveRelationshipAnswerToConversation
+    [Migration("20230607122858_init")]
+    partial class init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,6 +24,9 @@ namespace WarGamesAPI.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.HasSequence<int>("SharedIdSequence")
+                .StartsAt(101L);
 
             modelBuilder.Entity("WarGamesAPI.Model.Address", b =>
                 {
@@ -61,7 +64,7 @@ namespace WarGamesAPI.Migrations
                             UserId = 5,
                             City = "Stockholm",
                             Country = "Sweden",
-                            Street = "Röntgenvägen 5 lgh 1410",
+                            Street = "R�ntgenv�gen 5 lgh 1410",
                             ZipCode = "14152"
                         });
                 });
@@ -70,9 +73,8 @@ namespace WarGamesAPI.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                        .HasColumnType("int")
+                        .HasDefaultValueSql("NEXT VALUE FOR SharedIdSequence");
 
                     b.Property<DateTime>("Date")
                         .HasColumnType("datetime2");
@@ -88,6 +90,78 @@ namespace WarGamesAPI.Migrations
                     b.HasIndex("QuestionId");
 
                     b.ToTable("Answer");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 14,
+                            Date = new DateTime(2023, 2, 2, 0, 0, 1, 0, DateTimeKind.Unspecified),
+                            QuestionId = 4,
+                            Text = "The capital of France is Paris."
+                        },
+                        new
+                        {
+                            Id = 15,
+                            Date = new DateTime(2023, 2, 3, 0, 0, 1, 0, DateTimeKind.Unspecified),
+                            QuestionId = 5,
+                            Text = "A quantum computer works by leveraging phenomena in quantum mechanics like superposition and entanglement."
+                        },
+                        new
+                        {
+                            Id = 16,
+                            Date = new DateTime(2023, 2, 4, 0, 0, 1, 0, DateTimeKind.Unspecified),
+                            QuestionId = 6,
+                            Text = "The meaning of life is subjective and can differ from person to person. It can be happiness, love, contribution, or something else entirely."
+                        },
+                        new
+                        {
+                            Id = 17,
+                            Date = new DateTime(2023, 2, 5, 0, 0, 1, 0, DateTimeKind.Unspecified),
+                            QuestionId = 7,
+                            Text = "The highest mountain in the world is Mount Everest."
+                        },
+                        new
+                        {
+                            Id = 18,
+                            Date = new DateTime(2023, 2, 6, 0, 0, 1, 0, DateTimeKind.Unspecified),
+                            QuestionId = 8,
+                            Text = "The square root of 144 is 12."
+                        },
+                        new
+                        {
+                            Id = 19,
+                            Date = new DateTime(2023, 2, 7, 0, 0, 1, 0, DateTimeKind.Unspecified),
+                            QuestionId = 9,
+                            Text = "The novel '1984' was written by George Orwell."
+                        },
+                        new
+                        {
+                            Id = 20,
+                            Date = new DateTime(2023, 2, 8, 0, 0, 1, 0, DateTimeKind.Unspecified),
+                            QuestionId = 10,
+                            Text = "The boiling point of water at sea level is approximately 100 degrees Celsius or 212 degrees Fahrenheit."
+                        },
+                        new
+                        {
+                            Id = 21,
+                            Date = new DateTime(2023, 2, 9, 0, 0, 1, 0, DateTimeKind.Unspecified),
+                            QuestionId = 11,
+                            Text = "The fastest land animal is the cheetah."
+                        },
+                        new
+                        {
+                            Id = 22,
+                            Date = new DateTime(2023, 2, 10, 0, 0, 1, 0, DateTimeKind.Unspecified),
+                            QuestionId = 12,
+                            Text = "The average distance between Earth and the Moon is about 238,855 miles."
+                        },
+                        new
+                        {
+                            Id = 23,
+                            Date = new DateTime(2023, 2, 11, 0, 0, 1, 0, DateTimeKind.Unspecified),
+                            QuestionId = 13,
+                            Text = "The chemical formula for water is H2O."
+                        });
                 });
 
             modelBuilder.Entity("WarGamesAPI.Model.Conversation", b =>
@@ -115,6 +189,88 @@ namespace WarGamesAPI.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Conversation");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 3,
+                            Date = new DateTime(2023, 2, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Name = "My first Conversation",
+                            Updated = new DateTime(2023, 3, 16, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            UserId = 5
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Date = new DateTime(2023, 4, 4, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Name = "Software Questions",
+                            Updated = new DateTime(2023, 5, 3, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            UserId = 5
+                        },
+                        new
+                        {
+                            Id = 1,
+                            Date = new DateTime(2023, 3, 3, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Name = "Fun chat",
+                            Updated = new DateTime(2023, 5, 3, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            UserId = 5
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Date = new DateTime(2023, 2, 2, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Name = "My second Conversation",
+                            Updated = new DateTime(2023, 3, 17, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            UserId = 5
+                        },
+                        new
+                        {
+                            Id = 5,
+                            Date = new DateTime(2023, 2, 3, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Name = "My third Conversation",
+                            Updated = new DateTime(2023, 3, 18, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            UserId = 5
+                        },
+                        new
+                        {
+                            Id = 6,
+                            Date = new DateTime(2023, 2, 4, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Name = "Fourth one here",
+                            Updated = new DateTime(2023, 3, 19, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            UserId = 5
+                        },
+                        new
+                        {
+                            Id = 7,
+                            Date = new DateTime(2023, 2, 5, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Name = "A bit of business",
+                            Updated = new DateTime(2023, 3, 20, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            UserId = 5
+                        },
+                        new
+                        {
+                            Id = 8,
+                            Date = new DateTime(2023, 2, 6, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Name = "Some other topic",
+                            Updated = new DateTime(2023, 3, 21, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            UserId = 5
+                        },
+                        new
+                        {
+                            Id = 9,
+                            Date = new DateTime(2023, 2, 7, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Name = "Yet another chat",
+                            Updated = new DateTime(2023, 3, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            UserId = 5
+                        },
+                        new
+                        {
+                            Id = 10,
+                            Date = new DateTime(2023, 2, 8, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Name = "Last but not least",
+                            Updated = new DateTime(2023, 3, 23, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            UserId = 5
+                        });
                 });
 
             modelBuilder.Entity("WarGamesAPI.Model.LibraryAnswer", b =>
@@ -131,9 +287,6 @@ namespace WarGamesAPI.Migrations
                     b.Property<DateTime>("Date")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("LibraryConversationId")
-                        .HasColumnType("int");
-
                     b.Property<int?>("LibraryQuestionId")
                         .HasColumnType("int");
 
@@ -143,8 +296,6 @@ namespace WarGamesAPI.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("ChatHistoryAnswerId");
-
-                    b.HasIndex("LibraryConversationId");
 
                     b.HasIndex("LibraryQuestionId");
 
@@ -221,9 +372,8 @@ namespace WarGamesAPI.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                        .HasColumnType("int")
+                        .HasDefaultValueSql("NEXT VALUE FOR SharedIdSequence");
 
                     b.Property<int>("ConversationId")
                         .HasColumnType("int");
@@ -244,6 +394,139 @@ namespace WarGamesAPI.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Question");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            ConversationId = 3,
+                            Date = new DateTime(2023, 3, 16, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Text = "How many babies can a rabbit have in its lifetime??",
+                            UserId = 5
+                        },
+                        new
+                        {
+                            Id = 2,
+                            ConversationId = 2,
+                            Date = new DateTime(2023, 5, 3, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Text = "What is the difference between a struct and a class in C#?",
+                            UserId = 5
+                        },
+                        new
+                        {
+                            Id = 3,
+                            ConversationId = 1,
+                            Date = new DateTime(2023, 5, 3, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Text = "What is AI?",
+                            UserId = 5
+                        },
+                        new
+                        {
+                            Id = 4,
+                            ConversationId = 4,
+                            Date = new DateTime(2023, 2, 2, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Text = "What is the capital of France?",
+                            UserId = 5
+                        },
+                        new
+                        {
+                            Id = 5,
+                            ConversationId = 5,
+                            Date = new DateTime(2023, 2, 3, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Text = "How does a quantum computer work?",
+                            UserId = 5
+                        },
+                        new
+                        {
+                            Id = 6,
+                            ConversationId = 6,
+                            Date = new DateTime(2023, 2, 4, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Text = "What is the meaning of life?",
+                            UserId = 5
+                        },
+                        new
+                        {
+                            Id = 7,
+                            ConversationId = 7,
+                            Date = new DateTime(2023, 2, 5, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Text = "What is the highest mountain in the world?",
+                            UserId = 5
+                        },
+                        new
+                        {
+                            Id = 8,
+                            ConversationId = 8,
+                            Date = new DateTime(2023, 2, 6, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Text = "What's the square root of 144?",
+                            UserId = 5
+                        },
+                        new
+                        {
+                            Id = 9,
+                            ConversationId = 9,
+                            Date = new DateTime(2023, 2, 7, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Text = "Who wrote the novel '1984'?",
+                            UserId = 5
+                        },
+                        new
+                        {
+                            Id = 10,
+                            ConversationId = 10,
+                            Date = new DateTime(2023, 2, 8, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Text = "What is the boiling point of water at sea level?",
+                            UserId = 5
+                        },
+                        new
+                        {
+                            Id = 11,
+                            ConversationId = 1,
+                            Date = new DateTime(2023, 2, 9, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Text = "What is the fastest land animal?",
+                            UserId = 5
+                        },
+                        new
+                        {
+                            Id = 12,
+                            ConversationId = 2,
+                            Date = new DateTime(2023, 2, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Text = "What is the distance between Earth and the Moon?",
+                            UserId = 5
+                        },
+                        new
+                        {
+                            Id = 13,
+                            ConversationId = 3,
+                            Date = new DateTime(2023, 2, 11, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Text = "What's the chemical formula for water?",
+                            UserId = 5
+                        });
+                });
+
+            modelBuilder.Entity("WarGamesAPI.Model.QuestionAnswer", b =>
+                {
+                    b.Property<int?>("Id")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ConversationId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Source")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Text")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Timestamp")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable((string)null);
+
+                    b.ToView("QuestionAnswer", (string)null);
                 });
 
             modelBuilder.Entity("WarGamesAPI.Model.User", b =>
@@ -349,10 +632,6 @@ namespace WarGamesAPI.Migrations
                         .HasForeignKey("ChatHistoryAnswerId")
                         .OnDelete(DeleteBehavior.SetNull);
 
-                    b.HasOne("WarGamesAPI.Model.LibraryConversation", "LibraryConversation")
-                        .WithMany("LibraryAnswers")
-                        .HasForeignKey("LibraryConversationId");
-
                     b.HasOne("WarGamesAPI.Model.LibraryQuestion", "LibraryQuestion")
                         .WithMany("LibraryAnswers")
                         .HasForeignKey("LibraryQuestionId")
@@ -360,14 +639,12 @@ namespace WarGamesAPI.Migrations
 
                     b.Navigation("Answer");
 
-                    b.Navigation("LibraryConversation");
-
                     b.Navigation("LibraryQuestion");
                 });
 
             modelBuilder.Entity("WarGamesAPI.Model.LibraryConversation", b =>
                 {
-                    b.HasOne("WarGamesAPI.Model.Conversation", "Conversation")
+                    b.HasOne("WarGamesAPI.Model.Conversation", "ChatHistoryConversation")
                         .WithMany()
                         .HasForeignKey("ChatHistoryConversationId")
                         .OnDelete(DeleteBehavior.SetNull);
@@ -378,7 +655,7 @@ namespace WarGamesAPI.Migrations
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.Navigation("Conversation");
+                    b.Navigation("ChatHistoryConversation");
 
                     b.Navigation("User");
                 });
@@ -435,8 +712,6 @@ namespace WarGamesAPI.Migrations
 
             modelBuilder.Entity("WarGamesAPI.Model.LibraryConversation", b =>
                 {
-                    b.Navigation("LibraryAnswers");
-
                     b.Navigation("LibraryQuestions");
                 });
 

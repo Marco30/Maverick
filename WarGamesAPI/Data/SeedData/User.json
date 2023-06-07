@@ -1,0 +1,17 @@
+[
+  {
+    "Id": 5,
+    "SocialSecurityNumber": "198507119595",
+    "FirstName": "Khaled",
+    "LastName": "Abo",
+    "FullName": "Khaled Abo",
+    "Email": "khaled@khaled.se",
+    "Password": "123456",
+    "MobilePhoneNumber": null,
+    "AgreeMarketing": true,
+    "SubscribeToEmailNotification": true,
+    "ProfileImage": null,
+    "Gender": "Man"
+  }
+
+]

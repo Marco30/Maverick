@@ -14,6 +14,7 @@ public interface IChatHistoryRepository
     Task<List<ConversationInfoDto>> GetConversationInfosAsync(int userId);
     Task<string?> ChangeConversationNameAsync(int conversationId, string newName);
     Task<Conversation?> CreateConversationAsync(int userId, string conversationName);
+    Task<SearchResultDto> SearchConversationHistoryAsync(int userId, string searchText);
     
 
 

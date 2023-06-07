@@ -246,6 +246,59 @@ public class ChatHistoryRepository : IChatHistoryRepository
 
     }
 
+    public async Task<List<Conversation>> GetUserConversationsAsync(int userId)
+    {
+        var conversations = await _context.Conversation
+            .Include(c => c.Questions)
+            .ThenInclude(q => q.Answers)
+            .Where(c => c.UserId == userId).ToListAsync();
+
+        return conversations;
+    }
+
+    /*
+ * This method is used for manual search of the database, not using Azure Cognitive Search
+ */
+    public async Task<SearchResultDto> SearchConversationHistoryAsync(int userId, string searchText)
+    {
+        var conversations = await GetUserConversationsAsync(userId);
+
+        var result = new SearchResultDto
+        {
+            SearchText = searchText
+        };
+
+        foreach (var conversation in conversations)
+        {
+            foreach (var question in conversation.Questions)
+            {
+
+                if (question.Text!.Contains(searchText, StringComparison.OrdinalIgnoreCase))
+                {
+                    result.ConversationIds.Add(conversation.Id);
+                    result.QuestionIds.Add(question.Id);
+                }
+
+                foreach (var answer in question.Answers)
+                {
+                    if (answer.Text != null)
+                    {
+                        if (answer.Text.Contains(searchText, StringComparison.OrdinalIgnoreCase))
+                        {
+                            result.AnswerIds.Add(answer.Id);
+                            if (!result.ConversationIds.Contains(conversation.Id))
+                            {
+                                result.ConversationIds.Add(question.ConversationId);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return result;
+    }
+
     private async Task<string> GenerateUniqueConversationNameAsync(int userId, string name)
     {
         var userConversations =

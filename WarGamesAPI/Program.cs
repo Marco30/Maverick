@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using Serilog;
 using Serilog.Sinks.Elasticsearch;
+using Typesense.Setup;
 using WarGamesAPI.Data;
 using WarGamesAPI.Helpers;
 using WarGamesAPI.Interfaces;
@@ -83,6 +84,17 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
+builder.Services.AddTypesenseClient(config =>
+{
+    config.ApiKey = "abcd1234";
+    config.Nodes = new List<Node>
+    {
+        new Node("localhost", "8108", "http")
+    };
+});
+
+
+
 builder.Services.AddAutoMapper(typeof(AutoMapperProfiles).Assembly);
 
 
@@ -101,6 +113,8 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IValidationRepository, ValidationRepository>();
 builder.Services.AddScoped<ILibraryRepository, LibraryRepository>();
 builder.Services.AddScoped<IGptService, GptService>();
+builder.Services.AddScoped<ISearchService, SearchService>();
+
 
 
 builder.Logging.ClearProviders(); // Remove default loggers

@@ -1,0 +1,62 @@
+[
+  {
+    "Id": 14,
+    "Text": "The capital of France is Paris.",
+    "Date": "2023-02-02T00:00:01",
+    "QuestionId": 4
+  },
+  {
+    "Id": 15,
+    "Text": "A quantum computer works by leveraging phenomena in quantum mechanics like superposition and entanglement.",
+    "Date": "2023-02-03T00:00:01",
+    "QuestionId": 5
+  },
+  {
+    "Id": 16,
+    "Text": "The meaning of life is subjective and can differ from person to person. It can be happiness, love, contribution, or something else entirely.",
+    "Date": "2023-02-04T00:00:01",
+    "QuestionId": 6
+  },
+  {
+    "Id": 17,
+    "Text": "The highest mountain in the world is Mount Everest.",
+    "Date": "2023-02-05T00:00:01",
+    "QuestionId": 7
+  },
+  {
+    "Id": 18,
+    "Text": "The square root of 144 is 12.",
+    "Date": "2023-02-06T00:00:01",
+    "QuestionId": 8
+  },
+  {
+    "Id": 19,
+    "Text": "The novel '1984' was written by George Orwell.",
+    "Date": "2023-02-07T00:00:01",
+    "QuestionId": 9
+  },
+  {
+    "Id": 20,
+    "Text": "The boiling point of water at sea level is approximately 100 degrees Celsius or 212 degrees Fahrenheit.",
+    "Date": "2023-02-08T00:00:01",
+    "QuestionId": 10
+  },
+  {
+    "Id": 21,
+    "Text": "The fastest land animal is the cheetah.",
+    "Date": "2023-02-09T00:00:01",
+    "QuestionId": 11
+  },
+  {
+    "Id": 22,
+    "Text": "The average distance between Earth and the Moon is about 238,855 miles.",
+    "Date": "2023-02-10T00:00:01",
+    "QuestionId": 12
+  },
+  {
+    "Id": 23,
+    "Text": "The chemical formula for water is H2O.",
+    "Date": "2023-02-11T00:00:01",
+    "QuestionId": 13
+  }
+]
