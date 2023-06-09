@@ -1,11 +1,11 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace WarGamesAPI.Model;
+namespace WarGamesAPI.Services.TypeSenseModel;
 
-public class QuestionAnswer
+public class QuestionAnswerIndex
 {
-    [JsonPropertyName("id")]
-    public int Id { get; set; }
+    [JsonPropertyName("id")] 
+    public string Id { get; set; } = string.Empty;
 
     [JsonPropertyName("text")]
     public string? Text { get; set; } = string.Empty;
@@ -21,7 +21,4 @@ public class QuestionAnswer
 
     [JsonPropertyName("timestamp")]
     public int Timestamp { get; set; }
-
-
 }
-

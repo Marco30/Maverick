@@ -13,11 +13,13 @@ public class ChatHistoryRepository : IChatHistoryRepository
 {
     readonly WarGamesContext _context;
     readonly IMapper _mapper;
+    readonly ISearchService _searchService;
 
-    public ChatHistoryRepository(WarGamesContext context, IMapper mapper)
+    public ChatHistoryRepository(WarGamesContext context, IMapper mapper, ISearchService searchService)
     {
         _context = context;
         _mapper = mapper;
+        _searchService = searchService;
     }
 
     public async Task<Answer?> SaveQuestionAndAnswerAsync(QuestionDto userQuestion, AnswerDto answer)
@@ -58,6 +60,28 @@ public class ChatHistoryRepository : IChatHistoryRepository
         await _context.Answer.AddAsync(answerToSave);
         await _context.SaveChangesAsync();
 
+        var questionIndexObject = new QuestionAnswer
+        {
+            Id = questionToSave.Id,
+            ConversationId = questionToSave.ConversationId,
+            UserId = questionToSave.UserId,
+            Text = questionToSave.Text,
+            Source = "Question"
+        };
+
+        var answerIndexObject = new QuestionAnswer
+        {
+            Id = answerToSave.Id,
+            ConversationId = questionToSave.ConversationId,
+            UserId = questionToSave.UserId,
+            Text = answerToSave.Text,
+            Source = "Answer"
+        };
+        var objectsToAddToIndexUpdate = new List<QuestionAnswer> { questionIndexObject, answerIndexObject };
+
+
+        await _searchService.IndexNewDocumentsAsync(objectsToAddToIndexUpdate);
+
         return answerToSave;
     }
 
@@ -86,7 +110,7 @@ public class ChatHistoryRepository : IChatHistoryRepository
             .ProjectTo<QuestionDto>(_mapper.ConfigurationProvider).SingleOrDefaultAsync();
     }
 
-    public async Task<ConversationDto?> GetConversationAsync(int conversationId)
+    public async Task<ConversationDto?> GetConversationDtoAsync(int conversationId)
     {
         var conversation = await _context.Conversation
             .Include(c => c.Questions)
@@ -256,6 +280,21 @@ public class ChatHistoryRepository : IChatHistoryRepository
         return conversations;
     }
 
+    public async Task<Conversation?> GetConversationAsync(int conversationId)
+    {
+        var conversation = await _context.Conversation
+            .Include(c => c.Questions)
+            .ThenInclude(q => q.Answers)
+            .Where(c => c.Id == conversationId).SingleOrDefaultAsync();
+
+        return conversation;
+    }
+
+    public async Task<List<QuestionAnswer>> GetQuestionAnswersAsync()
+    {
+        return await _context.QuestionAnswer.ToListAsync();
+    }
+    
     /*
  * This method is used for manual search of the database, not using Azure Cognitive Search
  */

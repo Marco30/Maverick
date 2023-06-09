@@ -1,7 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using WarGamesAPI.Model;
-using WarGamesAPI.Services.SearchServiceModel;
 
 namespace WarGamesAPI.Data;
 

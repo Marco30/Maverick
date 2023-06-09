@@ -193,7 +193,7 @@ public class ConversationController : ControllerBase
 
         if (!await _validationRepo.UserOwnsConversation(userId, getConversation.ConversationId)) return NotFound();
 
-        var conversation = await _questionRepo.GetConversationAsync(getConversation.ConversationId);
+        var conversation = await _questionRepo.GetConversationDtoAsync(getConversation.ConversationId);
 
         return conversation is null ? NotFound() : Ok(conversation);
 
@@ -305,7 +305,7 @@ public class ConversationController : ControllerBase
 
         try
         {
-            var conversation = await _questionRepo.GetConversationAsync(conversationId);
+            var conversation = await _questionRepo.GetConversationDtoAsync(conversationId);
             if (conversation == null)
             {
                 return NotFound(new ResponseMessageDto { Message = $"Conversation with id {conversationId} not found" });

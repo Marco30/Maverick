@@ -1,6 +1,8 @@
 using AutoMapper;
 using WarGamesAPI.DTO;
 using WarGamesAPI.Model;
+using WarGamesAPI.Services.TypeSenseModel;
+
 #pragma warning disable CS8602
 
 namespace WarGamesAPI.Helpers;
@@ -47,13 +49,15 @@ public class AutoMapperProfiles : Profile
         CreateMap<LibraryAnswer, AnswerDto>()
             .ForMember(dest => dest.ConversationId, options => options.MapFrom(src => src.LibraryQuestion.LibraryConversationId));
 
+        CreateMap<QuestionAnswer, QuestionAnswerIndex>();
 
 
 
 
 
 
-        
+
+
     }
 }
 
