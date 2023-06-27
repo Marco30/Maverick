@@ -22,4 +22,8 @@ export class HttpRequestService {
   public deleteData1<T>(url: string,QueryParams: object = {}): Observable<any> {
     return this.genericHttpService.delete1(url, QueryParams);
   }
+
+  public deleteData2<T>(url: string): Observable<any> {
+    return this.genericHttpService.delete2<T>(url);
+  }
 }

@@ -56,12 +56,10 @@ export class ConversationService {
 
 
   deleteConversation(conversationId: number): Observable<any>{
-    const url = environment.delete_conversation;
-    console.info('delete conversationId')
-    console.info(conversationId)
-    let conversationObject = { ConversationId: conversationId};
-    const queryParams = { params: conversationObject};
-    return this.httpRequestService.deleteData1<any>(url, conversationObject);
+    const url = `${environment.delete_conversation}/${conversationId}`;
+    console.info('delete conversationId:', conversationId);
+    return this.httpRequestService.deleteData2<any>(url);
   }
+  
 
 }

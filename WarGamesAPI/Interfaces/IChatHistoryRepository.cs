@@ -26,7 +26,7 @@ public interface IChatHistoryRepository
     Task<List<QuestionDto>> GetQuestionsFromConversationAsync(int conversationId);
     Task<List<AnswerDto>> GetAnswersFromConversationAsync(int conversationId);
 
-    Task<Answer?> SaveQuestionAndAnswerAsync(QuestionDto userQuestion, AnswerDto answer);
+    Task<Answer?> SaveQuestionAndAnswerAsync(QuestionDto userQuestion, AnswerDto answer, bool mockReply);
 
     Task UpdateConversationAsync(int conversationId);
 }

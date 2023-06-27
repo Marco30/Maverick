@@ -1,7 +1,7 @@
-﻿using AutoMapper;
+﻿using System.Text.RegularExpressions;
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
-using Org.BouncyCastle.Bcpg;
 using Typesense;
 using WarGamesAPI.Data;
 using WarGamesAPI.DTO;
@@ -127,6 +127,77 @@ public class SearchService : ISearchService
         return result;
     }
 
+    public async Task<ConversationDto> SearchConversationManuallyAsync(int userId, string searchText, int conversationId)
+    {
+        List<QuestionAnswer> questionAnswerList = await _context.QuestionAnswer.Where(qa => qa.ConversationId == conversationId).ToListAsync();
+
+        var regex = new Regex(searchText, RegexOptions.IgnoreCase);
+
+        var highlightedQAList = questionAnswerList;
+
+        foreach (var item in highlightedQAList)
+        {
+            if (item.Text!.Contains(searchText, StringComparison.OrdinalIgnoreCase))
+            {
+                item.Text = regex.Replace(item.Text, m => $"<mark>{m.Value}</mark>");
+            }
+        }
+
+        var highlightedIds = new List<int>();
+
+        foreach (var item in highlightedQAList)
+        {
+            highlightedIds.Add(item.Id);
+        }
+
+
+        var conversation = await _context.Conversation
+            .Include(c => c.Questions)
+            .ThenInclude(q => q.Answers)
+            .Where(c => c.Id == conversationId).SingleOrDefaultAsync();
+
+        
+        var messages = new List<QAItemDto>();
+
+        foreach (var question in conversation!.Questions)
+        {
+            var questionDto = _mapper.Map<QuestionDto>(question);
+            var answerDtos = _mapper.Map<List<AnswerDto>>(question.Answers);
+
+            var questionMessage = _mapper.Map<MessageDto>(questionDto);
+
+            if (highlightedIds.Contains(questionMessage.Id))
+            {
+                var qaObject = highlightedQAList.FirstOrDefault(qa => qa.Id == questionMessage.Id);
+                if (qaObject != null)  questionMessage.Text = qaObject.Text;
+            }
+
+            var answerMessages = _mapper.Map<List<MessageDto>>(answerDtos);
+
+            foreach (var answer in answerMessages)
+            {
+                answer.UserId = question.UserId;
+                
+                if (highlightedIds.Contains(answer.Id))
+                {
+                    var qaObject = highlightedQAList.FirstOrDefault(qa => qa.Id == answer.Id);
+                    if (qaObject != null)  answer.Text = qaObject.Text;
+                }
+            }
+
+
+
+            messages.Add(new QAItemDto { Question = questionMessage, Answers = answerMessages }); 
+        }
+        return new ConversationDto
+        {
+            Conversation = messages
+        };   
+
+
+
+    }
+
     public async Task IndexAllDocuments()
     {
         List<QuestionAnswer> questionAnswerList = await _context.QuestionAnswer.ToListAsync();
@@ -210,6 +281,9 @@ public class SearchService : ISearchService
     }
 
     
+
+
+
     private async Task<ConversationDto> ConvertToHighlightedConversationAsync(int conversationId, List<QuestionAnswerIndex> qaIndexObjects)
     {
         var highlightedIds = qaIndexObjects.Select(index => Convert.ToInt32(index.Id)).ToList();

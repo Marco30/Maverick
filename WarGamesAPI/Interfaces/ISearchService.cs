@@ -9,6 +9,7 @@ public interface ISearchService
     Task IndexAllDocuments();
     Task<ConversationDto> SearchConversationAsync(int userId, string searchText, int conversationId);
     Task IndexNewDocumentsAsync(List<QuestionAnswer> document);
+    Task<ConversationDto> SearchConversationManuallyAsync(int userId, string searchText, int conversationId);
 
 
 }

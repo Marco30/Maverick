@@ -82,10 +82,16 @@ export class GenericHttpService {
     } else {
       httQueryParams = this.getModel(params);
     }
+
+    console.info('httQueryParams: ', httQueryParams);
     
-console.info('options test');
-console.info(httQueryParams);
+    console.info('options test');
+    console.info(httQueryParams);
     return this.httpClient.delete<T>(url, httQueryParams);
+  }
+
+  delete2<T>(url: string): Observable<T> {
+    return this.httpClient.delete<T>(url);
   }
 
 

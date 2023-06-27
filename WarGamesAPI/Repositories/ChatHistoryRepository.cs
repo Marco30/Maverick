@@ -14,15 +14,18 @@ public class ChatHistoryRepository : IChatHistoryRepository
     readonly WarGamesContext _context;
     readonly IMapper _mapper;
     readonly ISearchService _searchService;
+    readonly ILogger<ChatHistoryRepository> _logger;
 
-    public ChatHistoryRepository(WarGamesContext context, IMapper mapper, ISearchService searchService)
+    public ChatHistoryRepository(WarGamesContext context, IMapper mapper, ISearchService searchService, 
+        ILogger<ChatHistoryRepository> logger)
     {
         _context = context;
         _mapper = mapper;
         _searchService = searchService;
+        _logger = logger;
     }
 
-    public async Task<Answer?> SaveQuestionAndAnswerAsync(QuestionDto userQuestion, AnswerDto answer)
+    public async Task<Answer?> SaveQuestionAndAnswerAsync(QuestionDto userQuestion, AnswerDto answer, bool mockReply)
     {
         var userId = userQuestion.UserId;
 
@@ -77,10 +80,22 @@ public class ChatHistoryRepository : IChatHistoryRepository
             Text = answerToSave.Text,
             Source = "Answer"
         };
+
         var objectsToAddToIndexUpdate = new List<QuestionAnswer> { questionIndexObject, answerIndexObject };
 
+        try
+        {
+            await _searchService.IndexNewDocumentsAsync(objectsToAddToIndexUpdate);
 
-        await _searchService.IndexNewDocumentsAsync(objectsToAddToIndexUpdate);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, 
+                "Failed to index new document. If you're using the manual search service in a development environment, " +
+                "this operation is expected to fail and there's nothing to worry about. " +
+                "If you're seeing this error in production, however, you need to investigate.");
+        }
+
 
         return answerToSave;
     }
@@ -296,7 +311,7 @@ public class ChatHistoryRepository : IChatHistoryRepository
     }
     
     /*
- * This method is used for manual search of the database, not using Azure Cognitive Search
+ * This method is used for manual search of the database, for development purposes.
  */
     public async Task<SearchResultDto> SearchConversationHistoryAsync(int userId, string searchText)
     {
@@ -337,6 +352,7 @@ public class ChatHistoryRepository : IChatHistoryRepository
 
         return result;
     }
+    
 
     private async Task<string> GenerateUniqueConversationNameAsync(int userId, string name)
     {

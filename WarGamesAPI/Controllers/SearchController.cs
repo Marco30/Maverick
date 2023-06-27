@@ -75,8 +75,18 @@ public class SearchController : ControllerBase
 
         try
         {
+            ConversationDto result;
+
+            if (!search.LocalSearch)
+            {
+                result = await _searchService.SearchConversationAsync(userId, search.SearchText, search.ConversationId);
+            }
+            else
+            {
+                result = await _searchService.SearchConversationManuallyAsync(userId, search.SearchText,
+                    search.ConversationId);
+            }
             
-            var result = await _searchService.SearchConversationAsync(userId, search.SearchText, search.ConversationId);
             return Ok(result);
         }
         catch (Exception e)
@@ -87,33 +97,6 @@ public class SearchController : ControllerBase
 
     }
 
-
-    //[ValidateToken]
-    //[HttpPost("autocompletesearch")]
-    //public async Task<ActionResult<AutoCompleteResultDto>> AutocompleteSearch(SearchDto search)
-    //{
-    //    if (!Request.Headers.ContainsKey("Authorization") || IsNullOrEmpty(Request.Headers["Authorization"])) 
-    //        return BadRequest("The Authorization header is required.");
-
-    //    if (IsNullOrEmpty(search.SearchText)) 
-    //        return BadRequest("The search text is required.");
-
-    //    var userId = TokenData.getUserId(Request.Headers["Authorization"]!);
-
-    //    try
-    //    {
-    //        var result = await _searchService.AutocompleteAsync(userId, search.SearchText);
-    //        return Ok(result);
-    //    }
-    //    catch (Exception e)
-    //    {
-    //        var error = new ResponseMessageDto { StatusCode = 500, Message = e.Message };
-    //        return StatusCode(500, error);
-    //    }
-
-    //}
-
-
-
+    
 
 }

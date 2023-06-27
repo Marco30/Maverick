@@ -233,7 +233,7 @@ console.info(index)
       }
     
 
-      this.questionData.mockReply = true;
+      this.questionData.mockReply = false;
      
 
       this.conversationService.askTheAI(this.questionData).pipe(takeUntil(this.onDestroy$)).subscribe({

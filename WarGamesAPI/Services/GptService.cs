@@ -48,7 +48,10 @@ public class GptService : IGptService
     private async Task<OpenAIRequest> GenerateRequestAsync(QuestionDto question)
     {
 
-        var conversationQuestions = await _questionRepo.GetQuestionsFromConversationAsync(question.ConversationId);
+        List<QuestionDto> conversationQuestions = await _questionRepo.GetQuestionsFromConversationAsync(question.ConversationId);
+
+        if (conversationQuestions.Count < 1) conversationQuestions.Add(question);
+
         List<AnswerDto> conversationAnswers = await _questionRepo.GetAnswersFromConversationAsync(question.ConversationId);
 
 

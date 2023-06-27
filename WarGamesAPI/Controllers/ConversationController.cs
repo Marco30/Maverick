@@ -115,7 +115,7 @@ public class ConversationController : ControllerBase
 
             if (answer is null) return StatusCode(500);
 
-            var savedAnswer = await _questionRepo.SaveQuestionAndAnswerAsync(question, answer);
+            var savedAnswer = await _questionRepo.SaveQuestionAndAnswerAsync(question, answer, userQuestion.MockReply);
 
             await _questionRepo.UpdateConversationAsync(question.ConversationId);
             
@@ -292,26 +292,25 @@ public class ConversationController : ControllerBase
     }
 
     [ValidateToken]
-    [HttpDelete("deleteconversation")]
-    public async Task<IActionResult> DeleteConversation([FromBody] GetConversationDto deleteConversation)
+    [HttpDelete("deleteconversation/{id}")]
+    public async Task<IActionResult> DeleteConversation(int id)
     {
         if (!Request.Headers.ContainsKey("Authorization") || string.IsNullOrEmpty(Request.Headers["Authorization"])) 
             return BadRequest("The Authorization header is required.");
         var userId = TokenData.getUserId(Request.Headers["Authorization"]!);
-        var conversationId = deleteConversation.ConversationId;
 
-        if (!await _validationRepo.UserOwnsConversation(userId, conversationId)) return NotFound();
+        if (!await _validationRepo.UserOwnsConversation(userId, id)) return NotFound();
 
 
         try
         {
-            var conversation = await _questionRepo.GetConversationDtoAsync(conversationId);
+            var conversation = await _questionRepo.GetConversationDtoAsync(id);
             if (conversation == null)
             {
-                return NotFound(new ResponseMessageDto { Message = $"Conversation with id {conversationId} not found" });
+                return NotFound(new ResponseMessageDto { Message = $"Conversation with id {id} not found" });
             }
 
-            await _questionRepo.DeleteConversationAsync(conversationId);
+            await _questionRepo.DeleteConversationAsync(id);
             var obj = new
             {
                 Info = "Conversation is deleted"
