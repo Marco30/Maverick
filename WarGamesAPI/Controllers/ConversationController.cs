@@ -225,28 +225,27 @@ public class ConversationController : ControllerBase
         }
         
     }
-
+    
     [ValidateToken]
-    [HttpDelete("deletequestion")]
-    public async Task<IActionResult> DeleteQuestion(GetQuestionDto deleteQuestion)
+    [HttpDelete("deletequestion/{id}")]
+    public async Task<IActionResult> DeleteQuestion(int id)
     {
         if (!Request.Headers.ContainsKey("Authorization") || string.IsNullOrEmpty(Request.Headers["Authorization"])) 
             return BadRequest("The Authorization header is required.");
         var userId = TokenData.getUserId(Request.Headers["Authorization"]!);
-        var questionId = deleteQuestion.QuestionId;
 
-        if (!await _validationRepo.UserOwnsQuestion(userId, questionId)) return NotFound();
+        if (!await _validationRepo.UserOwnsQuestion(userId, id)) return NotFound();
 
         try
         {
-            var question = await _questionRepo.GetQuestionAsync(questionId);
+            var question = await _questionRepo.GetQuestionAsync(id);
             if (question is null)
             {
                 return NotFound(new ResponseMessageDto 
-                    { Message = $"Question with id {questionId} not found" });
+                    { Message = $"Question with id {id} not found" });
             }
 
-            await _questionRepo.DeleteQuestionAsync(questionId);
+            await _questionRepo.DeleteQuestionAsync(id);
             return NoContent();
 
         }
@@ -260,25 +259,24 @@ public class ConversationController : ControllerBase
     }
 
     [ValidateToken]
-    [HttpDelete("deleteanswer")]
-    public async Task<IActionResult> DeleteAnswer([FromBody]GetAnswerDto deleteAnswer)
+    [HttpDelete("deleteanswer/{id}")]
+    public async Task<IActionResult> DeleteAnswer(int id)
     {
         if (!Request.Headers.ContainsKey("Authorization") || string.IsNullOrEmpty(Request.Headers["Authorization"])) 
             return BadRequest("The Authorization header is required.");
         var userId = TokenData.getUserId(Request.Headers["Authorization"]!);
-        var answerId = deleteAnswer.AnswerId;
 
-        if (!await _validationRepo.UserOwnsAnswer(userId, answerId)) return NotFound();
+        if (!await _validationRepo.UserOwnsAnswer(userId, id)) return NotFound();
         
         try
         {
-            var answer = await _questionRepo.GetAnswerAsync(answerId);
+            var answer = await _questionRepo.GetAnswerAsync(id);
             if (answer == null)
             {
-                return NotFound(new ResponseMessageDto { Message = $"Answer with id {answerId} not found" });
+                return NotFound(new ResponseMessageDto { Message = $"Answer with id {id} not found" });
             }
 
-            await _questionRepo.DeleteAnswerAsync(answerId);
+            await _questionRepo.DeleteAnswerAsync(id);
             return NoContent();
 
         }

@@ -68,9 +68,6 @@ export class GenericHttpService {
     return null;
   }
 
-  delete<T>(url: string, item: any) {
-    return this.httpClient.delete(url, item);
-  }
 
   delete1<T>(url: string, params: object = {}): Observable<T> {
 
@@ -90,7 +87,7 @@ export class GenericHttpService {
     return this.httpClient.delete<T>(url, httQueryParams);
   }
 
-  delete2<T>(url: string): Observable<T> {
+  delete<T>(url: string): Observable<T> {
     return this.httpClient.delete<T>(url);
   }
 

@@ -58,7 +58,7 @@ export class ConversationService {
   deleteConversation(conversationId: number): Observable<any>{
     const url = `${environment.delete_conversation}/${conversationId}`;
     console.info('delete conversationId:', conversationId);
-    return this.httpRequestService.deleteData2<any>(url);
+    return this.httpRequestService.deleteData<any>(url);
   }
   
 
